@@ -1,0 +1,22 @@
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #282c34;
+}
+
+.navigation-header {
+  height: 10vh;
+}
+
+.content {
+  flex-grow: 1;
+  overflow: hidden;
+  width: 100;
+  height: 89.5vh; /* Adjust this value based on the total height of other elements in the App-header */
+  overflow: hidden;
+  padding: 0em 0.25em 0.25em 0.25em;
+}
