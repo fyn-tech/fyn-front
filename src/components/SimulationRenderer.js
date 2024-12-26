@@ -26,27 +26,33 @@ const SimulationRenderer = ({file_path}) => {
 
   // Define the handleResize function using useCallback at the top level
   const handleResize = useCallback(() => {
-    if (canvasRef.current && sceneRef.current && rendererRef.current) {
-      const width = canvasRef.current.clientWidth;
-      const height = canvasRef.current.clientHeight;
-
-      // Update the aspect ratio before changing the size of the renderer
-      sceneRef.current.camera.aspect = width / height;
-      sceneRef.current.camera.updateProjectionMatrix();
-    
-      rendererRef.current.setSize(width, height);
+    // Capture current values at time of execution
+    const canvas = canvasRef.current;
+    const scene = sceneRef.current;
+    const renderer = rendererRef.current;
+  
+    if (canvas && scene && renderer) {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+  
+      // Use captured values
+      scene.camera.aspect = width / height;
+      scene.camera.updateProjectionMatrix();
+      
+      renderer.setSize(width, height);
     }
   }, []);
   
 
   // Set up the scene
   useEffect(() => {
-    if (canvasRef.current) {
-      sceneRef.current = new Scene(canvasRef.current);
+    const currentCanvas = canvasRef.current;
+    if (currentCanvas) {
+      sceneRef.current = new Scene(currentCanvas);
       
       // Create a renderer and attach it to the canvas
-      rendererRef.current = new THREE.WebGLRenderer({ canvas: canvasRef.current });
-      rendererRef.current.setSize(canvasRef.current.clientWidth, canvasRef.current.clientHeight);
+      rendererRef.current = new THREE.WebGLRenderer({ canvas: currentCanvas });
+      rendererRef.current.setSize(currentCanvas.clientWidth, currentCanvas.clientHeight);
       sceneRef.current.setupCamera(rendererRef.current);
 
       // Update the animate function to use the renderer
@@ -64,19 +70,19 @@ const SimulationRenderer = ({file_path}) => {
         for (let entry of entries) {
           // Ensure the callback is not called more than once per frame
           requestAnimationFrame(() => {
-            if (entry.target === canvasRef.current) {
+            if (entry.target === currentCanvas) {
               handleResize();
             }
           });
         }
       });
 
-      resizeObserver.observe(canvasRef.current);
+      resizeObserver.observe(currentCanvas);
       animate();
       
       return () => {
-        if (canvasRef.current instanceof Element) {
-          resizeObserver.unobserve(canvasRef.current);
+        if (currentCanvas instanceof Element) {
+          resizeObserver.unobserve(currentCanvas);
         }
       };
 
