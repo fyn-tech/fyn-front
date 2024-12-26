@@ -1,47 +1,83 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-
-const AxisCanvas = ({ sceneRef, canvasRef }) => {
+const AxisCanvas = ({ sceneRef }) => {
   const axisCanvasRef = useRef();
   const axisSceneRef = useRef();
   const axisRendererRef = useRef();
 
   useEffect(() => {
-    if (axisCanvasRef.current && sceneRef.current && sceneRef.current.camera) {
-      axisRendererRef.current = new THREE.WebGLRenderer({ canvas: axisCanvasRef.current, alpha: true });
-      axisRendererRef.current.setSize(axisCanvasRef.current.clientWidth, axisCanvasRef.current.clientHeight);
+    const currentAxisCanvas = axisCanvasRef.current;
+    const currentScene = sceneRef.current;
 
-      // Create a scene for the axis
+    if (currentAxisCanvas && currentScene && currentScene.camera) {
+      // Create renderer
+      axisRendererRef.current = new THREE.WebGLRenderer({ 
+        canvas: currentAxisCanvas, 
+        alpha: true 
+      });
+      axisRendererRef.current.setSize(currentAxisCanvas.clientWidth, currentAxisCanvas.clientHeight);
+
+      // Create scene
       axisSceneRef.current = new THREE.Scene();
 
-      // Create a camera for the axis
-      const axisCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      // Create camera
+      const axisCamera = new THREE.PerspectiveCamera(
+        75, 
+        currentAxisCanvas.clientWidth / currentAxisCanvas.clientHeight, 
+        0.1, 
+        1000
+      );
       axisCamera.position.z = 5;
 
-      // Add the axis helper to the axis scene
+      // Add axis helper
       const axesHelper = new THREE.AxesHelper(2.5);
       axesHelper.position.setLength(2);
       axisSceneRef.current.add(axesHelper);
 
-      axisRendererRef.current.render(axisSceneRef.current, axisCamera);
+      const currentRenderer = axisRendererRef.current;
+      const currentAxisScene = axisSceneRef.current;
 
-    
-      // Update the animate function to use the renderer
+      currentRenderer.render(currentAxisScene, axisCamera);
+
+      // Animation loop
       const animate = () => {
         requestAnimationFrame(animate);
 
-        // Apply the inverse transformation to the axesHelper
-        const cameraTransformation = sceneRef.current.camera.matrix.clone();
-        axesHelper.matrix.copy(cameraTransformation).invert();
-        axesHelper.rotation.setFromRotationMatrix(axesHelper.matrix);
-        axisRendererRef.current.render(axisSceneRef.current, axisCamera);
+        if (currentScene.camera) {
+          // Apply inverse transformation
+          const cameraTransformation = currentScene.camera.matrix.clone();
+          axesHelper.matrix.copy(cameraTransformation).invert();
+          axesHelper.rotation.setFromRotationMatrix(axesHelper.matrix);
+          currentRenderer.render(currentAxisScene, axisCamera);
+        }
       };
 
       animate();
-    }
-  }, [sceneRef.current]);
 
-  return <canvas ref={axisCanvasRef} style={{ position: 'fixed',  bottom:'0', width: '200px', height: '200px' }} />;};
+      // Cleanup
+      return () => {
+        currentRenderer.dispose();
+        if (currentAxisScene) {
+          while(currentAxisScene.children.length > 0) {
+            currentAxisScene.remove(currentAxisScene.children[0]);
+          }
+        }
+      };
+    }
+  }, [sceneRef]); // Only depend on sceneRef
+
+  return (
+    <canvas 
+      ref={axisCanvasRef} 
+      style={{ 
+        position: 'fixed',  
+        bottom: '0', 
+        width: '200px', 
+        height: '200px' 
+      }} 
+    />
+  );
+};
 
 export default AxisCanvas;
