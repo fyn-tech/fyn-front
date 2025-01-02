@@ -1,12 +1,13 @@
 import React from 'react';
 import Form from '../components/form';
+import { API_ENDPOINTS } from '../utilities/api_config';
 import { fetchCsrfToken, post } from '../utilities/api_service';
 import './general_page.css';
 
 const Register = () => {
   const title = 'Register';
   const format = 'json';
-  const endpoint = 'http://localhost:8000/register_user/';
+  const endpoint = API_ENDPOINTS.REGISTER;
   const button_text = 'Register';
   const fields = [
     { label: 'First Name*', name: 'first_name', type: 'text', required: true },

@@ -2,13 +2,14 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/user_context'; 
 import Form from '../components/form';
+import { API_ENDPOINTS } from '../utilities/api_config';
 import { fetchCsrfToken, post } from '../utilities/api_service';
 import './general_page.css';
 
 const SignIn = () => {
   const title = 'Sign in';
   const format = 'json';
-  const endpoint = 'http://localhost:8000/sign_in/';
+  const endpoint = API_ENDPOINTS.SIGN_IN;
   const button_text = 'Sign In';
   const fields = [
     { label: 'Username', name: 'username', type: 'text', required: true },
