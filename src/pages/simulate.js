@@ -3,6 +3,7 @@ import UserContext from '../context/user_context';
 import SimulationRenderer from '../components/SimulationRenderer';
 import Form from '../components/form';
 import DynamicSplitScreen from '../components/DynamicSplitScreen';
+import { API_ENDPOINTS } from '../utilities/api_config';
 import { fetchCsrfToken, post } from '../utilities/api_service';
 import './general_page.css';
 
@@ -12,7 +13,7 @@ const Simulate = () => {
 
     const title = 'Simulation Configuration';
     const format = 'yaml';
-    const endpoint = 'http://localhost:8000/simulation_submission/';
+    const endpoint = API_ENDPOINTS.SIMULATION_SUBMISSION;
     const button_text = 'Submit';
     const fields = [
       { label: 'Simulation Time', name: 'time', type: 'number', required: true },

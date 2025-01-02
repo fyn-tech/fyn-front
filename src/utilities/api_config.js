@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/register/`,
   SIGN_IN: `${API_BASE_URL}/sign_in/`,
   SIGN_OUT: `${API_BASE_URL}/sign_out/`,
+  SIMULATION_SUBMISSION: `${API_BASE_URL}/simulation_submission/`,
 };
 
 export const API_COOKIES = {
