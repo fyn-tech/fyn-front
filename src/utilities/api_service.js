@@ -6,10 +6,15 @@ import yaml from 'js-yaml';
  * Fetches the CSRF token from the server.
  * @returns {Promise} A promise that resolves to the CSRF token.
  */
-export const fetchCsrfToken = () => {
+export const fetchCsrfToken = async () => {
   deleteCookie('csrftoken');
-  const data = get(API_ENDPOINTS.GET_CSRF_TOKEN);
-  return data;
+  try {
+    const data = await get(API_ENDPOINTS.GET_CSRF_TOKEN);
+    return data;
+  } catch (error) {
+    console.error('Error fetching CSRF token:', error);
+    throw error;
+  }
 };
 
 /**
