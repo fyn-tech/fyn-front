@@ -13,7 +13,7 @@ const NavigationBar = () => {
       <div className="header-wrapper">
         <div className="logo">
             <Link to="/simulate" className="header-link">
-                <h1>RankOne</h1>
+                <h1>Fyn-Front</h1>
             </Link>
             <p>Creativity Leads Innovation</p>
         </div>
