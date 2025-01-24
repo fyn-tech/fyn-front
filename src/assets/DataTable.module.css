@@ -1,0 +1,66 @@
+@import './theme.css';
+
+.table {
+  --cell-padding: 0.75rem;
+  --row-spacing: 0.5rem;
+  color: var(--text-primary);  
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.h1{
+  color: var(--text-primary);  
+  padding: var(--cell-padding);
+  margin-left: 1.0rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.header {
+  background-color: var(--background-primary);
+  font-size: var(--text-font-size);
+  cursor: pointer;
+}
+
+.headerCell {  
+  background-color: var(--background-primary);
+  padding: var(--cell-padding);
+  text-align: left;
+  font-weight: 600;
+}
+
+.headerCell:hover {
+  background-color: var(--background-hover);
+}
+
+.cell {
+  font-size: var(--text-font-size);
+  padding: var(--cell-padding);
+}
+
+.row:nth-child(odd) {
+  background-color: var(--background-primary);
+}
+
+.row:nth-child(even) {
+  background-color: var(--background-secondary);
+}
+
+.row:hover {
+  background-color: var(--background-hover);
+}
+
+.sortIcon {
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.wrapper {
+  overflow-x: auto;
+}
+
+.empty {
+  padding: var(--cell-padding);
+  color: var(--text-muted);
+}
