@@ -23,17 +23,23 @@ export const fetchCsrfToken = async () => {
  * @returns {Promise<any>} - A promise that resolves to the response data.
  */
 export const get = async (api_url) => {
-  const response = await fetch(api_url, {
-    method: 'GET',
-    headers: {
-      'X-CSRFToken': getCookie('csrftoken'),
-    },
-    credentials: 'include'
-  });
+  
+  try{
+    const response = await fetch(api_url, {
+      method: 'GET',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      credentials: 'include'
+    });
 
-  const data = await handleResponse(response);
-  return data;
-
+    const data = await handleResponse(response);
+    return data;
+  }
+  catch (error) {
+    console.error('API call failed:', error);
+    return null;
+  }
 };
 
 /**
@@ -44,28 +50,35 @@ export const get = async (api_url) => {
  * @returns {Promise<Object>} - A promise that resolves to the response data from the API.
  */
 export const post = async (api_url, outputFormat, data) => {
-  let outputBody = {};
-  let outputHeader = {};
-  
-  if (outputFormat === 'yaml') {
-    outputHeader['Content-Type'] = 'application/x-yaml';
-    outputBody = yaml.dump(data);
-  } else if (outputFormat === 'json') {
-    outputHeader['Content-Type'] = 'application/json';
-    outputBody = JSON.stringify(data);
+
+   try{
+    let outputBody = {};
+    let outputHeader = {};
+    
+    if (outputFormat === 'yaml') {
+      outputHeader['Content-Type'] = 'application/x-yaml';
+      outputBody = yaml.dump(data);
+    } else if (outputFormat === 'json') {
+      outputHeader['Content-Type'] = 'application/json';
+      outputBody = JSON.stringify(data);
+    }
+    outputHeader['X-CSRFToken'] = getCookie('csrftoken');
+
+    const response = await fetch(api_url, {
+      method: 'POST',
+      headers: outputHeader,
+      body: outputBody,
+      credentials: 'include'
+    });
+
+    const responseData = await handleResponse(response);
+    console.log(responseData);
+    return responseData;
   }
-  outputHeader['X-CSRFToken'] = getCookie('csrftoken');
-
-  const response = await fetch(api_url, {
-    method: 'POST',
-    headers: outputHeader,
-    body: outputBody,
-    credentials: 'include'
-  });
-
-  const responseData = await handleResponse(response);
-  console.log(responseData);
-  return responseData;
+  catch (error) {
+    console.error('API call failed:', error);
+    throw error;
+  }
 };
 
 /**
