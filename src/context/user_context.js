@@ -5,6 +5,7 @@ const UserContext = React.createContext({
   user: null,
   logIn: () => {},
   logOut: () => {},
+  isBackendOnline: false,
 });
 
 export default UserContext;
