@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import UserContext from '../context/user_context';
 import SimulationRenderer from '../components/SimulationRenderer';
-import Form from '../components/form';
+import Form from '../components/base/Form';
 import DynamicSplitScreen from '../components/DynamicSplitScreen';
 import { API_ENDPOINTS } from '../utilities/api-config';
 import { fetchCsrfToken, post } from '../utilities/api-service';
@@ -49,6 +49,7 @@ const Simulate = () => {
     
     return (
       <DynamicSplitScreen startingPaneWidth={'23%'}>
+          
           <Form
             title={title}
             fields={fields}

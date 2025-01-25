@@ -5,8 +5,8 @@ import ResizeObserver from 'resize-observer-polyfill';
 import * as THREE from 'three';
 import { Scene } from '../utilities/three_scene.js';
 import AxisCanvas from './axis_canvas.js';
-import Button from './button';
-import Toolbar from './Toolbar';
+import Button from './base/Button.js';
+import Toolbar from './base/Toolbar.js';
 
 const SimulationContainer = styled.div.attrs({
   className: 'SimulationContainer',
