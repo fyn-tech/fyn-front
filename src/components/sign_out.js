@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import UserContext from '../context/user_context';
-import { post } from '../utilities/api_service';
-import { API_ENDPOINTS } from '../utilities/api_config';
+import { post } from '../utilities/api-service';
+import { API_ENDPOINTS } from '../utilities/api-config';
 
 const SignOut = () => {
   const { logOut } = useContext(UserContext);

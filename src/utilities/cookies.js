@@ -1,5 +1,3 @@
-
-
 /**
  * Checks if a cookie with the specified name exists.
  * @param {string} name - The name of the cookie to check.
