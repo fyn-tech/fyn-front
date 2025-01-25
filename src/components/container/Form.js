@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Button from './Button';
-import '../../assets/form.css'; 
+import Button from '../base/Button';
+import './form.css'; 
 
 const Form = ({ title, fields, columns, button_text, onSubmit, on_change}) => {
   const formClass = `form-${columns}-columns`;

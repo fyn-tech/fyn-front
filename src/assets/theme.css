@@ -5,7 +5,6 @@
   --secondary: #282c34;
   --text-primary:  white;
   --text-muted: #6b7280;
-  --border-color: #e5e7eb;
   --text-font-size: 1.0rem;
   
   --background-primary: #282c34;
@@ -16,6 +15,10 @@
   --header-bg: #f3f4f6;
   --header-hover-bg: #e5e7eb;
   --row-hover-bg: #f9fafb;
+
+  /* Drawing lines / boarders */
+  --divider-line: 1px;
+  --border-color: #e5e7eb;
 }
 
 [data-theme='dark'] {

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/user_context'; 
-import Form from '../components/base/Form';
+import Form from '../components/container/Form';
 import { API_ENDPOINTS } from '../utilities/api-config';
 import { fetchCsrfToken, post } from '../utilities/api-service';
 import './general_page.css';
