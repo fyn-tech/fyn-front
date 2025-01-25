@@ -1,0 +1,15 @@
+
+.toolbarContainer {
+  display: flex;
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: space-between;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+}

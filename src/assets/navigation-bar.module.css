@@ -9,7 +9,7 @@
   align-items: center; 
 }
   
-.header-wrapper {
+.header_wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
