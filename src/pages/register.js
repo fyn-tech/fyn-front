@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from '../components/form';
-import { API_ENDPOINTS } from '../utilities/api_config';
-import { fetchCsrfToken, post } from '../utilities/api_service';
+import { API_ENDPOINTS } from '../utilities/api-config';
+import { fetchCsrfToken, post } from '../utilities/api-service';
 import './general_page.css';
 
 const Register = () => {

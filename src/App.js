@@ -6,7 +6,7 @@ import Register from './pages/register';
 import SignIn from './pages/sign_in';
 import Simulate from './pages/simulate';
 import { deleteCookie } from './utilities/cookies';
-import { fetchCsrfToken } from './utilities/api_service';
+import { fetchCsrfToken } from './utilities/api-service';
 import './App.css';
 
 function App() {

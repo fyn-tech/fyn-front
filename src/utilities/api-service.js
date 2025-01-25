@@ -1,5 +1,5 @@
 import { deleteCookie, getCookie } from "./cookies";
-import { API_ENDPOINTS } from "./api_config";
+import { API_ENDPOINTS } from "./api-config";
 import yaml from 'js-yaml';
 
 /**

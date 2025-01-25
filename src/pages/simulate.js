@@ -3,8 +3,8 @@ import UserContext from '../context/user_context';
 import SimulationRenderer from '../components/SimulationRenderer';
 import Form from '../components/form';
 import DynamicSplitScreen from '../components/DynamicSplitScreen';
-import { API_ENDPOINTS } from '../utilities/api_config';
-import { fetchCsrfToken, post } from '../utilities/api_service';
+import { API_ENDPOINTS } from '../utilities/api-config';
+import { fetchCsrfToken, post } from '../utilities/api-service';
 import './general_page.css';
 
 const Simulate = () => {
