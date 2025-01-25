@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import UserContext from '../../context/user_context';
 import SignOut from '../sign_out';
-import styles from '../../assets/navigation-bar.module.css'; 
+import styles from './navigation-bar.module.css'; 
 
 const NavigationBar = () => {
   const { isLoggedIn, user } = useContext(UserContext);

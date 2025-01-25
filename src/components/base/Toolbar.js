@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "../../assets/toolbar.module.css";
+import styles from "./toolbar.module.css";
 
 const Toolbar = ({ children, isVertical }) => {
   return (
