@@ -64,6 +64,5 @@
     "testMatch": [
       "<rootDir>/tests/**/*.test.js"
     ]
-  },
-  "type": "module"
+  }
 }
