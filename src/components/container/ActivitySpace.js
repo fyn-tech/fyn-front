@@ -85,7 +85,7 @@ const ActivitySpace = ({ setGeometry }) => {
           setActivityComponent(<SimulationConfiguration setGeometry={setGeometry}></SimulationConfiguration>);
           break;
       case ActivityType.HARDWARE_MANAGER:
-          setActivityComponent(<DataTable name="Hardware Manager" data={hardwareData} />);
+          setActivityComponent(<DataTable name="Empty Table" data={""} />);
           break;
       default:
           setActivityComponent(null);
