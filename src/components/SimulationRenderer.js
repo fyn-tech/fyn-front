@@ -13,9 +13,10 @@ const SimulationContainer = styled.div.attrs({
   flex-wrap: wrap;
   align-items: flex-start;
   flex-direction: column;
-  flexGrow: 1
+  flex: 1;
   width: 100%;
   height: 100%;
+  position: relative;
 `;
 
 const SimulationRenderer = ({file_path}) => {
@@ -31,14 +32,19 @@ const SimulationRenderer = ({file_path}) => {
     const renderer = rendererRef.current;
   
     if (canvas && scene && renderer) {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-  
+      const container = canvas.parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      canvas.width = width;
+      canvas.height = height;
+
       // Use captured values
       scene.camera.aspect = width / height;
       scene.camera.updateProjectionMatrix();
       
-      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height, false);
     }
   }, []);
   
@@ -77,6 +83,7 @@ const SimulationRenderer = ({file_path}) => {
       });
 
       resizeObserver.observe(currentCanvas);
+      window.addEventListener('resize', handleResize);
       animate();
       
       return () => {
@@ -84,13 +91,13 @@ const SimulationRenderer = ({file_path}) => {
           resizeObserver.unobserve(currentCanvas);
         }
       };
-
+      
     }
   }, [file_path, handleResize]);
   
   return (
     <SimulationContainer>
-      <canvas ref={canvasRef} style={{ flexGrow: 1 }} />
+      <canvas ref={canvasRef} style={{ flexGrow: 1, width: "100%"}} />
       <AxisCanvas sceneRef={sceneRef} />
     </SimulationContainer>
   );
