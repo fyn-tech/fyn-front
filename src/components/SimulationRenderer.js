@@ -97,7 +97,7 @@ const SimulationRenderer = ({file_path}) => {
   
   return (
     <SimulationContainer>
-      <canvas ref={canvasRef} style={{ flexGrow: 1, width: "100%"}} />
+      <canvas ref={canvasRef} style={{ flexGrow: 1, width: "100vw"}} />
       <AxisCanvas sceneRef={sceneRef} />
     </SimulationContainer>
   );
