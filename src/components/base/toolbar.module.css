@@ -1,0 +1,13 @@
+
+.toolbarContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+}

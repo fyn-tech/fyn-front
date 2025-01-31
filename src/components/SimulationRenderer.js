@@ -5,8 +5,6 @@ import ResizeObserver from 'resize-observer-polyfill';
 import * as THREE from 'three';
 import { Scene } from '../utilities/three_scene.js';
 import AxisCanvas from './axis_canvas.js';
-import Button from './button';
-import Toolbar from './Toolbar';
 
 const SimulationContainer = styled.div.attrs({
   className: 'SimulationContainer',
@@ -15,8 +13,10 @@ const SimulationContainer = styled.div.attrs({
   flex-wrap: wrap;
   align-items: flex-start;
   flex-direction: column;
+  flex: 1;
   width: 100%;
   height: 100%;
+  position: relative;
 `;
 
 const SimulationRenderer = ({file_path}) => {
@@ -32,14 +32,19 @@ const SimulationRenderer = ({file_path}) => {
     const renderer = rendererRef.current;
   
     if (canvas && scene && renderer) {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-  
+      const container = canvas.parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      canvas.width = width;
+      canvas.height = height;
+
       // Use captured values
       scene.camera.aspect = width / height;
       scene.camera.updateProjectionMatrix();
       
-      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height, false);
     }
   }, []);
   
@@ -78,6 +83,7 @@ const SimulationRenderer = ({file_path}) => {
       });
 
       resizeObserver.observe(currentCanvas);
+      window.addEventListener('resize', handleResize);
       animate();
       
       return () => {
@@ -85,22 +91,13 @@ const SimulationRenderer = ({file_path}) => {
           resizeObserver.unobserve(currentCanvas);
         }
       };
-
+      
     }
   }, [file_path, handleResize]);
-
-  const handleClick = (buttonName) => {
-    console.log(`Clicked ${buttonName}`);
-  };
   
   return (
     <SimulationContainer>
-      <Toolbar isVertical={false}>
-        <Button text={'Button 1'} onClick={() => handleClick('Button 4')}></Button>
-        <Button text={'Button 2'} onClick={() => handleClick('Button 5')}></Button>
-        <Button text={'Button 3'} onClick={() => handleClick('Button 6')}></Button>
-      </Toolbar>
-      <canvas ref={canvasRef} style={{ flexGrow: 1 }} />
+      <canvas ref={canvasRef} style={{ flexGrow: 1, width: "100vw"}} />
       <AxisCanvas sceneRef={sceneRef} />
     </SimulationContainer>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from '../components/form';
+import Form from '../components/container/Form';
 import { API_ENDPOINTS } from '../utilities/api-config';
 import { fetchCsrfToken, post } from '../utilities/api-service';
 import './general_page.css';
