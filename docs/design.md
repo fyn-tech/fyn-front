@@ -1,6 +1,6 @@
 # Fynbos Technologies Design System
 
-**Version 1.0** | *Modern CFD/CAE Interface Design Language*
+**Version 1.1** | *Modern CFD/CAE Interface Design Language*
 
 ## Table of Contents
 
@@ -9,6 +9,7 @@
 3. [Visual Language](#visual-language)
 4. [Component Architecture](#component-architecture)
 5. [Layout Philosophy](#layout-philosophy)
+6. [CSS Architecture](#css-architecture)
 
 ---
 
@@ -173,3 +174,28 @@ Consistent spacing and grouping patterns that support engineering thinking:
 - Related parameters grouped spatially
 - Clear separation between different simulation contexts
 - Progressive disclosure for complex configuration options
+
+---
+
+## CSS Architecture
+
+### Framework Choice: Tailwind CSS
+
+**Decision:** Use Tailwind CSS for all component styling.
+
+**Rationale:** Eliminates CSS hierarchy/specificity issues. Atomic utilities make refactoring simple via find/replace. Built-in design system prevents inconsistent spacing and colors.
+
+**Conventions:**
+- Use Tailwind utilities directly in component classes
+- Prefer utility classes over custom CSS
+- Use `@layer components` only for complex reusable patterns
+- Configure brand colors in tailwind.config.js
+
+```rust
+// Example: Button component with Tailwind utilities
+view! {
+    <button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white rounded">
+        "Click me"
+    </button>
+}
+```
