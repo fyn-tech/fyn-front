@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 use crate::components::atoms::button::Button;
+use crate::components::atoms::typography::*;
 
 /// Component showcase page for design system development
 #[component]
@@ -12,9 +13,7 @@ pub fn Showcase() -> impl IntoView {
             <div class="max-w-6xl mx-auto">
                 // Header with title and dark mode toggle
                 <div class="flex justify-between items-center mb-8">
-                    <h1 class="text-3xl font-bold text-content-primary dark:text-content-primary-dark">
-                        "Fynbos Design System"
-                    </h1>
+                    <H1>"Fynbos Design System"</H1>
                     <Button 
                         variant="secondary".to_string() 
                         text="Toggle Dark Mode".to_string()
@@ -33,23 +32,16 @@ pub fn Showcase() -> impl IntoView {
                 </div>
                 
                 <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-content-primary dark:text-content-primary-dark mb-6">
-                        "Design Foundation"
-                    </h2>
+                    <H2>"Design Foundation"</H2>
                     
-
                     // Color Palette Preview
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
-                        <h3 class="text-lg font-medium text-content-secondary dark:text-content-secondary-dark mb-4">
-                            "Color Palette - Table Bay Blue & Emerald"
-                        </h3>
+                        <H3>"Color Palette - Table Bay Blue & Emerald"</H3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             // Primary Colors
                             <div>
-                                <h4 class="text-sm font-medium text-content-tertiary dark:text-content-tertiary-dark mb-2">
-                                    "Primary (Table Bay Blue)"
-                                </h4>
+                                <H4>"Primary (Table Bay Blue)"</H4>
                                 <div class="flex gap-2">
                                     <div class=format!("w-12 h-12 bg-primary-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-primary-500 rounded {}", color_boarder)></div>
@@ -59,9 +51,7 @@ pub fn Showcase() -> impl IntoView {
                             
                             // Accent Colors
                             <div>
-                                <h4 class="text-sm font-medium text-content-tertiary dark:text-content-tertiary-dark mb-2">
-                                    "Accent (Emerald)"
-                                </h4>
+                                <H4>"Accent (Emerald)"</H4>
                                 <div class="flex gap-2">
                                     <div class=format!("w-12 h-12 bg-accent-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-accent-500 rounded {}", color_boarder)></div>
@@ -71,9 +61,7 @@ pub fn Showcase() -> impl IntoView {
                             
                             // Surface Colors
                             <div>
-                                <h4 class="text-sm font-medium text-content-tertiary dark:text-content-tertiary-dark mb-2">
-                                    "Surface (Table Mountain Grays)"
-                                </h4>
+                                <H4>"Surface (Table Mountain Grays)"</H4>
                                 <div class="grid grid-cols-4 gap-1">
                                     <div class=format!("w-8 h-8 bg-surface-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-8 h-8 bg-surface-100 rounded {}", color_boarder)></div>
@@ -89,9 +77,7 @@ pub fn Showcase() -> impl IntoView {
 
                             // Sematic Colors
                             <div>
-                                <h4 class="text-sm font-medium text-content-tertiary dark:text-content-tertiary-dark mb-2">
-                                    "Sematic"
-                                </h4>
+                                <H4>"Sematic"</H4>
                                 <div class="flex gap-2">
                                     <div class=format!("w-12 h-12 bg-success rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-warning rounded {}", color_boarder)></div>
@@ -104,16 +90,23 @@ pub fn Showcase() -> impl IntoView {
 
                 // Atoms section
                 <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-content-primary dark:text-content-primary-dark mb-6">
-                        "Atoms"
-                    </h2>
+                    <H2>"Atoms"</H2>
                     
+                    // Typography subsection
+                    <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
+                        <H3>"Typography"</H3>
+                        <div class="space-y-4">
+                            <H1>"Heading 1"</H1>
+                            <H2>"Heading 2"</H2>
+                            <H3>"Heading 3"</H3>
+                            <H4>"Heading 4"</H4>
+                            <P>"Plain text"</P>
+                        </div>
+                    </div>
+
                     // Buttons subsection
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
-                        <h3 class="text-lg font-medium text-content-secondary dark:text-content-secondary-dark mb-4">
-                            "Buttons"
-                        </h3>
-
+                        <H3>"Buttons"</H3>
                         <div class="flex gap-4 flex-wrap">
                             <Button />
                             <Button variant="secondary".to_string() text="Secondary".to_string() />
