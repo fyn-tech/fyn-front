@@ -4,15 +4,17 @@ use crate::components::atoms::button::Button;
 /// Component showcase page for design system development
 #[component]
 pub fn Showcase() -> impl IntoView {
+
+    let color_boarder : String = "border border-surface-500 dark:border-surface-500".to_string();
+
     view! {
-        <div class="min-h-screen bg-surface-50 dark:bg-surface-900 transition-colors duration-200 p-8">
+        <div class="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200 p-8">
             <div class="max-w-6xl mx-auto">
                 // Header with title and dark mode toggle
                 <div class="flex justify-between items-center mb-8">
                     <h1 class="text-3xl font-bold text-content-primary dark:text-content-primary-dark">
                         "Fynbos Design System"
                     </h1>
-                    
                     <Button 
                         variant="secondary".to_string() 
                         text="Toggle Dark Mode".to_string()
@@ -49,9 +51,9 @@ pub fn Showcase() -> impl IntoView {
                                     "Primary (Table Bay Blue)"
                                 </h4>
                                 <div class="flex gap-2">
-                                    <div class="w-12 h-12 bg-primary-50 rounded border border-surface-200 dark:border-surface-600"></div>
-                                    <div class="w-12 h-12 bg-primary-500 rounded"></div>
-                                    <div class="w-12 h-12 bg-primary-900 rounded"></div>
+                                    <div class=format!("w-12 h-12 bg-primary-50 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-primary-500 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-primary-950 rounded {}", color_boarder)></div>
                                 </div>
                             </div>
                             
@@ -61,9 +63,9 @@ pub fn Showcase() -> impl IntoView {
                                     "Accent (Emerald)"
                                 </h4>
                                 <div class="flex gap-2">
-                                    <div class="w-12 h-12 bg-accent-50 rounded border border-surface-200 dark:border-surface-600"></div>
-                                    <div class="w-12 h-12 bg-accent-500 rounded"></div>
-                                    <div class="w-12 h-12 bg-accent-900 rounded"></div>
+                                    <div class=format!("w-12 h-12 bg-accent-50 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-accent-500 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-accent-950 rounded {}", color_boarder)></div>
                                 </div>
                             </div>
                             
@@ -73,14 +75,15 @@ pub fn Showcase() -> impl IntoView {
                                     "Surface (Table Mountain Grays)"
                                 </h4>
                                 <div class="grid grid-cols-4 gap-1">
-                                    <div class="w-8 h-8 bg-surface-50 rounded border border-surface-200 dark:border-surface-600"></div>
-                                    <div class="w-8 h-8 bg-surface-100 rounded border border-surface-200 dark:border-surface-600"></div>
-                                    <div class="w-8 h-8 bg-surface-200 rounded"></div>
-                                    <div class="w-8 h-8 bg-surface-300 rounded"></div>
-                                    <div class="w-8 h-8 bg-surface-600 rounded"></div>
-                                    <div class="w-8 h-8 bg-surface-700 rounded"></div>
-                                    <div class="w-8 h-8 bg-surface-800 rounded"></div>
-                                    <div class="w-8 h-8 bg-surface-900 rounded"></div>
+                                    <div class=format!("w-8 h-8 bg-surface-50 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-100 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-200 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-300 rounded {}", color_boarder)></div>
+                                    // dark mode background move 'down', i.e. lower shade as go to cards etc.
+                                    <div class=format!("w-8 h-8 bg-surface-950 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-900 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-800 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-8 h-8 bg-surface-700 rounded {}", color_boarder)></div>
                                 </div>
                             </div>
 
@@ -90,9 +93,9 @@ pub fn Showcase() -> impl IntoView {
                                     "Sematic"
                                 </h4>
                                 <div class="flex gap-2">
-                                    <div class="w-12 h-12 bg-success rounded border border-surface-200 dark:border-surface-600"></div>
-                                    <div class="w-12 h-12 bg-warning rounded"></div>
-                                    <div class="w-12 h-12 bg-error rounded"></div>
+                                    <div class=format!("w-12 h-12 bg-success rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-warning rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-error rounded {}", color_boarder)></div>
                                 </div>
                             </div>
                         </div>

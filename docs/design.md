@@ -70,8 +70,8 @@ A controlled accent that provides positive feedback and progress indication. Ins
 A carefully balanced neutral system supporting both light and dark themes. These grays ensure optimal contrast for numerical data presentation and reduce eye strain during extended engineering sessions.
 
 **Surface Colors:**
-- **Lightest** `#F8FAFC`: Primary page backgrounds providing calm visual foundation
-- **Light** `#FFFFFF`: Card and panel backgrounds for content organization
+- **Lightest** `#FFFFFF`: Primary page backgrounds providing calm visual foundation
+- **Light** `#F8FAFC`: Card and panel backgrounds for content organization
 - **Medium** `#E2E8F0`: Borders, dividers, and subtle separations
 - **Inactive** `#94A3B8`: Inactive elements and disabled states
 

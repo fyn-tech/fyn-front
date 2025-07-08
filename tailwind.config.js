@@ -7,29 +7,33 @@ module.exports = {
   darkMode: 'class', // or 'media' if you prefer system preference
   theme: {
     extend: {
+      fontFamily: {
+        'primary': ['Inter', 'system-ui', 'sans-serif'],     // Modern sans-serif
+        'technical': ['JetBrains Mono', 'monospace'],        // For data/code
+      },
       colors: {
         // Your Table Bay Blue primary
         primary: {
           50: '#E0F2FE',   // primary-light
           500: '#0891B2',  // primary (DEFAULT)
-          900: '#164E63',  // primary-dark
+          950: '#164E63',  // primary-dark
         },
         // Your Emerald accent  
         accent: {
           50: '#CFFAFE',   // accent-light
           500: '#10B981',  // accent (DEFAULT)
-          900: '#065F46',  // accent-dark
+          950: '#065F46',  // accent-dark
         },
         // Your Table Mountain neutrals
         surface: {
-          50: '#F8FAFC',   // surface-0 (light page bg)
-          100: '#FFFFFF',  // surface-1 (light cards)
+          50: '#FFFFFF',   // surface-0 (light page bg)
+          100: '#F8FAFC',  // surface-1 (light cards)
           200: '#E2E8F0',  // surface-2 (light borders)
           300: '#94A3B8',  // surface-3 (inactive)
-          600: '#475569',  // dark-surface-3 (dark inactive)
-          700: '#334155',  // dark-surface-2 (dark borders)
-          800: '#1E293B',  // dark-surface-1 (dark cards)
-          900: '#0F172A',  // dark-surface-0 (dark page bg)
+          700: '#475569',  // dark-surface-3 (dark inactive)
+          800: '#334155',  // dark-surface-2 (dark borders)
+          900: '#1E293B',  // dark-surface-1 (dark cards)
+          950: '#0F172A',  // dark-surface-0 (dark page bg)
         },
         content: {
           primary: '#2D3748',     // text-primary
