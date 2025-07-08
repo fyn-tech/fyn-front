@@ -53,48 +53,50 @@ Fast, responsive interactions optimized for desktop workflows. The design system
 ### Color Philosophy
 
 #### Primary: Table Bay Blue
-```css
---primary-light: #E0F2FE;  /* Calm backgrounds, data visualization */
---primary:       #0891B2;  /* Active states, primary actions */
---primary-dark:  #164E63;  /* Emphasis, dark theme foundation */
-```
+The foundation of the interface, representing the dependable precision of engineering work. A sophisticated blue that feels both modern and trustworthy, suitable for long CFD work sessions.
+
+- **Light variant** `#E0F2FE`: Calm backgrounds and subtle data visualization elements
+- **Standard** `#0891B2`: Active states, primary actions, and key interface elements  
+- **Dark variant** `#164E63`: Emphasis and high-contrast elements
 
 #### Accent: Emerald
-```css
---accent-light: #CFFAFE;   /* Success states, completion indicators */
---accent:       #10B981;   /* Progress, highlights, positive feedback */
---accent-dark:  #065F46;   /* Dark theme accent variations */
-```
+A controlled accent that provides positive feedback and progress indication. Inspired by Cape Town's natural landscape, this green supports the brand's South African heritage while maintaining professional restraint.
+
+- **Light variant** `#CFFAFE`: Success states and gentle completion indicators
+- **Standard** `#10B981`: Progress highlights and positive user feedback
+- **Dark variant** `#065F46`: Accent elements in dark themes
 
 #### Neutrals: Table Mountain Grays
-A carefully calibrated neutral palette supporting both light and dark themes, ensuring optimal contrast for numerical data and extended viewing sessions.
+A carefully balanced neutral system supporting both light and dark themes. These grays ensure optimal contrast for numerical data presentation and reduce eye strain during extended engineering sessions.
 
-```css
-/* Light Theme */
---surface-0:      #F8FAFC;  /* Page background */
---surface-1:      #FFFFFF;  /* Card background */
---surface-2:      #E2E8F0;  /* Borders, dividers */
---surface-3:      #94A3B8;  /* Inactive elements */
---text-primary:   #2D3748;  /* Main content text */
---text-secondary: #475569;  /* Secondary text, labels */
---text-tertiary:  #94A3B8;  /* Muted text, placeholders */
+**Surface Colors:**
+- **Lightest** `#F8FAFC`: Primary page backgrounds providing calm visual foundation
+- **Light** `#FFFFFF`: Card and panel backgrounds for content organization
+- **Medium** `#E2E8F0`: Borders, dividers, and subtle separations
+- **Inactive** `#94A3B8`: Inactive elements and disabled states
 
-/* Dark Theme */
---dark-surface-0:      #0F172A;  /* Page background */
---dark-surface-1:      #1E293B;  /* Card background */
---dark-surface-2:      #334155;  /* Borders, dividers */
---dark-surface-3:      #475569;  /* Inactive elements */
---dark-text-primary:   #E2E8F0;  /* Main content text */
---dark-text-secondary: #94A3B8;  /* Secondary text */
---dark-text-tertiary:  #64748B;  /* Muted text */
-```
+**Dark Theme Surfaces:**
+- **Darkest** `#0F172A`: Dark theme page backgrounds
+- **Dark** `#1E293B`: Dark theme card and panel backgrounds
+- **Medium** `#334155`: Dark theme borders and dividers
+- **Inactive** `#475569`: Dark theme inactive elements
+
+**Content Colors:**
+- **Primary** `#2D3748` / `#E2E8F0`: Main text and critical information requiring immediate attention
+- **Secondary** `#475569` / `#94A3B8`: Supporting text, labels, and contextual information  
+- **Tertiary** `#94A3B8` / `#64748B`: Muted text, placeholders, and background information
 
 #### Semantic Colors
-```css
---success: #059669;  /* Successful operations, converged solutions */
---warning: #D97706;  /* Cautions, non-critical issues */
---error:   #DC2626;  /* Errors, failed simulations, critical alerts */
-```
+Purpose-driven colors that communicate system states clearly:
+- **Success** `#059669`: Converged solutions, successful operations, positive outcomes
+- **Warning** `#D97706`: Non-critical issues, cautions requiring attention
+- **Error** `#DC2626`: Failed simulations, critical alerts, blocking issues
+
+### Color Relationships
+The color system creates clear information hierarchy while maintaining visual harmony. Primary blues establish authority and trust, accent greens provide positive reinforcement, and the neutral system ensures content legibility across all viewing conditions.
+
+### Theme Adaptability
+The color system seamlessly transitions between light and dark themes, maintaining contrast ratios and semantic meaning across all viewing preferences. Dark themes use inverted surface relationships while preserving the core brand colors and their functional meanings.
 
 ### Typography Strategy
 
