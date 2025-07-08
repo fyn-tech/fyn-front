@@ -4,6 +4,7 @@ module.exports = {
     "./src/**/*.rs", 
     "./index.html",
   ],
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {
@@ -16,8 +17,13 @@ module.exports = {
           light: '#CFFAFE',
           DEFAULT: '#10B981',
           dark: '#065F46',
+        },
+        sematic: {
+          success: '#059669',
+          warning: '#D97706',
+          error: '#DC2626',
         }
-      }
+      },
     },
   },
   plugins: [],
