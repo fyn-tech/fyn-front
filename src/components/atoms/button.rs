@@ -6,9 +6,9 @@ pub fn Button(
     #[prop(default = "Click me".to_string())] text: String,
 ) -> impl IntoView {
     let button_classes = match variant.as_str() {
-        "primary" => "bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded",
+        "primary" => "bg-primary-500 hover:bg-primary-900 text-white px-4 py-2 rounded",
         "secondary" => "bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded",
-        _ => "bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded",
+        _ => "bg-primary-500 hover:bg-primary-900 text-white px-4 py-2 rounded",
     };
 
     view! {

@@ -5,7 +5,7 @@ use crate::components::atoms::button::Button;
 #[component]
 pub fn Showcase() -> impl IntoView {
     view! {
-        <div class="min-h-screen bg-gray-50 p-8">
+        <div class="min-h-screen bg-surface-50 p-8">
             <div class="max-w-6xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-900 mb-8">
                     "Fynbos Design System"
