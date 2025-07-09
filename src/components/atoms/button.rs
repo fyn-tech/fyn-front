@@ -12,7 +12,7 @@ pub fn Button(
         _ => "bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-4 py-2 rounded transition-colors duration-200",
     };
 
-    view! {
+    return view! {
         <button 
             class={button_classes}
             on:click=move |_| {
@@ -23,5 +23,5 @@ pub fn Button(
         >
             {text}
         </button>
-    }
+    };
 }

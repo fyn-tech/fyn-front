@@ -4,7 +4,7 @@ use leptos::prelude::*;
 /// Default Home Page
 #[component]
 pub fn Home() -> impl IntoView {
-    view! {
+    return view! {
         <ErrorBoundary fallback=|errors| {
             view! {
                 <h1>"Uh oh! Something went wrong!"</h1>
@@ -48,5 +48,5 @@ pub fn Home() -> impl IntoView {
 
             </div>
         </ErrorBoundary>
-    }
+    };
 }

@@ -8,7 +8,7 @@ pub fn Showcase() -> impl IntoView {
 
     let color_boarder : String = "border border-surface-500 dark:border-surface-500".to_string();
 
-    view! {
+    return view! {
         <div class="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200 p-8">
             <div class="max-w-6xl mx-auto">
                 // Header with title and dark mode toggle
@@ -116,5 +116,5 @@ pub fn Showcase() -> impl IntoView {
                 </section>
             </div>
         </div>
-    }
+    };
 }
