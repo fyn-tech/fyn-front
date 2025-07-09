@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 use crate::components::atoms::button::Button;
+use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 
 /// Component showcase page for design system development
@@ -95,13 +96,13 @@ pub fn Showcase() -> impl IntoView {
                     // Typography subsection
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
                         <H3>"Typography"</H3>
-                        <div class="space-y-4">
+                        <Stack>
                             <H1>"Heading 1"</H1>
                             <H2>"Heading 2"</H2>
                             <H3>"Heading 3"</H3>
                             <H4>"Heading 4"</H4>
                             <P>"Plain text"</P>
-                        </div>
+                        </Stack>
                     </div>
 
                     // Buttons subsection
