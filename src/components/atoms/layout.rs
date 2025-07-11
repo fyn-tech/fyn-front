@@ -19,10 +19,11 @@ fn space_to_string(space: Spacing) -> &'static str{
 #[component]
 pub fn Stack(
     #[prop(default = Spacing::Sm)] space: Spacing,
+    #[prop(default = false)] horizontal: bool,
     children: Children
 ) -> impl IntoView {
     
-    let class_str:String = format!("space-y-{}", space_to_string(space)).to_string();
+    let class_str:String = format!("flex flex-{} gap-{}", if horizontal {"row"} else {"col"}, space_to_string(space)).to_string();
     return view!{
         <div class={class_str}>
             {children()}

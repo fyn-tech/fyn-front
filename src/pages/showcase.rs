@@ -7,7 +7,7 @@ use crate::components::atoms::typography::*;
 #[component]
 pub fn Showcase() -> impl IntoView {
 
-    let color_boarder : String = "border border-surface-500 dark:border-surface-500".to_string();
+    let color_boarder = "border border-surface-500 dark:border-surface-500";
 
     return view! {
         <div class="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200 p-8">
@@ -32,38 +32,38 @@ pub fn Showcase() -> impl IntoView {
                     />
                 </div>
                 
-                <section class="mb-12">
+                <Stack>
                     <H2>"Design Foundation"</H2>
-                    
+                        
                     // Color Palette Preview
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
                         <H3>"Color Palette - Table Bay Blue & Emerald"</H3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             // Primary Colors
-                            <div>
+                            <Stack>
                                 <H4>"Primary (Table Bay Blue)"</H4>
-                                <div class="flex gap-2">
+                                <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-primary-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-primary-500 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-primary-950 rounded {}", color_boarder)></div>
-                                </div>
-                            </div>
+                                </Stack>
+                            </Stack>
                             
                             // Accent Colors
-                            <div>
+                            <Stack>
                                 <H4>"Accent (Emerald)"</H4>
-                                <div class="flex gap-2">
+                                <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-accent-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-accent-500 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-accent-950 rounded {}", color_boarder)></div>
-                                </div>
-                            </div>
+                                </Stack>
+                            </Stack>
                             
                             // Surface Colors
-                            <div>
+                            <Stack>
                                 <H4>"Surface (Table Mountain Grays)"</H4>
-                                <div class="grid grid-cols-4 gap-1">
+                                <div class="grid grid-cols-4 gap-2">
                                     <div class=format!("w-8 h-8 bg-surface-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-8 h-8 bg-surface-100 rounded {}", color_boarder)></div>
                                     <div class=format!("w-8 h-8 bg-surface-200 rounded {}", color_boarder)></div>
@@ -74,23 +74,20 @@ pub fn Showcase() -> impl IntoView {
                                     <div class=format!("w-8 h-8 bg-surface-800 rounded {}", color_boarder)></div>
                                     <div class=format!("w-8 h-8 bg-surface-700 rounded {}", color_boarder)></div>
                                 </div>
-                            </div>
+                            </Stack>
 
                             // Sematic Colors
-                            <div>
+                            <Stack>
                                 <H4>"Sematic"</H4>
-                                <div class="flex gap-2">
+                                <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-success rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-warning rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-error rounded {}", color_boarder)></div>
-                                </div>
-                            </div>
+                                </Stack>
+                            </Stack>
                         </div>
                     </div>
-                </section>
-
-                // Atoms section
-                <section class="mb-12">
+                
                     <H2>"Atoms"</H2>
                     
                     // Typography subsection
@@ -101,20 +98,27 @@ pub fn Showcase() -> impl IntoView {
                             <H2>"Heading 2"</H2>
                             <H3>"Heading 3"</H3>
                             <H4>"Heading 4"</H4>
-                            <P>"Plain text"</P>
+                            <P>
+                                "Plain text paragraph: The computational fluid dynamics simulation converged after 1,247 iterations using a k-epsilon turbulence model with enhanced wall treatment. 
+                                Pressure distribution analysis revealed significant flow separation downstream of the airfoil at angles of attack exceeding 15 degrees.
+                                The Reynolds number of 2.3 × 10⁶ produced transitional boundary layer behavior, requiring adaptive mesh refinement near the leading edge to capture laminar-to-turbulent transition accurately.
+                                Velocity magnitude contours demonstrated the expected acceleration over the upper surface, with maximum velocities reaching 1.8 times the freestream value.
+                                Post-processing results indicate that the drag coefficient increased nonlinearly with angle of attack, while lift coefficient exhibited the characteristic stall behavior at 18 degrees. 
+                                These findings validate the numerical methodology for future parametric studies involving geometric optimization of the airfoil section."
+                            </P>
                         </Stack>
                     </div>
 
                     // Buttons subsection
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
                         <H3>"Buttons"</H3>
-                        <div class="flex gap-4 flex-wrap">
+                        <Stack horizontal=true>
                             <Button />
                             <Button variant="secondary".to_string() text="Secondary".to_string() />
                             <Button text="Custom Text".to_string() />
-                        </div>
+                        </Stack>
                     </div>
-                </section>
+                </Stack>
             </div>
         </div>
     };
