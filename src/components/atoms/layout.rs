@@ -30,3 +30,20 @@ pub fn Stack(
         </div>
     };
 }
+
+#[component]
+pub fn Grid(
+    #[prop(default = Spacing::Sm)] space: Spacing,
+    #[prop(default = 0)] cols: u8,
+    #[prop(default = 0)] rows: u8,
+    children: Children) -> impl IntoView{
+
+    let col_str = if cols != 0 {format!("grid-cols-{}", cols)} else {"".to_string()};
+    let row_str = if rows != 0 {format!("grid-rows-{}", rows)} else {"".to_string()};
+    let class_str:String = format!("grid {} {} gap-{}", col_str, row_str, space_to_string(space)).to_string();
+    return view!{
+        <div class={class_str}>
+            {children()}
+        </div>
+    };
+}
