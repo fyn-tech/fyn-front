@@ -39,10 +39,10 @@ pub fn Showcase() -> impl IntoView {
                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
                         <H3>"Color Palette - Table Bay Blue & Emerald"</H3>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <Grid cols=3>
                             // Primary Colors
                             <Stack>
-                                <H4>"Primary (Table Bay Blue)"</H4>
+                                <H4>"Primary"</H4>
                                 <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-primary-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-primary-500 rounded {}", color_boarder)></div>
@@ -52,7 +52,7 @@ pub fn Showcase() -> impl IntoView {
                             
                             // Accent Colors
                             <Stack>
-                                <H4>"Accent (Emerald)"</H4>
+                                <H4>"Accent"</H4>
                                 <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-accent-50 rounded {}", color_boarder)></div>
                                     <div class=format!("w-12 h-12 bg-accent-500 rounded {}", color_boarder)></div>
@@ -60,22 +60,6 @@ pub fn Showcase() -> impl IntoView {
                                 </Stack>
                             </Stack>
                             
-                            // Surface Colors
-                            <Stack>
-                                <H4>"Surface (Table Mountain Grays)"</H4>
-                                <div class="grid grid-cols-4 gap-2">
-                                    <div class=format!("w-8 h-8 bg-surface-50 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-100 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-200 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-300 rounded {}", color_boarder)></div>
-                                    // dark mode background move 'down', i.e. lower shade as go to cards etc.
-                                    <div class=format!("w-8 h-8 bg-surface-950 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-900 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-800 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-8 h-8 bg-surface-700 rounded {}", color_boarder)></div>
-                                </div>
-                            </Stack>
-
                             // Sematic Colors
                             <Stack>
                                 <H4>"Sematic"</H4>
@@ -85,7 +69,29 @@ pub fn Showcase() -> impl IntoView {
                                     <div class=format!("w-12 h-12 bg-error rounded {}", color_boarder)></div>
                                 </Stack>
                             </Stack>
-                        </div>
+
+                            // Surface Colors (Light)
+                            <Stack>
+                                <H4>"Surface (Light)"</H4>
+                                <Stack horizontal=true>
+                                    <div class=format!("w-12 h-12 bg-surface-50 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-100 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-200 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-300 rounded {}", color_boarder)></div>
+                                </Stack>
+                            </Stack>
+
+                            // Surface Colors (Dark)
+                            <Stack>
+                                <H4>"Surface (Dark)"</H4>
+                                <Stack horizontal=true>
+                                    <div class=format!("w-12 h-12 bg-surface-950 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-900 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-800 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-700 rounded {}", color_boarder)></div>
+                                </Stack>
+                            </Stack>
+                        </Grid>
                     </div>
                 
                     <H2>"Atoms"</H2>
