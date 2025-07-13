@@ -65,7 +65,7 @@ pub enum BorderColor {
 impl std::fmt::Display for BorderColor {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let class = match self {
-            BorderColor::Surface => "border border-surface-200 dark:border-surface-700",
+            BorderColor::Surface => "border border-surface-200 dark:border-surface-800",
             BorderColor::Primary => "border border-primary-500",
             BorderColor::Success => "border border-success",
             BorderColor::Warning => "border border-warning", 
