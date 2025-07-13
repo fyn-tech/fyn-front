@@ -1,4 +1,6 @@
 use leptos::prelude::*;
+use crate::components::atoms::typography::{NORMAL_CLASS};
+use crate::components::atoms::layout::*;
 
 #[component]
 pub fn Button(
@@ -6,10 +8,14 @@ pub fn Button(
     #[prop(default = "Click me".to_string())] text: String,
     #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
 ) -> impl IntoView {
+    let padding = format!("px-{} py-{}", Spacing::Md, Spacing::Sm);
+    let hover = "hover:bg-primary-50 dark:hover:bg-primary-950";
+    
     let button_classes = match variant.as_str() {
-        "primary" => "bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-4 py-2 rounded transition-colors duration-200",
-        "secondary" => "bg-surface-200 hover:bg-surface-300 dark:bg-surface-700 dark:hover:bg-surface-600 text-content-primary dark:text-content-primary-dark px-4 py-2 rounded transition-colors duration-200 border border-surface-300 dark:border-surface-600",
-        _ => "bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700 text-white px-4 py-2 rounded transition-colors duration-200",
+        "primary" => format!("bg-primary-500 {} {} {} {}", hover, ROUND_BORDER, NORMAL_CLASS, padding),
+        "secondary" => format!("bg-surface-200 dark:bg-surface-800 hover:bg-surface-300 dark:hover:bg-surface-700
+         {} {} {}", standard_border(None), NORMAL_CLASS, padding),
+        _ => format!("bg-primary-500 {} {} {} {}", hover, ROUND_BORDER, NORMAL_CLASS, padding),
     };
 
     return view! {
