@@ -14,6 +14,8 @@ console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1"
 web-sys = { version = "0.3", features = ["Document", "Window", "Element", "DomTokenList"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 # utils
 # strum = { version = "0.25", features = ["derive", "strum_macros"] }
