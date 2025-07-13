@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use crate::components::atoms::layout::{Align, align_to_string};
+use crate::components::atoms::layout::{Align};
 
 pub const H1_CLASS: &str = "font-primary font-bold text-2xl text-content-primary dark:text-content-primary-dark";
 pub const H2_CLASS: &str = "font-primary font-semibold text-xl text-content-primary dark:text-content-primary-dark";
@@ -13,7 +13,7 @@ pub fn H1(
     children: Children
 ) -> impl IntoView {
     return view! {
-        <h1 class=format!("{} {}", H1_CLASS, align_to_string(align))>
+        <h1 class=format!("{} {}", H1_CLASS, align)>
             {children()}
         </h1>
     };
@@ -25,7 +25,7 @@ pub fn H2(
     children: Children
 ) -> impl IntoView {
     return view! {
-        <h2 class=format!("{} {}", H2_CLASS, align_to_string(align))>
+        <h2 class=format!("{} {}", H2_CLASS, align)>
             {children()}
         </h2>
     };
@@ -37,7 +37,7 @@ pub fn H3(
     children: Children
 ) -> impl IntoView {
     return view! {
-        <h3 class=format!("{} {}", H3_CLASS, align_to_string(align))>
+        <h3 class=format!("{} {}", H3_CLASS, align)>
             {children()}
         </h3>
     };
@@ -49,7 +49,7 @@ pub fn H4(
     children: Children
 ) -> impl IntoView {
     return view! {
-        <h4 class=format!("{} {}", H4_CLASS, align_to_string(align))>
+        <h4 class=format!("{} {}", H4_CLASS, align)>
             {children()}
         </h4>
     };
@@ -61,7 +61,7 @@ pub fn P(
     children: Children
 ) -> impl IntoView {
     return view! {
-        <p class=format!("{} {}", NORMAL_CLASS, align_to_string(align))>
+        <p class=format!("{} {}", NORMAL_CLASS, align)>
             {children()}
         </p>
     };

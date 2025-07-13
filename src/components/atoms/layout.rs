@@ -1,3 +1,4 @@
+use std::fmt;
 use leptos::prelude::*;
 
 // ------------------------------------------------------------------------------------------------
@@ -12,12 +13,15 @@ pub enum Align {
     Justify, 
 }
 
-pub fn align_to_string(align: Align) -> &'static str {
-    match align {
-        Align::Left => "text-left",
-        Align::Center => "text-center", 
-        Align::Right => "text-right",
-        Align::Justify => "text-justify",
+impl std::fmt::Display for Align {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let class = match self {
+            Align::Left => "text-left",
+            Align::Center => "text-center", 
+            Align::Right => "text-right",
+            Align::Justify => "text-justify",
+        };
+        return write!(f, "{}", class);
     }
 }
 
@@ -32,12 +36,15 @@ pub enum Spacing{
     Lg, // 24
 }
 
-fn space_to_string(space: Spacing) -> &'static str{
-    return match space {
-        Spacing::Sm => "2",
-        Spacing::Md => "3",
-        Spacing::Lg => "4"
-    };
+impl std::fmt::Display for Spacing {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let class = match self {
+            Spacing::Sm => "2",
+            Spacing::Md => "3",
+            Spacing::Lg => "4"
+        };
+        return write!(f, "{}", class);
+    }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -51,7 +58,7 @@ pub fn Stack(
     children: Children
 ) -> impl IntoView {
     
-    let class_str:String = format!("flex flex-{} gap-{}", if horizontal {"row"} else {"col"}, space_to_string(space)).to_string();
+    let class_str:String = format!("flex flex-{} gap-{}", if horizontal {"row"} else {"col"}, space).to_string();
     return view!{
         <div class={class_str}>
             {children()}
@@ -68,7 +75,7 @@ pub fn Grid(
 
     let col_str = if cols != 0 {format!("grid-cols-{}", cols)} else {"".to_string()};
     let row_str = if rows != 0 {format!("grid-rows-{}", rows)} else {"".to_string()};
-    let class_str:String = format!("grid {} {} gap-{}", col_str, row_str, space_to_string(space)).to_string();
+    let class_str:String = format!("grid {} {} gap-{}", col_str, row_str, space).to_string();
     return view!{
         <div class={class_str}>
             {children()}
