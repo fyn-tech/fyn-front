@@ -5,7 +5,7 @@ pub const H1_CLASS: &str = "font-primary font-bold text-2xl text-content-primary
 pub const H2_CLASS: &str = "font-primary font-semibold text-xl text-content-primary dark:text-content-primary-dark";
 pub const H3_CLASS: &str = "font-primary font-medium text-lg text-content-primary dark:text-content-primary-dark";
 pub const H4_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark";
-pub const NORMAL_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark";
+pub const NORMAL_CLASS: &str = "font-primary font-sm text-base text-content-primary dark:text-content-primary-dark";
 
 #[component]
 pub fn H1(
