@@ -48,6 +48,34 @@ impl std::fmt::Display for Spacing {
 }
 
 // ------------------------------------------------------------------------------------------------
+//  Boarders
+// ------------------------------------------------------------------------------------------------
+
+pub const ROUND_BORDER: &str = "rounded-lg border";
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum BorderColor {
+    Surface,  
+    Primary,  
+    Success,  
+    Warning,  
+    Error,    
+}
+
+impl std::fmt::Display for BorderColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let class = match self {
+            BorderColor::Surface => "border-surface-200 dark:border-surface-700",
+            BorderColor::Primary => "border-primary-500",
+            BorderColor::Success => "border-success",
+            BorderColor::Warning => "border-warning", 
+            BorderColor::Error => "border-error",
+        };
+        write!(f, "{}", class)
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
 //  Components
 // ------------------------------------------------------------------------------------------------
 
@@ -58,7 +86,8 @@ pub fn Stack(
     children: Children
 ) -> impl IntoView {
     
-    let class_str:String = format!("flex flex-{} gap-{}", if horizontal {"row"} else {"col"}, space).to_string();
+    let class_str:String = format!("flex flex-{} gap-{}", 
+                                   if horizontal {"row"} else {"col"}, space).to_string();
     return view!{
         <div class={class_str}>
             {children()}
@@ -81,4 +110,19 @@ pub fn Grid(
             {children()}
         </div>
     };
+}
+
+#[component]
+pub fn BorderedDiv(
+    #[prop(default = BorderColor::Surface)] border: BorderColor,
+    #[prop(optional)] class: Option<String>,
+    children: Children,
+) -> impl IntoView {
+    let additional_class = class.unwrap_or_default();
+    
+    view! {
+        <div class=format!("overflow-hidden {} {} {}", border, ROUND_BORDER, additional_class)>
+            {children()}
+        </div>
+    }
 }

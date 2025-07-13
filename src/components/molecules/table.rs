@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::components::atoms::layout::{Align ,Spacing};
+use crate::components::atoms::layout::{Align, BorderedDiv, BorderColor, Spacing};
 use crate::components::atoms::typography::{H3, H4_CLASS, NORMAL_CLASS};
 
 // ------------------------------------------------------------------------------------------------
@@ -39,8 +39,8 @@ pub struct ColumnDefinition {
 // ------------------------------------------------------------------------------------------------
 
 fn cell_format() -> String {
-    return format!("px-{} py-{} border-r border-surface-200 dark:border-surface-700 first:border-l", 
-            Spacing::Sm, Spacing::Sm);
+    return format!("px-{} py-{} border-r {} last:border-r-0 ", 
+            Spacing::Sm, Spacing::Sm, BorderColor::Surface);
 }
 
 #[component]
@@ -80,7 +80,7 @@ pub fn Table(table: TableStruct) -> impl IntoView {
 
     // title
     let title = if !table.name.is_empty() {
-        Some(view!{<H3>{table.name}</H3>})
+        Some(view!{<H3 align=Align::Center>{table.name}</H3>})
     } else {
         None
     };
@@ -102,17 +102,19 @@ pub fn Table(table: TableStruct) -> impl IntoView {
 
 
     return view!{
+    
         {title}
-        <table>
-        // headings
-            <thead> 
-                <tr class="bg-surface-200 dark:bg-surface-800"> 
-                    {column_headers} 
-                </tr>
-            </thead>
-            <tbody> 
-                {row_data}
-            </tbody>
-        </table>
+        <BorderedDiv>
+            <table class="w-full border-collapse">
+                <thead> 
+                    <tr class="bg-surface-200 dark:bg-surface-800"> 
+                        {column_headers} 
+                    </tr>
+                </thead>
+                <tbody> 
+                    {row_data}
+                </tbody>
+            </table>
+        </BorderedDiv>
     };
 }
