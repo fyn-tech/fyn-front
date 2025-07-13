@@ -9,8 +9,6 @@ use crate::components::molecules::table::*;
 #[component]
 pub fn Showcase() -> impl IntoView {
 
-    let color_boarder = "border border-surface-500 dark:border-surface-500";
-
     return view! {
         <div class="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200 p-8">
             <div class="max-w-6xl mx-auto">
@@ -38,7 +36,7 @@ pub fn Showcase() -> impl IntoView {
                     <H2>"Design Foundation"</H2>
                         
                     // Color Palette Preview
-                    <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800">
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <H3>"Color Palette - Table Bay Blue & Emerald"</H3>
                         
                         <Grid cols=3>
@@ -46,9 +44,9 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Primary"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-primary-50 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-primary-500 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-primary-950 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-primary-50 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-primary-500 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-primary-950 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
                             
@@ -56,9 +54,9 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Accent"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-accent-50 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-accent-500 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-accent-950 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-accent-50 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-accent-500 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-accent-950 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
                             
@@ -66,9 +64,9 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Sematic"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-success rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-warning rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-error rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-success {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-warning {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-error {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
 
@@ -76,10 +74,10 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Surface (Light)"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-surface-50 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-100 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-200 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-300 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-50 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-100 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-200 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-300 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
 
@@ -87,19 +85,19 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Surface (Dark)"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-surface-950 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-900 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-800 rounded {}", color_boarder)></div>
-                                    <div class=format!("w-12 h-12 bg-surface-700 rounded {}", color_boarder)></div>
+                                    <div class=format!("w-12 h-12 bg-surface-950 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-900 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-800 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-surface-700 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
                         </Grid>
-                    </div>
+                    </BorderedDiv>
                 
                     <H2>"Atoms"</H2>
                     
                     // Typography subsection
-                    <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800">
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <H3>"Typography"</H3>
                         <Stack>
                             <H1>"Heading 1"</H1>
@@ -115,25 +113,25 @@ pub fn Showcase() -> impl IntoView {
                                 These findings validate the numerical methodology for future parametric studies involving geometric optimization of the airfoil section."
                             </P>
                         </Stack>
-                    </div>
+                    </BorderedDiv>
 
                     // Buttons subsection
-                    <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800">
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <H3>"Buttons"</H3>
                         <Stack horizontal=true>
                             <Button />
                             <Button variant="secondary".to_string() text="Secondary".to_string() />
                             <Button text="Custom Text".to_string() />
                         </Stack>
-                    </div>
+                    </BorderedDiv>
 
-                     <H2>"Molecules"</H2>
-                        
+                    <H2>"Molecules"</H2>          
+
                      // Tables
-                     <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800">
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <H3>"Tables"</H3>
                         <Table table={get_example_table_data()}></Table>
-                     </div>
+                    </BorderedDiv>
                 </Stack>
             </div>
         </div>

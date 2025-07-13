@@ -71,8 +71,13 @@ impl std::fmt::Display for BorderColor {
             BorderColor::Warning => "border-warning", 
             BorderColor::Error => "border-error",
         };
-        write!(f, "{}", class)
+        return write!(f, "{}", class);
     }
+}
+
+pub fn standard_border(color: Option<BorderColor>) -> String {
+    let color = color.unwrap_or(BorderColor::Surface);
+    return format!("{} {}", ROUND_BORDER, color);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -121,7 +126,7 @@ pub fn BorderedDiv(
     let additional_class = class.unwrap_or_default();
     
     view! {
-        <div class=format!("overflow-hidden {} {} {}", border, ROUND_BORDER, additional_class)>
+        <div class=format!("overflow-hidden {} {}", standard_border(Some(border)), additional_class)>
             {children()}
         </div>
     }
