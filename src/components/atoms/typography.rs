@@ -1,51 +1,67 @@
 use leptos::prelude::*;
+use crate::components::atoms::layout::{Align, align_to_string};
 
 pub const H1_CLASS: &str = "font-primary font-bold text-2xl text-content-primary dark:text-content-primary-dark";
 pub const H2_CLASS: &str = "font-primary font-semibold text-xl text-content-primary dark:text-content-primary-dark";
 pub const H3_CLASS: &str = "font-primary font-medium text-lg text-content-primary dark:text-content-primary-dark";
 pub const H4_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark";
-pub const NORMAL_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark px-4 py-2";
+pub const NORMAL_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark";
 
 #[component]
-pub fn H1(children: Children) -> impl IntoView {
+pub fn H1(
+    #[prop(default = Align::Left)] align: Align,
+    children: Children
+) -> impl IntoView {
     return view! {
-        <h1 class=H1_CLASS>
+        <h1 class=format!("{} {}", H1_CLASS, align_to_string(align))>
             {children()}
         </h1>
     };
 }
 
 #[component]
-pub fn H2(children: Children) -> impl IntoView {
+pub fn H2(
+    #[prop(default = Align::Left)] align: Align,
+    children: Children
+) -> impl IntoView {
     return view! {
-        <h2 class=H2_CLASS>
+        <h2 class=format!("{} {}", H2_CLASS, align_to_string(align))>
             {children()}
         </h2>
     };
 }
 
 #[component]
-pub fn H3(children: Children) -> impl IntoView {
+pub fn H3(
+    #[prop(default = Align::Left)] align: Align,
+    children: Children
+) -> impl IntoView {
     return view! {
-        <h3 class=H3_CLASS>
+        <h3 class=format!("{} {}", H3_CLASS, align_to_string(align))>
             {children()}
         </h3>
     };
 }
 
 #[component]
-pub fn H4(children: Children) -> impl IntoView {
+pub fn H4(
+    #[prop(default = Align::Left)] align: Align,
+    children: Children
+) -> impl IntoView {
     return view! {
-        <h4 class=H4_CLASS>
+        <h4 class=format!("{} {}", H4_CLASS, align_to_string(align))>
             {children()}
         </h4>
     };
 }
 
 #[component]
-pub fn P(children: Children) -> impl IntoView {
+pub fn P(
+    #[prop(default = Align::Justify)] align: Align,
+    children: Children
+) -> impl IntoView {
     return view! {
-        <p class=NORMAL_CLASS>
+        <p class=format!("{} {}", NORMAL_CLASS, align_to_string(align))>
             {children()}
         </p>
     };

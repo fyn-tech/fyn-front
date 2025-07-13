@@ -1,5 +1,30 @@
 use leptos::prelude::*;
 
+// ------------------------------------------------------------------------------------------------
+//  Alignment
+// ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Align {
+    Left,    
+    Center,  
+    Right,   
+    Justify, 
+}
+
+pub fn align_to_string(align: Align) -> &'static str {
+    match align {
+        Align::Left => "text-left",
+        Align::Center => "text-center", 
+        Align::Right => "text-right",
+        Align::Justify => "text-justify",
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+//  Spacing
+// ------------------------------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Spacing{
     Sm, // 8 (default)
@@ -14,6 +39,10 @@ fn space_to_string(space: Spacing) -> &'static str{
         Spacing::Lg => "4"
     };
 }
+
+// ------------------------------------------------------------------------------------------------
+//  Components
+// ------------------------------------------------------------------------------------------------
 
 #[component]
 pub fn Stack(
