@@ -51,7 +51,7 @@ impl std::fmt::Display for Spacing {
 //  Boarders
 // ------------------------------------------------------------------------------------------------
 
-pub const ROUND_BORDER: &str = "rounded-lg border";
+pub const ROUND_BORDER: &str = "rounded-lg";
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BorderColor {
@@ -65,11 +65,11 @@ pub enum BorderColor {
 impl std::fmt::Display for BorderColor {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let class = match self {
-            BorderColor::Surface => "border-surface-200 dark:border-surface-700",
-            BorderColor::Primary => "border-primary-500",
-            BorderColor::Success => "border-success",
-            BorderColor::Warning => "border-warning", 
-            BorderColor::Error => "border-error",
+            BorderColor::Surface => "border border-surface-200 dark:border-surface-700",
+            BorderColor::Primary => "border border-primary-500",
+            BorderColor::Success => "border border-success",
+            BorderColor::Warning => "border border-warning", 
+            BorderColor::Error => "border border-error",
         };
         return write!(f, "{}", class);
     }
