@@ -1,19 +1,62 @@
 use leptos::prelude::*;
-use crate::components::atoms::typography::{H4_CLASS, NORMAL_CLASS};
+use serde::{Deserialize, Serialize};
+
+use crate::components::atoms::layout::{Align ,Spacing};
+use crate::components::atoms::typography::{H3, H4_CLASS, NORMAL_CLASS};
+
+// ------------------------------------------------------------------------------------------------
+//  Data Structs
+// ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum CellType{ // we can get more complicated later.
+    Text, 
+    Float, 
+    Int, 
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]  
+pub struct TableStruct{
+    pub name: String,
+    pub data: TableData,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TableData {
+    pub col_def: Vec<ColumnDefinition>,
+    pub rows: Vec<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ColumnDefinition {
+    pub name: String,
+    pub data_type: CellType,
+}
+
+
+// ------------------------------------------------------------------------------------------------
+//  Components
+// ------------------------------------------------------------------------------------------------
+
+fn cell_format() -> String {
+    return format!("px-{} py-{} border-r border-surface-200 dark:border-surface-700 first:border-l", 
+            Spacing::Sm, Spacing::Sm);
+}
 
 #[component]
 fn TH(children: Children) -> impl IntoView {
     return view!{
-        <th class=H4_CLASS>
+        <th class=format!("{} {} {}", H4_CLASS, cell_format(), Align::Left)>
             {children()}
         </th>
     };
 }
 
 #[component]
-fn TD(children: Children) -> impl IntoView {
+fn TD(cell_type: CellType, children: Children) -> impl IntoView {
     return view!{
-        <th class=NORMAL_CLASS>
+        <th class=format!("{} {} {}", NORMAL_CLASS, cell_format(),
+                          if cell_type == CellType::Text {Align::Left} else {Align::Right})>
             {children()}
         </th>
     };
@@ -22,35 +65,53 @@ fn TD(children: Children) -> impl IntoView {
 #[component]
 fn TR(children: Children) -> impl IntoView {
     return view! {
-        <tr class="even:bg-surface-50 dark:even:bg-surface-950 odd:bg-surface-100 dark:odd:bg-surface-900 
-        hover:bg-surface-300 dark:hover:bg-surface-700">
+        <tr class="
+            even:bg-surface-50 dark:even:bg-surface-950 
+            odd:bg-surface-100 dark:odd:bg-surface-900 
+            hover:bg-surface-300 dark:hover:bg-surface-700
+        ">
             {children()}
         </tr>
     };
 }
 
 #[component]
-pub fn Table() -> impl IntoView {
+pub fn Table(table: TableStruct) -> impl IntoView {
+
+    // title
+    let title = if !table.name.is_empty() {
+        Some(view!{<H3>{table.name}</H3>})
+    } else {
+        None
+    };
+
+    // Headers and Data
+    let col_defs = table.data.col_def;
+    let rows = table.data.rows;
+    let column_headers: Vec<_> = col_defs.clone().into_iter() 
+                                 .map(|col_def| view!{<TH>{col_def.name.clone()}</TH>})
+                                 .collect();
+    let row_data: Vec<_> = rows.into_iter()
+        .map(|row_cells| {
+                let cells: Vec<_> = row_cells.into_iter()
+                                    .zip(col_defs.iter())  // Now col_defs is available
+                                    .map(|(col_data, col_def)| view! {<TD cell_type={col_def.data_type}>{col_data}</TD>}) 
+                                    .collect();
+                view! {<TR>{cells}</TR>}
+            }).collect();
+
+
     return view!{
+        {title}
         <table>
+        // headings
             <thead> 
-                <tr class="bg-surface-200 dark:bg-surface-800">  
-                    <TH>Name</TH>      
-                    <TH>Age</TH>
-                    <TH>City</TH>
+                <tr class="bg-surface-200 dark:bg-surface-800"> 
+                    {column_headers} 
                 </tr>
             </thead>
             <tbody> 
-                <TR>  
-                    <TD>John</TD>    
-                    <TD>25</TD>
-                    <TD>Cape Town</TD>
-                </TR>
-                <TR>
-                    <TD>Sarah</TD>
-                    <TD>30</TD>
-                    <TD>Johannesburg</TD>
-                </TR>
+                {row_data}
             </tbody>
         </table>
     };

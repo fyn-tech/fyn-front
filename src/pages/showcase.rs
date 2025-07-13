@@ -4,6 +4,7 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::components::molecules::table::*;
 
+
 /// Component showcase page for design system development
 #[component]
 pub fn Showcase() -> impl IntoView {
@@ -131,10 +132,50 @@ pub fn Showcase() -> impl IntoView {
                      // Tables
                      <div class="mb-8 p-6 bg-surface-100 dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800">
                         <H3>"Tables"</H3>
-                        <Table></Table>
+                        <Table table={get_example_table_data()}></Table>
                      </div>
                 </Stack>
             </div>
         </div>
+    };
+}
+
+fn get_example_table_data() -> TableStruct{
+    return  TableStruct {
+        name: "Airfoil Analysis Results".to_string(),
+        data: TableData {
+            col_def: vec![
+                ColumnDefinition { 
+                    name: "Parameter".to_string(), 
+                    data_type: CellType::Text 
+                },
+                ColumnDefinition { 
+                    name: "Value".to_string(), 
+                    data_type: CellType::Float 
+                },
+                ColumnDefinition { 
+                    name: "Units".to_string(), 
+                    data_type: CellType::Text 
+                },
+                ColumnDefinition { 
+                    name: "Iterations".to_string(), 
+                    data_type: CellType::Int 
+                },
+                ColumnDefinition { 
+                    name: "Status".to_string(), 
+                    data_type: CellType::Text 
+                },
+            ],
+            rows: vec![
+                vec!["Drag Coefficient".to_string(), "0.0234".to_string(), "-".to_string(), "1247".to_string(), "Converged".to_string()],
+                vec!["Lift Coefficient".to_string(), "1.2456".to_string(), "-".to_string(), "1247".to_string(), "Converged".to_string()],
+                vec!["Pressure Drop".to_string(), "1245.67".to_string(), "Pa".to_string(), "892".to_string(), "Converged".to_string()],
+                vec!["Reynolds Number".to_string(), "2300000.0".to_string(), "-".to_string(), "0".to_string(), "Input".to_string()],
+                vec!["Angle of Attack".to_string(), "15.5".to_string(), "degrees".to_string(), "0".to_string(), "Input".to_string()],
+                vec!["Mach Number".to_string(), "0.3".to_string(), "-".to_string(), "0".to_string(), "Input".to_string()],
+                vec!["Turbulence Intensity".to_string(), "0.05".to_string(), "%".to_string(), "1450".to_string(), "Converged".to_string()],
+                vec!["Wall Y+".to_string(), "1.2".to_string(), "-".to_string(), "2100".to_string(), "Converged".to_string()],
+            ],
+        },
     };
 }
