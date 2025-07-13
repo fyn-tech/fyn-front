@@ -54,11 +54,11 @@ fn TH(children: Children) -> impl IntoView {
 
 #[component]
 fn TD(cell_type: CellType, children: Children) -> impl IntoView {
-    return view!{
-        <th class=format!("{} {} {}", NORMAL_CLASS, cell_format(),
-                          if cell_type == CellType::Text {Align::Left} else {Align::Right})>
+    return view! {
+        <td class=format!("{} {} {}", NORMAL_CLASS, cell_format(),
+                        if cell_type == CellType::Text {Align::Left} else {Align::Right})>
             {children()}
-        </th>
+        </td>
     };
 }
 
