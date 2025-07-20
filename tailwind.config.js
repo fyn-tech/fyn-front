@@ -14,14 +14,18 @@ module.exports = {
       colors: {
         // Your Table Bay Blue primary
         primary: {
-          50: '#E0F2FE',   // primary-light
+          50: '#BAE6FD',   // primary-light
+          300: '#7BC8E8',
           500: '#0891B2',  // primary (DEFAULT)
+          700: '#0E7490',
           950: '#164E63',  // primary-dark
         },
         // Your Emerald accent  
         accent: {
-          50: '#CFFAFE',   // accent-light
+          50: '#A7F3D0',   // accent-light
+          300: '#6EE7B7',
           500: '#10B981',  // accent (DEFAULT)
+          700: '#047857',
           950: '#065F46',  // accent-dark
         },
         // Your Table Mountain neutrals
@@ -43,10 +47,12 @@ module.exports = {
           'secondary-dark': '#94A3B8', // dark-text-secondary
           'tertiary-dark': '#64748B',  // dark-text-tertiary
         },
-        // Your semantic colors
-        success: '#059669',
-        warning: '#D97706', 
-        error: '#DC2626',
+        semantic: {
+          // Your semantic colors
+          success: '#059669',
+          warning: '#D97706', 
+          error: '#DC2626',
+        }
       }
     },
   },

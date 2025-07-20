@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use crate::components::atoms::button::Button;
+use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::components::molecules::table::*;
@@ -16,7 +16,7 @@ pub fn Showcase() -> impl IntoView {
                 <div class="flex justify-between items-center mb-8">
                     <H1>"Fynbos Design System"</H1>
                     <Button 
-                        variant="secondary".to_string() 
+                        variant=Variant::Secondary
                         text="Toggle Dark Mode".to_string()
                         on_click=Box::new(|| {
                             let window = web_sys::window().expect("should have a window");
@@ -45,7 +45,9 @@ pub fn Showcase() -> impl IntoView {
                                 <H4>"Primary"</H4>
                                 <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-primary-50 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-primary-300 {}", standard_border(None))></div>
                                     <div class=format!("w-12 h-12 bg-primary-500 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-primary-700 {}", standard_border(None))></div>
                                     <div class=format!("w-12 h-12 bg-primary-950 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
@@ -55,7 +57,9 @@ pub fn Showcase() -> impl IntoView {
                                 <H4>"Accent"</H4>
                                 <Stack horizontal=true>
                                     <div class=format!("w-12 h-12 bg-accent-50 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-accent-300 {}", standard_border(None))></div>
                                     <div class=format!("w-12 h-12 bg-accent-500 {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-accent-700 {}", standard_border(None))></div>
                                     <div class=format!("w-12 h-12 bg-accent-950 {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
@@ -64,9 +68,9 @@ pub fn Showcase() -> impl IntoView {
                             <Stack>
                                 <H4>"Sematic"</H4>
                                 <Stack horizontal=true>
-                                    <div class=format!("w-12 h-12 bg-success {}", standard_border(None))></div>
-                                    <div class=format!("w-12 h-12 bg-warning {}", standard_border(None))></div>
-                                    <div class=format!("w-12 h-12 bg-error {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-semantic-success {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-semantic-warning {}", standard_border(None))></div>
+                                    <div class=format!("w-12 h-12 bg-semantic-error {}", standard_border(None))></div>
                                 </Stack>
                             </Stack>
 
@@ -119,9 +123,11 @@ pub fn Showcase() -> impl IntoView {
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <H3>"Buttons"</H3>
                         <Stack horizontal=true>
-                            <Button />
-                            <Button variant="secondary".to_string() text="Secondary".to_string() />
-                            <Button text="Custom Text".to_string() />
+                            <Button variant=Variant::Primary text="Primary".to_string() />
+                            <Button variant=Variant::Secondary text="Secondary".to_string() />
+                            <Button variant=Variant::Tertiary text="Tertiary".to_string() />
+                            <Button variant=Variant::Warning text="Warning".to_string() />
+                            <Button variant=Variant::Success text="Success".to_string() />
                         </Stack>
                     </BorderedDiv>
 

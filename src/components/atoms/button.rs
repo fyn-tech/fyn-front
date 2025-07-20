@@ -2,21 +2,49 @@ use leptos::prelude::*;
 use crate::components::atoms::typography::{NORMAL_CLASS};
 use crate::components::atoms::layout::*;
 
+// ------------------------------------------------------------------------------------------------
+//  Variant
+// ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Variant {
+    Primary,      
+    Secondary,    
+    Tertiary,     
+    Success,      
+    Warning,      
+}
+
+impl std::fmt::Display for Variant{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result{
+        let class = match self{
+            Variant::Primary => 
+                "bg-primary-500 dark:bg-primary-950 hover:bg-primary-300 dark:hover:bg-primary-700",
+            Variant::Secondary => 
+                "bg-primary-300 dark:bg-primary-700 hover:bg-primary-50 dark:hover:bg-primary-500",
+            Variant::Tertiary => 
+                "bg-accent-300 dark:bg-accent-500 hover:bg-accent-50 dark:hover:bg-accent-300",
+            Variant::Success => "bg-semantic-success",
+            Variant::Warning => "bg-semantic-warning",
+        };
+        return write!(f, "{}", class);
+    }
+
+}      
+
+// ------------------------------------------------------------------------------------------------
+//  Components
+// ------------------------------------------------------------------------------------------------
+
 #[component]
 pub fn Button(
-    #[prop(default = "primary".to_string())] variant: String,
+    #[prop(default = Variant::Primary)] variant: Variant,
     #[prop(default = "Click me".to_string())] text: String,
     #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
 ) -> impl IntoView {
     let padding = format!("px-{} py-{}", Spacing::Md, Spacing::Sm);
-    let hover = "hover:bg-primary-50 dark:hover:bg-primary-950";
     
-    let button_classes = match variant.as_str() {
-        "primary" => format!("bg-primary-500 {} {} {} {}", hover, ROUND_BORDER, NORMAL_CLASS, padding),
-        "secondary" => format!("bg-surface-200 dark:bg-surface-800 hover:bg-surface-300 dark:hover:bg-surface-700
-         {} {} {}", standard_border(None), NORMAL_CLASS, padding),
-        _ => format!("bg-primary-500 {} {} {} {}", hover, ROUND_BORDER, NORMAL_CLASS, padding),
-    };
+    let button_classes = format!("{} {} {} {}", variant, ROUND_BORDER, NORMAL_CLASS, padding);
 
     return view! {
         <button 
