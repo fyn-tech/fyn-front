@@ -121,13 +121,21 @@ pub fn Showcase() -> impl IntoView {
 
                     // Buttons subsection
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Buttons"</H3>
+                        <H3>"Button Variants"</H3>
                         <Stack horizontal=true>
                             <Button variant=Variant::Primary text="Primary".to_string() />
                             <Button variant=Variant::Secondary text="Secondary".to_string() />
                             <Button variant=Variant::Tertiary text="Tertiary".to_string() />
                             <Button variant=Variant::Warning text="Warning".to_string() />
                             <Button variant=Variant::Success text="Success".to_string() />
+                        </Stack>
+                        
+                        <H3>"Button States"</H3>
+                        <Stack horizontal=true>
+                            <Button variant=Variant::Primary state=State::Default text="Default".to_string() />
+                            <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
+                            <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
+                            <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
                         </Stack>
                     </BorderedDiv>
 
