@@ -1,11 +1,56 @@
+use const_format::formatcp;
 use leptos::prelude::*;
 use crate::components::atoms::layout::{Align};
 
-pub const H1_CLASS: &str = "font-primary font-bold text-2xl text-content-primary dark:text-content-primary-dark";
-pub const H2_CLASS: &str = "font-primary font-semibold text-xl text-content-primary dark:text-content-primary-dark";
-pub const H3_CLASS: &str = "font-primary font-medium text-lg text-content-primary dark:text-content-primary-dark";
-pub const H4_CLASS: &str = "font-primary font-medium text-base text-content-primary dark:text-content-primary-dark";
-pub const NORMAL_CLASS: &str = "font-primary font-sm text-base text-content-primary dark:text-content-primary-dark";
+// ------------------------------------------------------------------------------------------------
+//  TextSizing
+// ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Size{
+    Xs,
+    Sm,
+    Base,
+    Lg,
+    Xl,
+    Xl2,
+}
+
+impl Size {
+    pub const fn as_str(&self) -> &'static str {
+        return match self {
+            Size::Xs => "text-xs",
+            Size::Sm => "text-sm",
+            Size::Base => "text-base", 
+            Size::Lg => "text-lg",
+            Size::Xl => "text-xl",
+            Size::Xl2 => "text-2xl",
+        };
+    }
+}
+
+impl std::fmt::Display for Size {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result{
+        return write!(f, "{}", self.as_str());
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+//  Text Formatting
+// ------------------------------------------------------------------------------------------------
+
+pub const FONT_STR: &str = "font-primary";
+pub const FONT_CLR: &str = "text-content-primary dark:text-content-primary-dark";
+pub const H1_CLASS: &str = formatcp!("{} {} {} {} ", FONT_STR, " font-bold ", Size::Xl2.as_str(), FONT_CLR);
+pub const H2_CLASS: &str = formatcp!("{} {} {} {} ", FONT_STR, " font-semibold ", Size::Xl.as_str(), FONT_CLR);
+pub const H3_CLASS: &str = formatcp!("{} {} {} {} ", FONT_STR, " font-medium ", Size::Lg.as_str(), FONT_CLR);
+pub const H4_CLASS: &str = formatcp!("{} {} {} {} ", FONT_STR, " font-medium ", Size::Base.as_str(), FONT_CLR);
+pub const NORMAL_CLASS: &str = formatcp!("{} {} {} {} ", FONT_STR, " font-sm ", Size::Base.as_str(), FONT_CLR);
+
+// ------------------------------------------------------------------------------------------------
+//  Components
+// ------------------------------------------------------------------------------------------------
+
 
 #[component]
 pub fn H1(
