@@ -1,4 +1,3 @@
-use std::fmt;
 use leptos::prelude::*;
 
 // ------------------------------------------------------------------------------------------------
@@ -25,12 +24,35 @@ impl std::fmt::Display for Align {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FlexAlign {
+    Start,    
+    Center,   
+    End,      
+    Stretch,  
+    Baseline, 
+}
+
+impl std::fmt::Display for FlexAlign {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let class = match self {
+            FlexAlign::Start => "items-start",
+            FlexAlign::Center => "items-center",
+            FlexAlign::End => "items-end", 
+            FlexAlign::Stretch => "items-stretch",
+            FlexAlign::Baseline => "items-baseline",
+        };
+        write!(f, "{}", class)
+    }
+}
+
 // ------------------------------------------------------------------------------------------------
 //  Spacing
 // ------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Spacing{
+pub enum Spacing{ // in px
+    Xs, // 4 
     Sm, // 8 (default)
     Md, // 16
     Lg, // 24
@@ -39,6 +61,7 @@ pub enum Spacing{
 impl std::fmt::Display for Spacing {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let class = match self {
+            Spacing::Xs => "1",
             Spacing::Sm => "2",
             Spacing::Md => "3",
             Spacing::Lg => "4"
@@ -88,11 +111,15 @@ pub fn standard_border(color: Option<BorderColor>) -> String {
 pub fn Stack(
     #[prop(default = Spacing::Sm)] space: Spacing,
     #[prop(default = false)] horizontal: bool,
+    #[prop(default = FlexAlign::Stretch)] align: FlexAlign,
     children: Children
 ) -> impl IntoView {
     
-    let class_str:String = format!("flex flex-{} gap-{}", 
-                                   if horizontal {"row"} else {"col"}, space).to_string();
+    let class_str = format!("flex flex-{} gap-{} {}", 
+        if horizontal {"row"} else {"col"}, 
+        space,
+        align 
+    );
     return view!{
         <div class={class_str}>
             {children()}
