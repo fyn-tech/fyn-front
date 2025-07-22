@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use crate::components::atoms::button::*;
+use crate::components::atoms::button::{*, Size as ButtonSize};
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::components::molecules::table::*;
@@ -136,6 +136,15 @@ pub fn Showcase() -> impl IntoView {
                             <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
                             <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
                             <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
+                        </Stack>
+
+                        <H3>"Button Sizes"</H3>
+                        <Stack horizontal=true align=FlexAlign::End>
+                            <Button variant=Variant::Primary size=ButtonSize::Xl text="Xl".to_string() />
+                            <Button variant=Variant::Primary size=ButtonSize::Lg text="Lg".to_string() />
+                            <Button variant=Variant::Primary size=ButtonSize::Md text="Md".to_string() />
+                            <Button variant=Variant::Primary size=ButtonSize::Sm text="Sm".to_string() />
+                            <Button variant=Variant::Primary size=ButtonSize::Xs text="Xs".to_string() />
                         </Stack>
                     </BorderedDiv>
 

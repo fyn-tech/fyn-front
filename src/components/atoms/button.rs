@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use crate::components::atoms::typography::{NORMAL_CLASS};
+use crate::components::atoms::typography::{FONT_CLR, FONT_STR, Size as TextSize};
 use crate::components::atoms::layout::*;
 
 // ------------------------------------------------------------------------------------------------
@@ -38,15 +38,41 @@ impl Variant{
 }      
 
 // ------------------------------------------------------------------------------------------------
+//  Type
+// ------------------------------------------------------------------------------------------------
+
+// TODO TYPES: will add as we go along.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Type {
+    Standard,    // Default clickable button
+    Toggle,       // On/off state button
+    Radio,        // Single selection from group
+    Checkbox,     // Multiple selection
+}
+
+// ------------------------------------------------------------------------------------------------
+//  Size
+// ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Size {
+    Xs, 
+    Sm, 
+    Md, 
+    Lg, 
+    Xl, 
+}
+
+// ------------------------------------------------------------------------------------------------
 //  State
 // ------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum State {
     Default,
-    Loading,     // Shows spinner
-    Disabled,    // Non-interactive
-    Active,      // Currently selected/pressed
+    Loading,
+    Disabled,
+    Active, 
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -57,10 +83,19 @@ pub enum State {
 pub fn Button(
     #[prop(default = Variant::Primary)] variant: Variant,
     #[prop(default = State::Default)] state: State,
-    #[prop(default = "Click me".to_string())] text: String,
+    #[prop(default = Size::Md)] size: Size,
+     #[prop(default = "Click me".to_string())] text: String,
     #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
 ) -> impl IntoView {
-    let padding = format!("px-{} py-{}", Spacing::Md, Spacing::Sm);
+
+    
+    let padding = match size {
+        Size::Xs => format!("px-{} py-{}", Spacing::Xs, Spacing::Xs),
+        Size::Sm => format!("px-{} py-{}", Spacing::Sm, Spacing::Xs),
+        Size::Md => format!("px-{} py-{}", Spacing::Md, Spacing::Sm),
+        Size::Lg => format!("px-{} py-{}", Spacing::Lg, Spacing::Md),
+        Size::Xl => format!("px-{} py-{}", Spacing::Lg, Spacing::Lg),
+    };
     
     let (state_modifiers, hover) = match state {
         State::Default => ("", variant.hover_colour()),
@@ -69,10 +104,23 @@ pub fn Button(
         State::Loading => ("opacity-75", ""),
     };
 
-    let button_classes = format!("{} {} {} {} {} {}", variant.base_colour(), hover, state_modifiers, ROUND_BORDER, NORMAL_CLASS, padding);
+    let text_format = format!("{} {} {}", 
+        FONT_STR,
+        match size {
+            Size::Xs => TextSize::Xs,
+            Size::Sm => TextSize::Sm,
+            Size::Md => TextSize::Base,
+            Size::Lg => TextSize::Lg,
+            Size::Xl => TextSize::Xl,    
+        }, 
+        FONT_CLR);
 
+    let button_classes = format!("{} {} {} {} {} {}", variant.base_colour(), hover, state_modifiers,
+                                 ROUND_BORDER, padding, text_format);
+    web_sys::console::log_1(&format!("Button classes: {}", button_classes).into());
     return view! {
         <button 
+            id=format!("btn-{:?}", size)
             class={button_classes}
             on:click=move |_| {
                 if let Some(ref action) = on_click {
