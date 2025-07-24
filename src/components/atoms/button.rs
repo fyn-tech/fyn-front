@@ -16,7 +16,7 @@ pub enum Variant {
 }
 
 impl Variant{
-    fn base_colour(&self) -> &str{
+    pub fn base_colour(&self) -> &str{
         return match self{
             Variant::Primary => "bg-primary-500 dark:bg-primary-950",
             Variant::Secondary => "bg-primary-300 dark:bg-primary-700",
@@ -26,7 +26,7 @@ impl Variant{
         };
     }
 
-    fn hover_colour(&self) -> &str{
+    pub fn hover_colour(&self) -> &str{
         return match self{
             Variant::Primary => "hover:bg-primary-300 dark:hover:bg-primary-700",
             Variant::Secondary => "hover:bg-primary-50 dark:hover:bg-primary-500",
@@ -63,6 +63,17 @@ pub enum Size {
     Xl, 
 }
 
+fn padding(size: &Size) -> String {
+    return match size {
+        Size::Xs => format!("px-{} py-{}", Spacing::Xs, Spacing::Xs),
+        Size::Sm => format!("px-{} py-{}", Spacing::Sm, Spacing::Xs),
+        Size::Md => format!("px-{} py-{}", Spacing::Md, Spacing::Sm),
+        Size::Lg => format!("px-{} py-{}", Spacing::Lg, Spacing::Md),
+        Size::Xl => format!("px-{} py-{}", Spacing::Lg, Spacing::Lg),
+    };
+}
+
+
 // ------------------------------------------------------------------------------------------------
 //  State
 // ------------------------------------------------------------------------------------------------
@@ -84,22 +95,15 @@ pub fn Button(
     #[prop(default = Variant::Primary)] variant: Variant,
     #[prop(default = State::Default)] state: State,
     #[prop(default = Size::Md)] size: Size,
-     #[prop(default = "Click me".to_string())] text: String,
+    #[prop(default = "Click me".to_string())] text: String,
     #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
 ) -> impl IntoView {
-
     
-    let padding = match size {
-        Size::Xs => format!("px-{} py-{}", Spacing::Xs, Spacing::Xs),
-        Size::Sm => format!("px-{} py-{}", Spacing::Sm, Spacing::Xs),
-        Size::Md => format!("px-{} py-{}", Spacing::Md, Spacing::Sm),
-        Size::Lg => format!("px-{} py-{}", Spacing::Lg, Spacing::Md),
-        Size::Xl => format!("px-{} py-{}", Spacing::Lg, Spacing::Lg),
-    };
+    let padding = padding(&size);
     
     let (state_modifiers, hover) = match state {
         State::Default => ("", variant.hover_colour()),
-        State::Active => ("ring-2 ring-primary-300", variant.hover_colour()),
+        State::Active => ("ring-2 ring-primary-950 dark:ring-primary-300", variant.hover_colour()),
         State::Disabled => ("opacity-50 cursor-not-allowed", ""),
         State::Loading => ("opacity-75", ""),
     };
@@ -117,7 +121,53 @@ pub fn Button(
 
     let button_classes = format!("{} {} {} {} {} {}", variant.base_colour(), hover, state_modifiers,
                                  ROUND_BORDER, padding, text_format);
-    web_sys::console::log_1(&format!("Button classes: {}", button_classes).into());
+
+    return view! {
+        <button 
+            id=format!("btn-{:?}", size)
+            class={button_classes}
+            on:click=move |_| {
+                if let Some(ref action) = on_click {
+                    action();
+                }
+            }
+        >
+            {text}
+        </button>
+    };
+}
+
+#[component]
+pub fn GroupButton(
+    #[prop(default = State::Default)] state: State,
+    #[prop(default = Size::Md)] size: Size,
+    #[prop(default = "Click me".to_string())] text: String,
+    #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
+) -> impl IntoView {
+    
+    let padding = padding(&size);
+    
+    let (state_modifiers, hover) = match state {
+        State::Default => ("", Variant::Primary.hover_colour()),
+        State::Active => ("ring-2 ring-primary-300", Variant::Primary.hover_colour()),
+        State::Disabled => ("opacity-50 cursor-not-allowed", ""),
+        State::Loading => ("opacity-75", ""),
+    };
+
+    let text_format = format!("{} {} {}", 
+        FONT_STR,
+        match size {
+            Size::Xs => TextSize::Xs,
+            Size::Sm => TextSize::Sm,
+            Size::Md => TextSize::Base,
+            Size::Lg => TextSize::Lg,
+            Size::Xl => TextSize::Xl,    
+        }, 
+        FONT_CLR);
+
+    let button_classes = format!("{} {} {} {}", hover, state_modifiers,
+                                 padding, text_format);
+
     return view! {
         <button 
             id=format!("btn-{:?}", size)

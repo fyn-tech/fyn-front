@@ -52,6 +52,7 @@ impl std::fmt::Display for FlexAlign {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Spacing{ // in px
+    No, // 4 
     Xs, // 4 
     Sm, // 8 (default)
     Md, // 16
@@ -61,6 +62,7 @@ pub enum Spacing{ // in px
 impl std::fmt::Display for Spacing {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let class = match self {
+            Spacing::No => "",
             Spacing::Xs => "1",
             Spacing::Sm => "2",
             Spacing::Md => "3",
@@ -111,14 +113,20 @@ pub fn standard_border(color: Option<BorderColor>) -> String {
 pub fn Stack(
     #[prop(default = Spacing::Sm)] space: Spacing,
     #[prop(default = false)] horizontal: bool,
+    #[prop(default = true)] fill_space: bool,
     #[prop(default = FlexAlign::Stretch)] align: FlexAlign,
+    #[prop(optional)] add_class: Option<String>,
     children: Children
 ) -> impl IntoView {
     
-    let class_str = format!("flex flex-{} gap-{} {}", 
+    let additional_class = add_class.unwrap_or_default();
+
+    let class_str = format!("{} flex-{} gap-{} {} {}", 
+        if fill_space {"flex"} else {"inline-flex"},
         if horizontal {"row"} else {"col"}, 
         space,
-        align 
+        align,
+        additional_class
     );
     return view!{
         <div class={class_str}>
@@ -132,11 +140,16 @@ pub fn Grid(
     #[prop(default = Spacing::Sm)] space: Spacing,
     #[prop(default = 0)] cols: u8,
     #[prop(default = 0)] rows: u8,
+    #[prop(default = true)] fill_space: bool,
     children: Children) -> impl IntoView{
 
     let col_str = if cols != 0 {format!("grid-cols-{}", cols)} else {"".to_string()};
     let row_str = if rows != 0 {format!("grid-rows-{}", rows)} else {"".to_string()};
-    let class_str:String = format!("grid {} {} gap-{}", col_str, row_str, space).to_string();
+    let class_str:String = format!("{} {} {} gap-{}", 
+                                   if fill_space {"grid"} else {"inline-grid"},
+                                   col_str, 
+                                   row_str, 
+                                   space).to_string();
     return view!{
         <div class={class_str}>
             {children()}

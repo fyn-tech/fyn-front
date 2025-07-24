@@ -2,6 +2,7 @@ use leptos::prelude::*;
 use crate::components::atoms::button::{*, Size as ButtonSize};
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
+use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 
 
@@ -149,6 +150,22 @@ pub fn Showcase() -> impl IntoView {
                     </BorderedDiv>
 
                     <H2>"Molecules"</H2>          
+                     // Button Bars
+                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
+                        <H3>"Button Bars"</H3>
+                        <Grid cols=1 fill_space=false>
+                            <ButtonBar items=vec![
+                                view! {<GroupButton text="First".to_string() />},
+                                view! {<GroupButton text="Second".to_string() />},
+                                view! {<GroupButton text="Third".to_string() />}
+                            ]/>
+                            <ButtonBar horizontal=false items=vec![
+                                view! {<GroupButton text="First".to_string() />},
+                                view! {<GroupButton text="Second".to_string() />},
+                                view! {<GroupButton text="Third".to_string() />}
+                            ]/>
+                        </Grid>
+                     </BorderedDiv>
 
                      // Tables
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
