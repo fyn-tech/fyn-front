@@ -3,12 +3,13 @@ use leptos_meta::*;
 use leptos_router::{components::*, path};
 
 // Modules
+mod common;
 mod components;
 mod pages;
 
 // Top-Level pages
 use crate::pages::home::Home;
-use crate::pages::showcase::Showcase; 
+use crate::pages::showcase::Showcase;
 
 /// An app router which renders the homepage and handles 404's
 #[component]
