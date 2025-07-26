@@ -8,9 +8,9 @@ authors = ["bevanwsjones <bevanwsjones@gmail.com>"]
 
 [dependencies]
 const_format = "0.2"
-leptos = { version = "0.8", features = ["csr"] }
-leptos_meta = { version = "0.8" }
-leptos_router = { version = "0.8" }
+leptos = { version = "0.8.5", features = ["csr"] }
+leptos_meta = { version = "0.8.5" }
+leptos_router = { version = "0.8.5" }
 console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1"
