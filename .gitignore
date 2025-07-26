@@ -8,3 +8,6 @@
 
 # Editor directories and files
 .vscode/
+
+# remove lock file
+.lock
