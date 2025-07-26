@@ -174,6 +174,13 @@ pub fn Showcase() -> impl IntoView {
                         <Stack horizontal=true align=FlexAlign::Center>
                             <CheckBox id="checkbox".to_string() key="checkbox".to_string()/>
                         </Stack>
+                        <H3>"Select"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <Select id="select".to_string() key="select".to_string() options={vec![
+                                ("item_1".to_string(), "item 1".to_string()),
+                                ("item_2".to_string(), "item 2".to_string()),
+                                ]}/>
+                        </Stack>
                     </BorderedDiv>
 
                     <H2>"Molecules"</H2>
