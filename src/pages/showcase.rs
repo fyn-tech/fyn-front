@@ -152,9 +152,27 @@ pub fn Showcase() -> impl IntoView {
 
                     <H2>"Form Elements"</H2>
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Input"</H3>
-                        <Stack horizontal=true align=FlexAlign::End>
-                            <Text/>
+                        <H3>"Text Input"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <Text id="text".to_string() key="text".to_string()/>
+                        </Stack>
+                        <H3>"Numerical"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <Float id="float".to_string() key="float".to_string()/>
+                            <Integer id="int".to_string() key="int".to_string()/>
+                        </Stack>
+                        <H3>"Email & Password"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <Email id="email".to_string() key="email".to_string()/>
+                            <Password id="password".to_string() key="password".to_string()/>
+                        </Stack>
+                        <H3>"File"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <File id="file".to_string() key="file".to_string()/>
+                        </Stack>
+                        <H3>"Check Box"</H3>
+                        <Stack horizontal=true align=FlexAlign::Center>
+                            <CheckBox id="checkbox".to_string() key="checkbox".to_string()/>
                         </Stack>
                     </BorderedDiv>
 
