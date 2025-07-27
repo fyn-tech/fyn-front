@@ -6,6 +6,7 @@ use crate::components::atoms::input::*;
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::{H1, H2, H3, H4, P};
 use crate::components::molecules::button_bar::*;
+use crate::components::molecules::form_field::*;
 use crate::components::molecules::table::*;
 
 /// Component showcase page for design system development
@@ -200,6 +201,13 @@ pub fn Showcase() -> impl IntoView {
                             ]/>
                         </Grid>
                      </BorderedDiv>
+                     // Tables
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
+                        <H3>"Form Fields"</H3>
+                        <div class="w-1/2"> // would normally be done by the form
+                            <FormField></FormField>
+                        </div>
+                    </BorderedDiv>
 
                      // Tables
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
