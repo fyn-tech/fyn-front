@@ -2,7 +2,7 @@ use leptos::prelude::*;
 
 use crate::common::size::*;
 use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{Size as TextSize, FONT_CLR, FONT_STR};
+use crate::components::atoms::typography::{text_size, FONT_CLR, FONT_STR};
 
 // ------------------------------------------------------------------------------------------------
 //  Variant
@@ -88,19 +88,7 @@ pub fn Button(
         State::Loading => ("opacity-75", ""),
     };
 
-    let text_format = format!(
-        "{} {} {}",
-        FONT_STR,
-        match size {
-            Size::None => TextSize::None,
-            Size::Xs => TextSize::Xs,
-            Size::Sm => TextSize::Sm,
-            Size::Md => TextSize::Base,
-            Size::Lg => TextSize::Lg,
-            Size::Xl => TextSize::Xl,
-        },
-        FONT_CLR
-    );
+    let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
 
     let button_classes = format!(
         "{} {} {} {} {} {}",
@@ -143,19 +131,7 @@ pub fn GroupButton(
         State::Loading => ("opacity-75", ""),
     };
 
-    let text_format = format!(
-        "{} {} {}",
-        FONT_STR,
-        match size {
-            Size::None => TextSize::None,
-            Size::Xs => TextSize::Xs,
-            Size::Sm => TextSize::Sm,
-            Size::Md => TextSize::Base,
-            Size::Lg => TextSize::Lg,
-            Size::Xl => TextSize::Xl,
-        },
-        FONT_CLR
-    );
+    let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
 
     let button_classes = format!("{} {} {} {}", hover, state_modifiers, padding, text_format);
 

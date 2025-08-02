@@ -6,7 +6,7 @@ use serde::de::value;
 use crate::common::size::Size;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{Size as TextSize, FONT_CLR, FONT_STR};
+use crate::components::atoms::typography::{FONT_CLR, FONT_STR};
 
 // -------------------------------------------------------------------------------------------------
 //  Common Input

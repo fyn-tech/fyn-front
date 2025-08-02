@@ -6,4 +6,5 @@ pub enum Size {
     Md,
     Lg,
     Xl,
+    Xl2,
 }

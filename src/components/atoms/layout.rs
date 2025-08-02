@@ -60,6 +60,7 @@ pub fn spacing(size: Size) -> &'static str {
         Size::Md => "3",
         Size::Lg => "4",
         Size::Xl => "5",
+        Size::Xl2 => "6",
     };
 }
 
@@ -71,6 +72,7 @@ pub fn padding(size: Size) -> String {
         Size::Md => format!("px-{} py-{}", spacing(Size::Md), spacing(Size::Sm)),
         Size::Lg => format!("px-{} py-{}", spacing(Size::Lg), spacing(Size::Md)),
         Size::Xl => format!("px-{} py-{}", spacing(Size::Xl), spacing(Size::Lg)),
+        Size::Xl2 => format!("px-{} py-{}", spacing(Size::Xl2), spacing(Size::Xl)),
     };
 }
 
