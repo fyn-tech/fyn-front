@@ -7,6 +7,7 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::{H1, H2, H3, H4, P};
 use crate::components::molecules::button_bar::*;
 use crate::components::molecules::form_field::*;
+use crate::components::molecules::section::*;
 use crate::components::molecules::table::*;
 
 /// Component showcase page for design system development
@@ -124,95 +125,112 @@ pub fn Showcase() -> impl IntoView {
 
                     // Buttons subsection
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Button Variants"</H3>
-                        <Stack horizontal=true>
-                            <Button variant=Variant::Primary text="Primary".to_string() />
-                            <Button variant=Variant::Secondary text="Secondary".to_string() />
-                            <Button variant=Variant::Tertiary text="Tertiary".to_string() />
-                            <Button variant=Variant::Warning text="Warning".to_string() />
-                            <Button variant=Variant::Success text="Success".to_string() />
-                        </Stack>
+                        <Section level=SectionLevel::H3 is_first=true title="Button Variants".to_string()>
+                            <Stack horizontal=true>
+                                <Button variant=Variant::Primary text="Primary".to_string() />
+                                <Button variant=Variant::Secondary text="Secondary".to_string() />
+                                <Button variant=Variant::Tertiary text="Tertiary".to_string() />
+                                <Button variant=Variant::Warning text="Warning".to_string() />
+                                <Button variant=Variant::Success text="Success".to_string() />
+                            </Stack>
+                        </Section>
 
-                        <H3>"Button States"</H3>
-                        <Stack horizontal=true>
-                            <Button variant=Variant::Primary state=State::Default text="Default".to_string() />
-                            <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
-                            <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
-                            <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
-                        </Stack>
+                        <Section level=SectionLevel::H3 title="Button States".to_string()>
+                            <Stack horizontal=true>
+                                <Button variant=Variant::Primary state=State::Default text="Default".to_string() />
+                                <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
+                                <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
+                                <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
+                            </Stack>
+                        </Section>
 
-                        <H3>"Button Sizes"</H3>
-                        <Stack horizontal=true align=FlexAlign::End>
-                            <Button variant=Variant::Primary size=Size::Xl text="Xl".to_string() />
-                            <Button variant=Variant::Primary size=Size::Lg text="Lg".to_string() />
-                            <Button variant=Variant::Primary size=Size::Md text="Md".to_string() />
-                            <Button variant=Variant::Primary size=Size::Sm text="Sm".to_string() />
-                            <Button variant=Variant::Primary size=Size::Xs text="Xs".to_string() />
-                        </Stack>
+                        <Section level=SectionLevel::H3 title="Button Sizes".to_string()>
+                            <Stack horizontal=true align=FlexAlign::End>
+                                <Button variant=Variant::Primary size=Size::Xl text="Xl".to_string() />
+                                <Button variant=Variant::Primary size=Size::Lg text="Lg".to_string() />
+                                <Button variant=Variant::Primary size=Size::Md text="Md".to_string() />
+                                <Button variant=Variant::Primary size=Size::Sm text="Sm".to_string() />
+                                <Button variant=Variant::Primary size=Size::Xs text="Xs".to_string() />
+                            </Stack>
+                        </Section>
                     </BorderedDiv>
 
                     <H2>"Form Elements"</H2>
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Text Input"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <Text id="text".to_string() key="text".to_string()/>
-                        </Stack>
-                        <H3>"Numerical"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <Float id="float".to_string() key="float".to_string()/>
-                            <Integer id="int".to_string() key="int".to_string()/>
-                        </Stack>
-                        <H3>"Email & Password"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <Email id="email".to_string() key="email".to_string()/>
-                            <Password id="password".to_string() key="password".to_string()/>
-                        </Stack>
-                        <H3>"File"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <File id="file".to_string() key="file".to_string()/>
-                        </Stack>
-                        <H3>"Check Box"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <CheckBox id="checkbox".to_string() key="checkbox".to_string()/>
-                        </Stack>
-                        <H3>"Select"</H3>
-                        <Stack horizontal=true align=FlexAlign::Center>
-                            <Select id="select".to_string() key="select".to_string() options={vec![
-                                ("item_1".to_string(), "item 1".to_string()),
-                                ("item_2".to_string(), "item 2".to_string()),
-                                ]}/>
-                        </Stack>
+                        <Section level=SectionLevel::H3 is_first=true title="Text Input".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <Text id="text".to_string() key="text".to_string()/>
+                            </Stack>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="Numerical".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <Float id="float".to_string() key="float".to_string()/>
+                                <Integer id="int".to_string() key="int".to_string()/>
+                            </Stack>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="Email & Password".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <Email id="email".to_string() key="email".to_string()/>
+                                <Password id="password".to_string() key="password".to_string()/>
+                            </Stack>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="File".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <File id="file".to_string() key="file".to_string()/>
+                            </Stack>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="Check Box".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <CheckBox id="checkbox".to_string() key="checkbox".to_string()/>
+                            </Stack>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="Select".to_string()>
+                            <Stack horizontal=true align=FlexAlign::Center>
+                                <Select id="select".to_string() key="select".to_string() options={vec![
+                                    ("item_1".to_string(), "item 1".to_string()),
+                                    ("item_2".to_string(), "item 2".to_string()),
+                                    ]}/>
+                            </Stack>
+                        </Section>
                     </BorderedDiv>
 
                     <H2>"Molecules"</H2>
                      // Button Bars
                      <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Button Bars"</H3>
-                        <Grid cols=1 fill_space=false>
-                            <ButtonBar items=vec![
-                                view! {<GroupButton text="First".to_string() />},
-                                view! {<GroupButton text="Second".to_string() />},
-                                view! {<GroupButton text="Third".to_string() />}
-                            ]/>
-                            <ButtonBar horizontal=false items=vec![
-                                view! {<GroupButton text="First".to_string() />},
-                                view! {<GroupButton text="Second".to_string() />},
-                                view! {<GroupButton text="Third".to_string() />}
-                            ]/>
-                        </Grid>
+                        <Section level=SectionLevel::H3 is_first=true title="Button Bars".to_string()>
+                            <Grid cols=1 fill_space=false>
+                                <ButtonBar items=vec![
+                                    view! {<GroupButton text="First".to_string() />},
+                                    view! {<GroupButton text="Second".to_string() />},
+                                    view! {<GroupButton text="Third".to_string() />}
+                                ]/>
+                                <ButtonBar horizontal=false items=vec![
+                                    view! {<GroupButton text="First".to_string() />},
+                                    view! {<GroupButton text="Second".to_string() />},
+                                    view! {<GroupButton text="Third".to_string() />}
+                                ]/>
+                            </Grid>
+                        </Section>
                      </BorderedDiv>
                      // Tables
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Form Fields"</H3>
-                        <div class="w-1/2"> // would normally be done by the form
-                            <FormField></FormField>
-                        </div>
+                        <Section level=SectionLevel::H3 is_first=true title="Form Fields".to_string()>
+                            <div class="w-1/2"> // would normally be done by the form
+                                <FormField></FormField>
+                            </div>
+                        </Section>
                     </BorderedDiv>
 
                      // Tables
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <H3>"Tables"</H3>
-                        <Table table={get_example_table_data()}></Table>
+                        <Section level=SectionLevel::H3 is_first=true title="Tables".to_string()>
+                            <Table table={get_example_table_data()}></Table>
+                        </Section>
                     </BorderedDiv>
                 </Stack>
             </div>
