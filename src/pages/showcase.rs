@@ -219,7 +219,7 @@ pub fn Showcase() -> impl IntoView {
                      </BorderedDiv>
 
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
-                        <Section level=SectionLevel::H3 is_first=true title="Form Fields".to_string()>
+                        <Section level=SectionLevel::H3 is_first=true title="Form Fields Horizontal".to_string()>
                             <div class="w-1/2"> // would normally be done by the form
                                 <Stack>
                                     <FormField
@@ -238,6 +238,38 @@ pub fn Showcase() -> impl IntoView {
                                     <FormField
                                         label="Number Field".to_string()
                                         key="form_number".to_string()
+                                        input_type=InputType::Float {
+                                            value: (None),
+                                            min: (None),
+                                            max: (None),
+                                            step: (None) }>
+                                        </FormField>
+                                </Stack>
+                            </div>
+                        </Section>
+
+                        <Section level=SectionLevel::H3 title="Vertical Fields Horizontal".to_string()>
+                            <div class="w-1/2"> // would normally be done by the form
+                                <Stack>
+                                    <FormField
+                                        label="Text Field".to_string()
+                                        key="form_text_v".to_string()
+                                        horizontal=false
+                                        input_type=InputType::Text { value: (None)}>
+                                    </FormField>
+                                    <FormField
+                                        label="Select Field".to_string()
+                                        key="form_select_v".to_string()
+                                        horizontal=false
+                                        input_type=InputType::Select { options:{vec![
+                                            ("item_1".to_string(), "item 1".to_string()),
+                                            ("item_2".to_string(), "item 2".to_string()),
+                                            ]}, selected: (None)}>
+                                    </FormField>
+                                    <FormField
+                                        label="Number Field".to_string()
+                                        key="form_number_v".to_string()
+                                        horizontal=false
                                         input_type=InputType::Float {
                                             value: (None),
                                             min: (None),
