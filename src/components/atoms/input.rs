@@ -14,8 +14,9 @@ use crate::components::atoms::typography::{Size as TextSize, FONT_CLR, FONT_STR}
 
 fn input_field_string(align: Align) -> String {
     return format!(
-        "{} {} {} {} {} {} {} {}",
+        "{} {} {} {} {} {} {} {} {}",
         "bg-surface-50 dark:bg-surface-950",
+        "w-64",
         standard_border(Some(BorderColor::Surface)),
         ROUND_BORDER,
         padding(Size::Sm),
@@ -34,15 +35,21 @@ fn input_field_string(align: Align) -> String {
 pub fn Text(
     id: String,
     key: String,
-    #[prop(default = "".to_string())] value: String,
-    #[prop(default = "text".to_string())] placeholder: String,
+    #[prop(default = None)] value: Option<String>,
+    #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Right);
 
     return view! {
-      <input class={class_str} type="text" id={id} name={key} value={value}
-        placeholder={placeholder} required={required}/>
+        <input
+            class={class_str}
+            type="text" id={id}
+            name={key}
+            value={value.unwrap_or("".to_string())}
+            placeholder={placeholder.unwrap_or("text".to_string())}
+            required={required}
+        />
     };
 }
 
@@ -50,12 +57,12 @@ pub fn Text(
 pub fn Float(
     id: String,
     key: String,
-    #[prop(default = "Enter value".to_string())] placeholder: String,
+    #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(optional)] value: Option<f64>,
-    #[prop(optional)] min: Option<f64>,
-    #[prop(optional)] max: Option<f64>,
-    #[prop(optional)] step: Option<f64>,
+    #[prop(default = None)] value: Option<f64>,
+    #[prop(default = None)] min: Option<f64>,
+    #[prop(default = None)] max: Option<f64>,
+    #[prop(default = None)] step: Option<f64>,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Right);
 
@@ -66,7 +73,7 @@ pub fn Float(
             id={id}
             name={key}
             value={value}
-            placeholder={placeholder}
+            placeholder={placeholder.unwrap_or("enter value".to_string())}
             required={required}
             min={min}
             max={max}
@@ -79,12 +86,12 @@ pub fn Float(
 pub fn Integer(
     id: String,
     key: String,
-    #[prop(default = "Enter value".to_string())] placeholder: String,
+    #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(optional)] value: Option<i64>,
-    #[prop(optional)] min: Option<i64>,
-    #[prop(optional)] max: Option<i64>,
-    #[prop(optional)] step: Option<i64>,
+    #[prop(default = None)] value: Option<i64>,
+    #[prop(default = None)] min: Option<i64>,
+    #[prop(default = None)] max: Option<i64>,
+    #[prop(default = None)] step: Option<i64>,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Right);
 
@@ -95,7 +102,7 @@ pub fn Integer(
             id={id}
             name={key}
             value={value}
-            placeholder={placeholder}
+            placeholder={placeholder.unwrap_or("enter value".to_string())}
             required={required}
             min={min}
             max={max}
@@ -108,7 +115,7 @@ pub fn Integer(
 pub fn Email(
     id: String,
     key: String,
-    #[prop(default = "email".to_string())] placeholder: String,
+    #[prop(default = "e-mail".to_string())] placeholder: String,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Right);
@@ -203,9 +210,9 @@ pub fn Select(
     id: String,
     key: String,
     options: Vec<(String, String)>, // (value, display_text) pairs
-    #[prop(default = "Select option".to_string())] placeholder: String,
+    #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(optional)] selected_value: Option<String>,
+    #[prop(default = None)] selected_value: Option<String>,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Left);
 
@@ -217,10 +224,10 @@ pub fn Select(
             required={required}
         >
 
-            {if !placeholder.is_empty() {
+            {if placeholder.is_none() {
                 Some(view! {
                     <option value="" disabled={true} selected={selected_value.is_none()}>
-                        {placeholder}
+                        {placeholder.unwrap_or("select option".to_string())}
                     </option>
                 })
             } else {
