@@ -38,7 +38,7 @@ pub fn Section(
     };
 
     view! {
-        <div class=format!("mt-{}", space_above)>
+        <div class=format!("mt-{} mt-{}", space_above, space_above)>
             {heading}
             <Stack>
                 {children()}

@@ -1,11 +1,11 @@
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::common::size::*;
+use crate::common::size::Size;
 use crate::components::atoms::button::*;
 use crate::components::atoms::input::*;
 use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{Size, H3, H4_CLASS, NORMAL_CLASS};
+use crate::components::atoms::typography::{H3, H4_CLASS, NORMAL_CLASS};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum InputType {
@@ -125,19 +125,24 @@ pub fn FormField(
     input_type: InputType,
 
     #[prop(optional)] id: Option<String>,
+    #[prop(default = true)] horizontal: bool,
     #[prop(optional)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
     let field_id = id.unwrap_or_else(|| format!("field-{}", key));
-
-    let class_str = format!("{} {}", H4_CLASS, "");
-
     let input = build_input(field_id.clone(), key, input_type, required, placeholder);
+    let align = if horizontal {
+        FlexAlign::Center
+    } else {
+        FlexAlign::Start
+    };
+    let spacing = if horizontal { Size::Sm } else { Size::Xs };
 
     return view! {
-      <Stack horizontal=true align=FlexAlign::Center add_class="justify-between".to_string()>
+      <Stack size={spacing} horizontal={horizontal} align={align} add_class="justify-between".to_string()>
         <label class={H4_CLASS} for={field_id.clone()}>{label}</label>
-            {input}
+
+        {input}
       </Stack>
     };
 }
