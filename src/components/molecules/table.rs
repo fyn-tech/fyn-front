@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::size::*;
 use crate::components::atoms::layout::{spacing, Align, BorderColor, BorderedDiv};
-use crate::components::atoms::typography::{H3, H4_CLASS, NORMAL_CLASS};
+use crate::components::atoms::typography::{FONT_CLR, H3, H4_CLASS, NORMAL_CLASS};
 
 // ------------------------------------------------------------------------------------------------
 //  Data Structs
@@ -51,7 +51,7 @@ fn cell_format() -> String {
 #[component]
 fn TH(children: Children) -> impl IntoView {
     return view! {
-        <th class=format!("{} {} {}", H4_CLASS, cell_format(), Align::Left)>
+        <th class=format!("{} {} {} {}", H4_CLASS, FONT_CLR, cell_format(), Align::Left)>
             {children()}
         </th>
     };
@@ -60,7 +60,7 @@ fn TH(children: Children) -> impl IntoView {
 #[component]
 fn TD(cell_type: CellType, children: Children) -> impl IntoView {
     return view! {
-        <td class=format!("{} {} {}", NORMAL_CLASS, cell_format(),
+        <td class=format!("{} {} {} {}", NORMAL_CLASS, FONT_CLR, cell_format(),
                         if cell_type == CellType::Text {Align::Left} else {Align::Right})>
             {children()}
         </td>

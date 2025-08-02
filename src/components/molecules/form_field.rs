@@ -1,12 +1,9 @@
 use leptos::prelude::*;
-use serde::{Deserialize, Serialize};
 
 use crate::common::size::Size;
-use crate::common::size::Size;
-use crate::components::atoms::button::*;
 use crate::components::atoms::input::*;
 use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{H3, H4_CLASS, NORMAL_CLASS};
+use crate::components::atoms::typography::{FONT_CLR, H4_CLASS};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum InputType {
@@ -141,7 +138,7 @@ pub fn FormField(
 
     return view! {
       <Stack size={spacing} horizontal={horizontal} align={align} add_class="justify-between".to_string()>
-        <label class={H4_CLASS} for={field_id.clone()}>{label}</label>
+        <label class={format!("{} {}", H4_CLASS, FONT_CLR)} for={field_id.clone()}>{label}</label>
         {input}
       </Stack>
     };
