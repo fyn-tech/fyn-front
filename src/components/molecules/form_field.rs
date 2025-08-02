@@ -2,6 +2,7 @@ use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::common::size::Size;
+use crate::common::size::Size;
 use crate::components::atoms::button::*;
 use crate::components::atoms::input::*;
 use crate::components::atoms::layout::*;
