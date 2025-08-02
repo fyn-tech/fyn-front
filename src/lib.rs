@@ -9,6 +9,7 @@ use leptos_router::{components::*, path};
 // Top-Level pages
 use crate::pages::home::Home;
 use crate::pages::not_found::NotFound;
+use crate::pages::register::Register;
 use crate::pages::showcase::Showcase;
 
 /// An app router which renders the homepage and handles 404's
@@ -27,11 +28,14 @@ pub fn App() -> impl IntoView {
         <Meta charset="UTF-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <Router>
-            <Routes fallback=NotFound >
-                <Route path=path!("/") view=Home />
-                <Route path=path!("/showcase") view=Showcase />  // Add this
-            </Routes>
-        </Router>
+        <div class="min-h-screen bg-surface-50 dark:bg-surface-950">
+            <Router>
+                <Routes fallback=NotFound >
+                    <Route path=path!("/") view=Home />
+                    <Route path=path!("/register") view=Register />
+                    <Route path=path!("/showcase") view=Showcase />  // Add this
+                </Routes>
+            </Router>
+        </div>
     }
 }

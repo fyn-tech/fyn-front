@@ -57,4 +57,8 @@ module.exports = {
     },
   },
   plugins: [],
+  safelist: [
+    'text-content-primary-dark',
+    'dark:text-content-primary-dark'  // Add the dark variant too
+  ],
 }
