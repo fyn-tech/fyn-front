@@ -12,6 +12,7 @@ use crate::pages::home::Home;
 use crate::pages::not_found::NotFound;
 use crate::pages::register::Register;
 use crate::pages::showcase::Showcase;
+use crate::pages::sign_in::SignIn;
 
 /// An app router which renders the homepage and handles 404's
 #[component]
@@ -34,6 +35,7 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=NotFound >
                     <Route path=path!("/") view=Home />
                     <Route path=path!("/register") view=Register />
+                    <Route path=path!("/sign_in") view=SignIn />
                     <Route path=path!("/showcase") view=Showcase />  // Add this
                 </Routes>
             </Router>

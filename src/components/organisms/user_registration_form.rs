@@ -9,7 +9,7 @@ use crate::components::molecules::section::*;
 pub fn UserRegisterForm() -> impl IntoView {
     return view! {
       <form>
-        <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Sign Up".to_string()}>
+        <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Register".to_string()}>
           <Grid size={Size::Xl} cols=2>
             <FormField
               label={"First Name".to_string()}
