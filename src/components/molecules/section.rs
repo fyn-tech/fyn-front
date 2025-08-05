@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::layout::{spacing, Align, FlexAlign, Stack};
+use crate::components::atoms::layout::{spacing, Align, Stack};
 use crate::components::atoms::typography::{H1, H2, H3, H4};
 
 #[derive(Debug, Clone, Copy, PartialEq)]

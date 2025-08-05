@@ -1,6 +1,7 @@
 mod common;
 mod components;
 mod pages;
+mod templates;
 
 use leptos::prelude::*;
 use leptos_meta::*;
