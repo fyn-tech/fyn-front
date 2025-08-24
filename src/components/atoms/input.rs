@@ -1,10 +1,6 @@
-use std::default;
-
 use leptos::prelude::*;
-use serde::de::value;
 
 use crate::common::size::Size;
-use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::{FONT_CLR, FONT_STR};
 
