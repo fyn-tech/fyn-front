@@ -39,7 +39,7 @@ pub fn Text(
     #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
-    let class_str = input_field_string(Align::Right);
+    let class_str = input_field_string(Align::Left);
 
     return view! {
         <input
@@ -64,7 +64,7 @@ pub fn Float(
     #[prop(default = None)] max: Option<f64>,
     #[prop(default = None)] step: Option<f64>,
 ) -> impl IntoView {
-    let class_str = input_field_string(Align::Right);
+    let class_str = input_field_string(Align::Left);
 
     return view! {
         <input
@@ -93,7 +93,7 @@ pub fn Integer(
     #[prop(default = None)] max: Option<i64>,
     #[prop(default = None)] step: Option<i64>,
 ) -> impl IntoView {
-    let class_str = input_field_string(Align::Right);
+    let class_str = input_field_string(Align::Left);
 
     return view! {
         <input
@@ -118,7 +118,7 @@ pub fn Email(
     #[prop(default = "e-mail".to_string())] placeholder: String,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
-    let class_str = input_field_string(Align::Right);
+    let class_str = input_field_string(Align::Left);
 
     return view! {
         <input
@@ -139,7 +139,7 @@ pub fn Password(
     #[prop(default = "password".to_string())] placeholder: String,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
-    let class_str = input_field_string(Align::Right);
+    let class_str = input_field_string(Align::Left);
 
     return view! {
         <input
@@ -165,7 +165,7 @@ pub fn File(id: String, key: String, #[prop(default = false)] required: bool) ->
         file:px-{} file:py-{}
         file:{}
         file:text-content-primary dark:file:text-content-primary-dark",
-        input_field_string(Align::Right),
+        input_field_string(Align::Left),
         ROUND_BORDER,
         spacing(Size::Sm),
         spacing(Size::Xs),
