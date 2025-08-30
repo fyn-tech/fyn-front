@@ -6,6 +6,10 @@
 /dist
 /target
 
+# api client
+/fyn_api
+fyn_api_client.yaml
+
 # Editor directories and files
 .vscode/
 
