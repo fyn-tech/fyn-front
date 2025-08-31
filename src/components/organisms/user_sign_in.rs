@@ -12,9 +12,9 @@ pub fn UserSignIn() -> impl IntoView {
         <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Sign In".to_string()}>
           <Grid size={Size::Xl} cols=2>
             <FormField
-              label={"Email".to_string()}
-              key={"email".to_string()}
-              input_type=InputType::Email/>
+              label={"Username".to_string()}
+              key={"username".to_string()}
+              input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Password".to_string()}
               key={"password".to_string()}

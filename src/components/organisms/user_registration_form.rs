@@ -20,6 +20,10 @@ pub fn UserRegisterForm() -> impl IntoView {
               key={"last_name".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
+              label={"Username".to_string()}
+              key={"username".to_string()}
+              input_type=InputType::Text { value: (None) }/>
+            <FormField
               label={"Email".to_string()}
               key={"email".to_string()}
               input_type=InputType::Email/>
