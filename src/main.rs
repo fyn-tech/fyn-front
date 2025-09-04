@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use fyn_front::App;
+use leptos::prelude::*;
 
 fn main() {
     // set up logging

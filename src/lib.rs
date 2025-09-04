@@ -1,11 +1,15 @@
 mod common;
 mod components;
+mod domain;
+mod infrastructure;
 mod pages;
 mod templates;
 
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{components::*, path};
+
+use crate::infrastructure::fyn_api_context::FynApiSessionContext;
 
 // Top-Level pages
 use crate::pages::home::Home;
@@ -19,6 +23,10 @@ use crate::pages::sign_in::SignIn;
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+
+    // Fetch CSRF token on app startup
+    let context = FynApiSessionContext::new();
+    provide_context(context.clone());
 
     view! {
         <Html attr:lang="en" attr:dir="ltr" attr:data-theme="light" />
