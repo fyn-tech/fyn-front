@@ -14,6 +14,7 @@ pub fn UserSignIn() -> impl IntoView {
             <FormField
               label={"Username".to_string()}
               key={"username".to_string()}
+              placeholder={"username".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Password".to_string()}

@@ -14,14 +14,17 @@ pub fn UserRegisterForm() -> impl IntoView {
             <FormField
               label={"First Name".to_string()}
               key={"first_name".to_string()}
+              placeholder={"first name".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Last Name".to_string()}
               key={"last_name".to_string()}
+              placeholder={"last name".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Username".to_string()}
               key={"username".to_string()}
+              placeholder={"username".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Email".to_string()}
@@ -34,10 +37,12 @@ pub fn UserRegisterForm() -> impl IntoView {
             <FormField
               label={"Company".to_string()}
               key={"company".to_string()}
+              placeholder={"company".to_string()}
               input_type=InputType::Text { value: (None) }/>
             <FormField
               label={"Country".to_string()}
               key={"country".to_string()}
+              placeholder={"country".to_string()}
               input_type=InputType::Text { value: (None) }/>
           </Grid>
         </Section>
