@@ -13,6 +13,7 @@ pub fn Navigation() -> impl IntoView {
               <H4 color={FONT_DRK_CLR.to_string()}>"creativity leads inovation"</H4>
             </Stack>
             <Stack horizontal={true}>
+              <A href={"/simulate".to_string()} text_class={H4_CLASS.to_string()}>"Simulate"</A>
               <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Register"</A>
               <A href={"/sign_in".to_string()} text_class={H4_CLASS.to_string()}>"Sign In"</A>
             </Stack>
