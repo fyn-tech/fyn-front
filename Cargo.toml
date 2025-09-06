@@ -9,15 +9,16 @@ authors = ["bevanwsjones <bevanwsjones@gmail.com>"]
 [dependencies]
 leptos = { version = "0.8.5", features = ["csr"] }
 leptos_meta = { version = "0.8.5" }
-leptos_router = { version = "0.8.5" }
+leptos_router = { version = "0.8.6" }
 
 const_format = "0.2"
 console_log = "1"
 console_error_panic_hook = "0.1"
 futures = "0.3.31"
-log = "0.4"
+log = "0.4.28"
+indexmap = "2.11"
+serde_json = { version = "1.0.143", features = ["preserve_order"] }
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
 wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["Document", "Window", "Element", "DomTokenList"] }
 uuid = { version = "1.0", features = ["js", "serde"] }
