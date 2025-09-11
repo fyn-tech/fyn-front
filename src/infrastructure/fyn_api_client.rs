@@ -1,24 +1,28 @@
-use crate::infrastructure::fyn_api_service::FynApiService;
 use leptos::{prelude::*, reactive::spawn_local};
 
+use fyn_api::apis::auth_api::auth_csrf_retrieve;
+use fyn_api::apis::configuration::Configuration;
+
 #[derive(Clone)]
-pub struct FynApiSessionContext {
-    service: FynApiService,
+pub struct FynApiClient {
+    config: Configuration,
     csrf_token: RwSignal<Option<String>>,
     session_token: RwSignal<Option<String>>,
     user_id: RwSignal<Option<String>>,
     loading: RwSignal<bool>,
 }
 
-impl FynApiSessionContext {
+impl FynApiClient {
     pub fn new() -> Self {
-        let context = Self {
-            service: FynApiService::new(),
+        let mut context = Self {
+            config: Configuration::new(),
             csrf_token: RwSignal::new(None),
             session_token: RwSignal::new(None),
             user_id: RwSignal::new(None),
             loading: RwSignal::new(true),
         };
+
+        context.config.base_path = "http://localhost:8000".to_string();
 
         spawn_local({
             let context = context.clone();
@@ -34,8 +38,16 @@ impl FynApiSessionContext {
     }
 
     pub async fn fetch_new_csrf_token(&self) -> Result<(), String> {
-        let response = self.service.get_csrf_token().await?;
-        self.csrf_token.set(Some(response));
+        let response = auth_csrf_retrieve(&self.config)
+            .await
+            .map_err(|e| format!("API error: {:?}", e))?;
+
+        self.csrf_token.set(Some(
+            response
+                .csrf_token
+                .unwrap_or("Empty CSRF token from API".to_string()),
+        ));
+
         self.loading.set(false);
         return Ok(());
     }
