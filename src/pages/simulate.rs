@@ -6,6 +6,7 @@ use crate::components::atoms::button::*;
 use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
+use crate::components::organisms::navigation::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {
@@ -19,8 +20,9 @@ pub fn Simulate() -> impl IntoView {
     let (current_view, set_current_view) = signal(SimulateView::FormAndViewer);
 
     view! {
-        <div class="h-screen w-full flex bg-surface-50 dark:bg-surface-950">
+        <Navigation/>
 
+        <div class="h-screen w-full flex bg-surface-50 dark:bg-surface-950">
             <ButtonBar horizontal=false items = vec![
                 view! {<GroupButton text="SM".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::FormAndViewer);})/>},
                 view! {<GroupButton text="RS".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::TableView);})/>},
@@ -33,18 +35,18 @@ pub fn Simulate() -> impl IntoView {
 
                     SimulateView::TableView => view! { <Table table={
                     TableStruct {name : "Table Name".to_string(),
-                                   data: TableData{
+                                    data: TableData{
                                     col_def: vec![
-                                      ColumnDefinition {
+                                        ColumnDefinition {
                                         name: "Column 1".to_string(),
                                         data_type: CellType::Text
-                                      }],
+                                        }],
                                     rows: vec![
-                                      vec!["text 0".to_string()],
-                                      vec!["text 1".to_string()],
+                                        vec!["text 0".to_string()],
+                                        vec!["text 1".to_string()],
                                     ]
-                                   } }}></Table>
-                                  }.into_any(),
+                                    } }}></Table>
+                                    }.into_any(),
 
                 }}
             </div>
