@@ -1,11 +1,13 @@
 use leptos::prelude::*;
 
-use crate::components::organisms::navigation::*;
+use crate::components::organisms::fyn_tech_profile::FynTechProfile;
+use crate::templates::standard::Standard;
 
-/// Default Home Page
 #[component]
 pub fn Home() -> impl IntoView {
     return view! {
-        <Navigation/>
+        <Standard>
+            <FynTechProfile />
+        </Standard>
     };
 }
