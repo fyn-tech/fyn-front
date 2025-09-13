@@ -9,7 +9,7 @@ use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{components::*, path};
 
-use crate::infrastructure::fyn_api_context::FynApiSessionContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
 
 // Top-Level pages
 use crate::pages::home::Home;
@@ -26,7 +26,7 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     // Fetch CSRF token on app startup
-    let context = FynApiSessionContext::new();
+    let context = FynApiClient::new();
     provide_context(context.clone());
 
     view! {
