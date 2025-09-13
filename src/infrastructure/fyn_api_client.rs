@@ -6,7 +6,7 @@ use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
 use fyn_api::models::*;
 
-use crate::domain::user_service::UserService;
+use crate::domain::user_context::UserContext;
 
 #[derive(Clone)]
 pub struct FynApiClient {
@@ -60,7 +60,7 @@ impl FynApiClient {
         return self.csrf_token.get().unwrap_or("no token set".to_string());
     }
 
-    pub async fn login(&self, username: String, password: String) -> Result<UserService, String> {
+    pub async fn login(&self, username: String, password: String) -> Result<UserContext, String> {
         self.loading.set(true);
 
         let login_request = LoginRequest::new(username, password);
@@ -73,7 +73,7 @@ impl FynApiClient {
             .user_data
             .unwrap_or(Box::new(AuthUserLoginCreate200ResponseUserData::new()));
 
-        let new_user = UserService::new_partial(
+        let new_user = UserContext::new_partial(
             fetched_user_data.username,
             fetched_user_data.first_name,
             fetched_user_data.last_name,
