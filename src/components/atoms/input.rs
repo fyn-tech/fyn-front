@@ -31,7 +31,7 @@ fn input_field_string(align: Align) -> String {
 pub fn Text(
     id: String,
     key: String,
-    #[prop(default = None)] value: Option<String>,
+    signal: RwSignal<String>,
     #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
@@ -42,9 +42,12 @@ pub fn Text(
             class={class_str}
             type="text" id={id}
             name={key}
-            value={value.unwrap_or("".to_string())}
             placeholder={placeholder.unwrap_or("text".to_string())}
             required={required}
+            prop:signal=move || signal.get()
+            on:input=move |ev| {
+                signal.set(event_target_value(&ev));
+            }
         />
     };
 }
@@ -53,9 +56,9 @@ pub fn Text(
 pub fn Float(
     id: String,
     key: String,
+    signal: RwSignal<Option<f64>>,
     #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(default = None)] value: Option<f64>,
     #[prop(default = None)] min: Option<f64>,
     #[prop(default = None)] max: Option<f64>,
     #[prop(default = None)] step: Option<f64>,
@@ -68,12 +71,20 @@ pub fn Float(
             type="number"
             id={id}
             name={key}
-            value={value}
             placeholder={placeholder.unwrap_or("enter value".to_string())}
             required={required}
             min={min}
             max={max}
             step={step.map_or("any".to_string(), |s| s.to_string())}
+            prop:signal=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
+            on:input=move |ev| {
+                let input_str = event_target_value(&ev);
+                if input_str.is_empty() {
+                    signal.set(None);
+                } else {
+                    signal.set(input_str.parse::<f64>().ok());
+                }
+            }
         />
     };
 }
@@ -82,9 +93,9 @@ pub fn Float(
 pub fn Integer(
     id: String,
     key: String,
+    signal: RwSignal<Option<i64>>,
     #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(default = None)] value: Option<i64>,
     #[prop(default = None)] min: Option<i64>,
     #[prop(default = None)] max: Option<i64>,
     #[prop(default = None)] step: Option<i64>,
@@ -97,12 +108,20 @@ pub fn Integer(
             type="number"
             id={id}
             name={key}
-            value={value}
             placeholder={placeholder.unwrap_or("enter value".to_string())}
             required={required}
             min={min}
             max={max}
             step={step.map_or("1".to_string(), |s| s.to_string())}
+            prop:signal=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
+            on:input=move |ev| {
+                let input_str = event_target_value(&ev);
+                if input_str.is_empty() {
+                    signal.set(None);
+                } else {
+                    signal.set(input_str.parse::<i64>().ok());
+                }
+            }
         />
     };
 }
@@ -111,6 +130,7 @@ pub fn Integer(
 pub fn Email(
     id: String,
     key: String,
+    signal: RwSignal<String>,
     #[prop(default = "e-mail".to_string())] placeholder: String,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
@@ -124,6 +144,10 @@ pub fn Email(
             name={key}
             placeholder={placeholder}
             required={required}
+            prop:signal=move || signal.get()
+            on:input=move |ev| {
+                signal.set(event_target_value(&ev));
+            }
         />
     };
 }
@@ -132,6 +156,7 @@ pub fn Email(
 pub fn Password(
     id: String,
     key: String,
+    signal: RwSignal<String>,
     #[prop(default = "password".to_string())] placeholder: String,
     #[prop(default = false)] required: bool,
 ) -> impl IntoView {
@@ -145,13 +170,22 @@ pub fn Password(
             name={key}
             placeholder={placeholder}
             required={required}
+            prop:signal=move || signal.get()
+            on:input=move |ev| {
+                signal.set(event_target_value(&ev));
+            }
         />
     };
 }
 
 /*TODO: fixed abstract the styling away. */
 #[component]
-pub fn File(id: String, key: String, #[prop(default = false)] required: bool) -> impl IntoView {
+pub fn File(
+    id: String,
+    key: String,
+    signal: RwSignal<String>,
+    #[prop(default = false)] required: bool,
+) -> impl IntoView {
     let class_str = format!(
         "{} 
         file:bg-primary-500 dark:file:bg-primary-950 
@@ -175,12 +209,16 @@ pub fn File(id: String, key: String, #[prop(default = false)] required: bool) ->
             id={id}
             name={key}
             required={required}
+            prop:signal=move || signal.get()
+            on:input=move |ev| {
+                signal.set(event_target_value(&ev));
+            }
         />
     };
 }
 
 #[component]
-pub fn CheckBox(id: String, key: String) -> impl IntoView {
+pub fn CheckBox(id: String, key: String, signal: RwSignal<bool>) -> impl IntoView {
     let class_str = format!(
         "w-5 h-5 {} {} {} {} {}",
         "bg-surface-50 dark:bg-surface-950",
@@ -196,19 +234,23 @@ pub fn CheckBox(id: String, key: String) -> impl IntoView {
             type="checkbox"
             id={id}
             name={key}
-
+            prop:checked=move || signal.get()
+            on:change=move |ev| {
+                let checked = event_target_checked(&ev);
+                signal.set(checked);
+            }
         />
     };
 }
 
 #[component]
-pub fn Select(
+pub fn SelectText(
     id: String,
     key: String,
     options: Vec<(String, String)>, // (value, display_text) pairs
+    signal: RwSignal<String>,
     #[prop(default = None)] placeholder: Option<String>,
     #[prop(default = false)] required: bool,
-    #[prop(default = None)] selected_value: Option<String>,
 ) -> impl IntoView {
     let class_str = input_field_string(Align::Left);
 
@@ -218,22 +260,86 @@ pub fn Select(
             id={id}
             name={key}
             required={required}
+            prop:value=move || signal.get()
+            on:change=move |ev| {
+                signal.set(event_target_value(&ev));
+            }
         >
-
-            {if placeholder.is_none() {
+            // Placeholder option (only if provided)
+            {if let Some(placeholder_text) = placeholder {
                 Some(view! {
-                    <option value="" disabled={true} selected={selected_value.is_none()}>
-                        {placeholder.unwrap_or("select option".to_string())}
+                    <option value="" disabled=true selected={signal.get().is_empty()}>
+                        {placeholder_text}
                     </option>
                 })
             } else {
                 None
             }}
 
+            // Regular options
             {options.into_iter().map(|(value, text)| {
-                let is_selected = selected_value.as_ref() == Some(&value);
                 view! {
-                    <option value={value} selected={is_selected}>
+                    <option
+                        value={value.clone()}
+                        selected={signal.get() == value}
+                    >
+                        {text}
+                    </option>
+                }
+            }).collect_view()}
+        </select>
+    };
+}
+
+#[component]
+pub fn SelectInteger(
+    id: String,
+    key: String,
+    options: Vec<(i64, String)>,
+    signal: RwSignal<Option<i64>>,
+    #[prop(default = None)] placeholder: Option<String>,
+    #[prop(default = false)] required: bool,
+) -> impl IntoView {
+    let class_str = input_field_string(Align::Left);
+
+    return view! {
+        <select
+            class={class_str}
+            id={id}
+            name={key}
+            required={required}
+            prop:value=move || {  // Convert Option<i64> to String for HTML
+                signal.get()
+                    .map(|v| v.to_string())
+                    .unwrap_or_default()
+            }
+            on:change=move |ev| {  // Parse String back to Option<i64>
+                let value_str = event_target_value(&ev);
+                if value_str.is_empty() {
+                    signal.set(None);
+                } else {
+                    signal.set(value_str.parse::<i64>().ok());
+                }
+            }
+        >
+            // Placeholder option (only if provided)
+            {if let Some(placeholder_text) = placeholder {
+                Some(view! {
+                    <option value="" disabled=true selected={signal.get().is_none()}>  // Fixed: is_none()
+                        {placeholder_text}
+                    </option>
+                })
+            } else {
+                None
+            }}
+
+            // Regular options
+            {options.into_iter().map(|(value, text)| {
+                view! {
+                    <option
+                        value={value.to_string()}  // Convert i64 to String for HTML
+                        selected={signal.get() == Some(value)}  // Fixed: compare with Some(value)
+                    >
                         {text}
                     </option>
                 }

@@ -13,6 +13,14 @@ use crate::components::molecules::table::*;
 /// Component showcase page for design system development
 #[component]
 pub fn Showcase() -> impl IntoView {
+    let dummy_text_signal = RwSignal::new(String::new());
+    let dummy_float_signal = RwSignal::new(None);
+    let dummy_integer_signal = RwSignal::new(None);
+    let dummy_email_signal = RwSignal::new(String::new());
+    let dummy_bool_signal = RwSignal::new(false);
+    let dummy_password_signal = RwSignal::new(String::new());
+    let dummy_file_signal = RwSignal::new(String::new());
+
     return view! {
         <div class="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200 p-8">
             <div class="max-w-6xl mx-auto">
@@ -159,39 +167,41 @@ pub fn Showcase() -> impl IntoView {
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <Section level=SectionLevel::H3 is_first=true title="Text Input".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <Text id="text".to_string() key="text".to_string()/>
+                                <Text id="text".to_string() key="text".to_string() signal=dummy_text_signal/>
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Numerical".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <Float id="float".to_string() key="float".to_string()/>
-                                <Integer id="int".to_string() key="int".to_string()/>
+                                <Float id="float".to_string() key="float".to_string() signal=dummy_float_signal/>
+                                <Integer id="int".to_string() key="int".to_string() signal=dummy_integer_signal/>
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Email & Password".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <Email id="email".to_string() key="email".to_string()/>
-                                <Password id="password".to_string() key="password".to_string()/>
+                                <Email id="email".to_string() key="email".to_string() signal=dummy_email_signal/>
+                                <Password id="password".to_string() key="password".to_string() signal=dummy_password_signal/>
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="File".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <File id="file".to_string() key="file".to_string()/>
+                                <File id="file".to_string() key="file".to_string() signal=dummy_file_signal/>
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Check Box".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <CheckBox id="checkbox".to_string() key="checkbox".to_string()/>
+                                <CheckBox id="checkbox".to_string() key="checkbox".to_string() signal=dummy_bool_signal/>
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Select".to_string()>
                             <Stack horizontal=true align=FlexAlign::Center>
-                                <Select id="select".to_string() key="select".to_string() options={vec![
+                                <SelectText id="select".to_string() key="select".to_string()
+                                signal={dummy_text_signal}
+                                options={vec![
                                     ("item_1".to_string(), "item 1".to_string()),
                                     ("item_2".to_string(), "item 2".to_string()),
                                     ]}/>
@@ -225,21 +235,24 @@ pub fn Showcase() -> impl IntoView {
                                     <FormField
                                         label="Text Field".to_string()
                                         key="form_text".to_string()
-                                        input_type=InputType::Text { value: (None)}>
+                                        input_type=InputType::Text { signal: dummy_text_signal}>
                                     </FormField>
                                     <FormField
                                         label="Select Field".to_string()
                                         key="form_select".to_string()
-                                        input_type=InputType::Select { options:{vec![
+                                        input_type=InputType::SelectText {
+                                            signal:{dummy_text_signal},
+                                            options:{vec![
                                             ("item_1".to_string(), "item 1".to_string()),
                                             ("item_2".to_string(), "item 2".to_string()),
-                                            ]}, selected: (None)}>
+                                            ]}
+                                        }>
                                     </FormField>
                                     <FormField
                                         label="Number Field".to_string()
                                         key="form_number".to_string()
                                         input_type=InputType::Float {
-                                            value: (None),
+                                            signal: dummy_float_signal,
                                             min: (None),
                                             max: (None),
                                             step: (None) }>
@@ -255,23 +268,25 @@ pub fn Showcase() -> impl IntoView {
                                         label="Text Field".to_string()
                                         key="form_text_v".to_string()
                                         horizontal=false
-                                        input_type=InputType::Text { value: (None)}>
+                                        input_type=InputType::Text { signal: dummy_text_signal }>
                                     </FormField>
                                     <FormField
                                         label="Select Field".to_string()
                                         key="form_select_v".to_string()
                                         horizontal=false
-                                        input_type=InputType::Select { options:{vec![
+                                        input_type=InputType::SelectText {
+                                            signal:{dummy_text_signal},
+                                            options:{vec![
                                             ("item_1".to_string(), "item 1".to_string()),
                                             ("item_2".to_string(), "item 2".to_string()),
-                                            ]}, selected: (None)}>
+                                            ]}}>
                                     </FormField>
                                     <FormField
                                         label="Number Field".to_string()
                                         key="form_number_v".to_string()
                                         horizontal=false
                                         input_type=InputType::Float {
-                                            value: (None),
+                                            signal: dummy_float_signal,
                                             min: (None),
                                             max: (None),
                                             step: (None) }>

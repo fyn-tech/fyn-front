@@ -8,27 +8,39 @@ use crate::components::atoms::typography::{FONT_CLR, H4_CLASS};
 #[derive(Debug, Clone, PartialEq)]
 pub enum InputType {
     Text {
-        value: Option<String>,
+        signal: RwSignal<String>,
     },
     Float {
-        value: Option<f64>,
+        signal: RwSignal<Option<f64>>,
         min: Option<f64>,
         max: Option<f64>,
         step: Option<f64>,
     },
     Integer {
-        value: Option<i64>,
+        signal: RwSignal<Option<i64>>,
         min: Option<i64>,
         max: Option<i64>,
         step: Option<i64>,
     },
-    Email,
-    Password,
-    File,
-    CheckBox,
-    Select {
+    Email {
+        signal: RwSignal<String>,
+    },
+    Password {
+        signal: RwSignal<String>,
+    },
+    File {
+        signal: RwSignal<String>,
+    },
+    CheckBox {
+        signal: RwSignal<bool>,
+    },
+    SelectText {
         options: Vec<(String, String)>,
-        selected: Option<String>,
+        signal: RwSignal<String>,
+    },
+    SelectInteger {
+        options: Vec<(i64, String)>,
+        signal: RwSignal<Option<i64>>,
     },
 }
 
@@ -40,18 +52,18 @@ fn build_input(
     placeholder: Option<String>,
 ) -> impl IntoView {
     return match input_type {
-        InputType::Text { value } => view! {
+        InputType::Text { signal } => view! {
           <Text
             id={id.clone()}
             key={key}
             placeholder={placeholder}
             required={required}
-            value={value}
+            signal={signal}
           />
         }
         .into_any(),
         InputType::Float {
-            value,
+            signal,
             min,
             max,
             step,
@@ -61,7 +73,7 @@ fn build_input(
             key={key}
             placeholder={placeholder}
             required={required}
-            value={value}
+            signal={signal}
             min={min}
             max={max}
             step={step}
@@ -69,7 +81,7 @@ fn build_input(
         }
         .into_any(),
         InputType::Integer {
-            value,
+            signal,
             min,
             max,
             step,
@@ -79,37 +91,48 @@ fn build_input(
             key={key}
             placeholder={placeholder}
             required={required}
-            value={value}
+            signal={signal}
             min={min}
             max={max}
             step={step}
           />
         }
         .into_any(),
-        InputType::Email => view! {
-          <Email id={id.clone()} key={key} required={required}/>
+        InputType::Email { signal } => view! {
+          <Email id={id.clone()} key={key} signal={signal} required={required}/>
         }
         .into_any(),
-        InputType::Password => view! {
-          <Password id={id.clone()} key={key} required={required}/>
+        InputType::Password { signal } => view! {
+          <Password id={id.clone()} key={key} signal={signal} required={required}/>
         }
         .into_any(),
-        InputType::File => view! {
-          <File id={id.clone()} key={key} required={required}/>
+        InputType::File { signal } => view! {
+          <File id={id.clone()} key={key} signal={signal} required={required}/>
         }
         .into_any(),
-        InputType::CheckBox => view! {
-          <CheckBox id={id.clone()} key={key}/>
+        InputType::CheckBox { signal } => view! {
+          <CheckBox id={id.clone()} key={key} signal={signal}/>
         }
         .into_any(),
-        InputType::Select { options, selected } => view! {
-          <Select
+        InputType::SelectText { options, signal } => view! {
+          <SelectText
             id={id.clone()}
             key={key}
             placeholder={placeholder}
             required={required}
             options={options}
-            selected_value={selected}
+            signal={signal}
+          />
+        }
+        .into_any(),
+        InputType::SelectInteger { options, signal } => view! {
+          <SelectInteger
+            id={id.clone()}
+            key={key}
+            placeholder={placeholder}
+            required={required}
+            options={options}
+            signal={signal}
           />
         }
         .into_any(),
@@ -121,7 +144,6 @@ pub fn FormField(
     label: String,
     key: String,
     input_type: InputType,
-
     #[prop(optional)] id: Option<String>,
     #[prop(default = true)] horizontal: bool,
     #[prop(optional)] placeholder: Option<String>,
