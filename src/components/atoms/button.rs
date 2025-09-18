@@ -123,7 +123,7 @@ pub fn Button(
         text_format
     );
 
-    view! {
+    return view! {
         <button
             id=format!("btn-{:?}", size)
             class={button_classes}
@@ -158,7 +158,7 @@ pub fn GroupButton(
 
     let button_classes = format!("{} {} {} {}", hover, state_modifiers, padding, text_format);
 
-    view! {
+    return view! {
         <button
             id=format!("btn-{:?}", size)
             class={button_classes}
