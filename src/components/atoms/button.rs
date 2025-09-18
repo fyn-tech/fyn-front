@@ -1,3 +1,25 @@
+/* ------------------------------------------------------------------------------------------------
+ * Fyn-Front: Modern CFD/CAE Web Interface
+ * Copyright (C) 2025 Fyn-Front Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * ------------------------------------------------------------------------------------------------
+ * filename: button.rs
+ * description: Button atomic components with variants, states, and styling
+ * ------------------------------------------------------------------------------------------------
+ */
+
 use leptos::prelude::*;
 
 use crate::common::size::*;
@@ -19,23 +41,23 @@ pub enum Variant {
 
 impl Variant {
     pub fn base_colour(&self) -> &str {
-        return match self {
+        match self {
             Variant::Primary => "bg-primary-500 dark:bg-primary-950",
             Variant::Secondary => "bg-primary-300 dark:bg-primary-700",
             Variant::Tertiary => "bg-accent-300 dark:bg-accent-500",
             Variant::Success => "bg-semantic-success",
             Variant::Warning => "bg-semantic-warning",
-        };
+        }
     }
 
     pub fn hover_colour(&self) -> &str {
-        return match self {
+        match self {
             Variant::Primary => "hover:bg-primary-300 dark:hover:bg-primary-700",
             Variant::Secondary => "hover:bg-primary-50 dark:hover:bg-primary-500",
             Variant::Tertiary => "hover:bg-accent-50 dark:hover:bg-accent-300",
             Variant::Success => "",
             Variant::Warning => "",
-        };
+        }
     }
 }
 
@@ -44,6 +66,7 @@ impl Variant {
 // ------------------------------------------------------------------------------------------------
 
 // TODO TYPES: will add as we go along.
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     Standard, // Default clickable button
@@ -100,7 +123,7 @@ pub fn Button(
         text_format
     );
 
-    return view! {
+    view! {
         <button
             id=format!("btn-{:?}", size)
             class={button_classes}
@@ -135,7 +158,7 @@ pub fn GroupButton(
 
     let button_classes = format!("{} {} {} {}", hover, state_modifiers, padding, text_format);
 
-    return view! {
+    view! {
         <button
             id=format!("btn-{:?}", size)
             class={button_classes}

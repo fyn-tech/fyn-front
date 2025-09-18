@@ -1,4 +1,25 @@
-use leptos::server_fn::response;
+/* ------------------------------------------------------------------------------------------------
+ * Fyn-Front: Modern CFD/CAE Web Interface
+ * Copyright (C) 2025 Fyn-Front Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * ------------------------------------------------------------------------------------------------
+ * filename: fyn_api_client.rs
+ * description: API client wrapper providing authentication and communication with Fyn backend
+ * ------------------------------------------------------------------------------------------------
+ */
+
 use leptos::{prelude::*, reactive::spawn_local};
 
 use crate::domain::user_context::UserContext;
@@ -6,7 +27,7 @@ use fyn_api::apis::accounts_api::accounts_users_create;
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
-use fyn_api::models::{self, *};
+use fyn_api::models::*;
 
 #[derive(Clone)]
 pub struct FynApiClient {
@@ -38,7 +59,7 @@ impl FynApiClient {
             }
         });
 
-        return context;
+        context
     }
 
     pub async fn fetch_new_csrf_token(&self) -> Result<(), String> {
@@ -53,11 +74,12 @@ impl FynApiClient {
         ));
 
         self.loading.set(false);
-        return Ok(());
+        Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn get_token(&self) -> String {
-        return self.csrf_token.get().unwrap_or("no token set".to_string());
+        self.csrf_token.get().unwrap_or_else(|| "no token set".to_string())
     }
 
     pub async fn login(&self, username: String, password: String) -> Result<UserContext, String> {
@@ -83,7 +105,7 @@ impl FynApiClient {
         self.session_token.set(response.token);
 
         self.loading.set(false);
-        return Ok(new_user);
+        Ok(new_user)
     }
 
     pub async fn register(
@@ -103,11 +125,11 @@ impl FynApiClient {
         new_user_request.last_name = new_user.last_name;
         new_user_request.email = new_user.email;
 
-        let response = accounts_users_create(&self.config, new_user_request)
+        let _response = accounts_users_create(&self.config, new_user_request)
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
 
         self.loading.set(false);
-        return Ok("Created new user".to_string());
+        Ok("Created new user".to_string())
     }
 }

@@ -116,22 +116,40 @@ Mathematical 8px grid system ensuring visual harmony and systematic layouts. Spa
 
 ---
 
-## Component Architecture
+## Business Logic Architecture
+
+For business logic implementation, we follow Domain Driven Design (DDD) principles to ensure a clear separation of concerns and maintainable code structure:
+
+### Domain-Driven Design Layers
+
+- **Domain Layer** (`src/domain/`): Core business logic and entities independent of external concerns
+  - Contains business rules, domain entities, and value objects
+  - No dependencies on external frameworks or infrastructure
+  - Represents the heart of the CFD/CAE workflow logic
+
+- **Application Layer** (`src/application/`): Use cases and application services coordinating domain operations
+  - Orchestrates domain objects to fulfill specific use cases
+  - Handles cross-cutting concerns like transactions and security
+  - Provides the interface between presentation and domain layers
+
+- **Infrastructure Layer** (`src/infrastructure/`): External concerns like API clients, data persistence, and external services
+  - Implements interfaces defined by the domain layer
+  - Handles communication with external systems and APIs
+  - Contains adapters for third-party services and frameworks
+
+- **Presentation Layer** (`src/components/`): UI components and user interaction handling
+  - Implements the atomic design component hierarchy
+  - Handles user interface concerns and user experience
+  - Translates user actions into application layer commands
+
+This layered architecture ensures that business rules remain isolated and testable while providing clear boundaries between different architectural concerns. The domain layer forms the core, with dependencies flowing inward, maintaining the independence of business logic from technical implementation details.
+
+## Component UI Architecture
 
 ### Atomic Design Structure
 
 The design system follows atomic design principles for UI organization, organizing components from simple to complex:
 
-### Business Logic Architecture
-
-For business logic implementation, we follow Domain Driven Design (DDD) principles to ensure a clear separation of concerns and maintainable code structure:
-
-- **Domain Layer**: Core business logic and entities independent of external concerns
-- **Application Layer**: Use cases and application services coordinating domain operations
-- **Infrastructure Layer**: External concerns like API clients, data persistence, and external services
-- **Presentation Layer**: UI components and user interaction handling
-
-This approach ensures that business rules remain isolated and testable while providing clear boundaries between different architectural concerns.
 
 ```
 src/components/
