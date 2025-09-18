@@ -20,11 +20,10 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::{prelude::*, reactive::spawn_local};
-use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
+use crate::components::atoms::alert::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::molecules::form_field::*;
@@ -102,13 +101,7 @@ pub fn UserSignIn() -> impl IntoView {
                         input_type=InputType::Password { signal: password }
                     />
                 </Grid>
-                {move || {
-                      error_message.get().map(|msg| view! {
-                          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                              {msg}
-                          </div>
-                      })
-                }}
+                <ErrorAlert message={error_message.read_only()} />
             </Section>
             <Stack align=FlexAlign::Center>
                 <Button

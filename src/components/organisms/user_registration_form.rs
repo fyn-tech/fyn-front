@@ -20,11 +20,11 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::{prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
+use crate::components::atoms::alert::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::molecules::form_field::*;
@@ -189,12 +189,7 @@ pub fn UserRegisterForm() -> impl IntoView {
                         input_type=InputType::Text { signal: reg_form.country }
                     />
                 </Grid>
-
-                <Show when=move || reg_form.error.get().is_some()>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {move || reg_form.error.get().unwrap_or_default()}
-                    </div>
-                </Show>
+                <ErrorAlert message={reg_form.error.read_only()} />
             </Section>
 
             <Stack align=FlexAlign::Center>
