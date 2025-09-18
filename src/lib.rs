@@ -1,9 +1,8 @@
+mod application;
 mod common;
 mod components;
 mod domain;
 mod infrastructure;
-mod pages;
-mod templates;
 
 use leptos::prelude::*;
 use leptos_meta::*;
@@ -13,12 +12,12 @@ use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
 // Top-Level pages
-use crate::pages::home::Home;
-use crate::pages::not_found::NotFound;
-use crate::pages::register::Register;
-use crate::pages::showcase::Showcase;
-use crate::pages::sign_in::SignIn;
-use crate::pages::simulate::Simulate;
+use crate::application::home::Home;
+use crate::application::not_found::NotFound;
+use crate::application::register::Register;
+use crate::application::showcase::Showcase;
+use crate::application::sign_in::SignIn;
+use crate::application::simulate::Simulate;
 
 /// An app router which renders the homepage and handles 404's
 #[component]

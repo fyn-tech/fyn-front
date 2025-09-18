@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 use crate::components::organisms::user_sign_in::*;
-use crate::templates::standard::*;
+use crate::components::templates::standard::*;
 
 #[component]
 pub fn SignIn() -> impl IntoView {
