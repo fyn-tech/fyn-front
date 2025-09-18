@@ -1,12 +1,12 @@
 use leptos::server_fn::response;
 use leptos::{prelude::*, reactive::spawn_local};
 
+use crate::domain::user_context::UserContext;
+use fyn_api::apis::accounts_api::accounts_users_create;
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
-use fyn_api::models::*;
-
-use crate::domain::user_context::UserContext;
+use fyn_api::models::{self, *};
 
 #[derive(Clone)]
 pub struct FynApiClient {
@@ -84,5 +84,30 @@ impl FynApiClient {
 
         self.loading.set(false);
         return Ok(new_user);
+    }
+
+    pub async fn register(
+        &self,
+        new_user: UserContext,
+        password: String,
+    ) -> Result<String, String> {
+        self.loading.set(true);
+
+        let mut new_user_request = UserRequest::new(
+            new_user.username.unwrap(),
+            password,
+            new_user.country.unwrap(),
+            new_user.company.unwrap(),
+        );
+        new_user_request.first_name = new_user.first_name;
+        new_user_request.last_name = new_user.last_name;
+        new_user_request.email = new_user.email;
+
+        let response = accounts_users_create(&self.config, new_user_request)
+            .await
+            .map_err(|e| format!("API error: {:?}", e))?;
+
+        self.loading.set(false);
+        return Ok("Created new user".to_string());
     }
 }

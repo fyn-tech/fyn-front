@@ -9,6 +9,7 @@ use crate::components::molecules::section::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
+#[component]
 pub fn UserSignIn() -> impl IntoView {
     let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
     let user_context =
@@ -86,9 +87,6 @@ pub fn UserSignIn() -> impl IntoView {
                       })
                 }}
             </Section>
-
-
-
             <Stack align=FlexAlign::Center>
                 <Button
                     text={"Sign In".to_string()}
