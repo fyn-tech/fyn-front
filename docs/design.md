@@ -120,7 +120,18 @@ Mathematical 8px grid system ensuring visual harmony and systematic layouts. Spa
 
 ### Atomic Design Structure
 
-The design system follows atomic design principles, organizing components from simple to complex:
+The design system follows atomic design principles for UI organization, organizing components from simple to complex:
+
+### Business Logic Architecture
+
+For business logic implementation, we follow Domain Driven Design (DDD) principles to ensure a clear separation of concerns and maintainable code structure:
+
+- **Domain Layer**: Core business logic and entities independent of external concerns
+- **Application Layer**: Use cases and application services coordinating domain operations
+- **Infrastructure Layer**: External concerns like API clients, data persistence, and external services
+- **Presentation Layer**: UI components and user interaction handling
+
+This approach ensures that business rules remain isolated and testable while providing clear boundaries between different architectural concerns.
 
 ```
 src/components/
