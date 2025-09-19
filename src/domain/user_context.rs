@@ -20,6 +20,8 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+use crate::domain::runner_info::*;
+
 #[derive(Clone, Debug, Default)]
 pub struct UserContext {
     pub username: Option<String>,
@@ -28,6 +30,9 @@ pub struct UserContext {
     pub email: Option<String>,
     pub company: Option<String>,
     pub country: Option<String>,
+
+    // related runners
+    pub runners: Vec<RunnerInfo>,
 }
 
 impl UserContext {
@@ -47,6 +52,7 @@ impl UserContext {
             email: None,
             company: None,
             country: None,
+            runners: Vec::new(),
         }
     }
 }

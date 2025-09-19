@@ -20,13 +20,18 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+use chrono::{DateTime, Utc};
 use leptos::{prelude::*, reactive::spawn_local};
 
+use crate::domain::runner_info::{
+    RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
+};
 use crate::domain::user_context::UserContext;
 use fyn_api::apis::accounts_api::accounts_users_create;
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
+use fyn_api::apis::runner_manager_api::runner_manager_users_list;
 use fyn_api::models::*;
 
 #[derive(Clone)]
@@ -79,7 +84,9 @@ impl FynApiClient {
 
     #[allow(dead_code)]
     pub fn get_token(&self) -> String {
-        self.csrf_token.get().unwrap_or_else(|| "no token set".to_string())
+        self.csrf_token
+            .get()
+            .unwrap_or_else(|| "no token set".to_string())
     }
 
     pub async fn login(&self, username: String, password: String) -> Result<UserContext, String> {
@@ -131,5 +138,37 @@ impl FynApiClient {
 
         self.loading.set(false);
         Ok("Created new user".to_string())
+    }
+
+    pub async fn get_runner_info(&self) -> Result<Vec<RunnerInfoDomain>, String> {
+        self.loading.set(true);
+
+        let _response = runner_manager_users_list(&self.config)
+            .await
+            .map_err(|e| format!("API error: {:?}", e))?;
+        self.loading.set(false);
+
+        let mut runner_infos = _response
+            .iter()
+            .map(|run| {
+                RunnerInfoDomain::new_complete(
+                    run.id,
+                    match run.state {
+                        Some(StateEnum::Id) => RunnerStateDomain::Idle,
+                        Some(StateEnum::Bs) => RunnerStateDomain::Busy,
+                        Some(StateEnum::Of) => RunnerStateDomain::Offline,
+                        Some(StateEnum::Ur) => RunnerStateDomain::Unregistered,
+                        None => RunnerStateDomain::Unknown,
+                    },
+                    run.created_at.parse::<DateTime<Utc>>().unwrap(),
+                    run.last_contact
+                        .as_ref()
+                        .flatten()
+                        .and_then(|s| s.parse::<DateTime<Utc>>().ok()),
+                )
+            })
+            .collect::<Vec<RunnerInfoDomain>>();
+
+        return Ok(runner_infos);
     }
 }
