@@ -36,7 +36,7 @@ use fyn_api::models::*;
 
 #[derive(Clone)]
 pub struct FynApiClient {
-    config: Configuration,
+    config: RwSignal<Configuration>,
     csrf_token: RwSignal<Option<String>>,
     session_token: RwSignal<Option<String>>,
     user_id: RwSignal<Option<String>>,
@@ -45,8 +45,11 @@ pub struct FynApiClient {
 
 impl FynApiClient {
     pub fn new() -> Self {
+        let mut config = Configuration::new();
+        config.base_path = "http://localhost:8000".to_string();
+
         let mut context = Self {
-            config: Configuration::new(),
+            config: RwSignal::new(config),
             csrf_token: RwSignal::new(None),
             session_token: RwSignal::new(None),
             user_id: RwSignal::new(None),
@@ -68,7 +71,7 @@ impl FynApiClient {
     }
 
     pub async fn fetch_new_csrf_token(&self) -> Result<(), String> {
-        let response = auth_csrf_retrieve(&self.config)
+        let response = auth_csrf_retrieve(&self.config.get())
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
 
@@ -94,7 +97,7 @@ impl FynApiClient {
 
         let login_request = LoginRequest::new(username, password);
 
-        let response = auth_user_login_create(&self.config, login_request)
+        let response = auth_user_login_create(&self.config.get(), login_request)
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
 
@@ -110,7 +113,6 @@ impl FynApiClient {
 
         self.user_id.set(fetched_user_data.id);
         self.session_token.set(response.token);
-
         self.loading.set(false);
         Ok(new_user)
     }
@@ -132,7 +134,7 @@ impl FynApiClient {
         new_user_request.last_name = new_user.last_name;
         new_user_request.email = new_user.email;
 
-        let _response = accounts_users_create(&self.config, new_user_request)
+        let _response = accounts_users_create(&self.config.get(), new_user_request)
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
 
@@ -143,12 +145,16 @@ impl FynApiClient {
     pub async fn get_runner_info(&self) -> Result<Vec<RunnerInfoDomain>, String> {
         self.loading.set(true);
 
-        let _response = runner_manager_users_list(&self.config)
+        leptos::logging::log!("Making authenticated request using session cookie");
+
+        // The sessionid cookie will automatically be sent with this request
+        let _response = runner_manager_users_list(&self.config.get())
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
+
         self.loading.set(false);
 
-        let mut runner_infos = _response
+        let runner_infos = _response
             .iter()
             .map(|run| {
                 RunnerInfoDomain::new_complete(
@@ -169,6 +175,6 @@ impl FynApiClient {
             })
             .collect::<Vec<RunnerInfoDomain>>();
 
-        return Ok(runner_infos);
+        Ok(runner_infos)
     }
 }
