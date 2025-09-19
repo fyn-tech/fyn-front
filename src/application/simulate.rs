@@ -20,9 +20,9 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 use leptos::reactive::signal;
+use leptos::reactive::spawn_local;
 
 use crate::common::size::*;
 use crate::components::atoms::button::*;
@@ -30,11 +30,14 @@ use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
 use crate::components::organisms::navigation::*;
+use crate::domain::user_context::UserContext;
+
+use crate::infrastructure::fyn_api_client::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {
     FormAndViewer,
-    TableView,
+    RunnerStateViewer,
 }
 
 /// Simulate Page - Left toolbar template with dynamic content area
@@ -48,7 +51,7 @@ pub fn Simulate() -> impl IntoView {
         <div class="h-screen w-full flex bg-surface-50 dark:bg-surface-950">
             <ButtonBar horizontal=false items = vec![
                 view! {<GroupButton text="SM".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::FormAndViewer);})/>},
-                view! {<GroupButton text="RS".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::TableView);})/>},
+                view! {<GroupButton text="RS".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::RunnerStateViewer);})/>},
             ] />
 
             // Main content area - displays different components based on toolbar selection
@@ -56,24 +59,77 @@ pub fn Simulate() -> impl IntoView {
                 {move || match current_view.get() {
                     SimulateView::FormAndViewer => view! { <FormAndViewerLayout /> }.into_any(),
 
-                    SimulateView::TableView => view! { <Table table={
-                    TableStruct {name : "Table Name".to_string(),
-                                    data: TableData{
-                                    col_def: vec![
-                                        ColumnDefinition {
-                                        name: "Column 1".to_string(),
-                                        data_type: CellType::Text
-                                        }],
-                                    rows: vec![
-                                        vec!["text 0".to_string()],
-                                        vec!["text 1".to_string()],
-                                    ]
-                                    } }}></Table>
-                                    }.into_any(),
+                    SimulateView::RunnerStateViewer => view! { <RunnerView />}.into_any(),
 
                 }}
             </div>
         </div>
+    }
+}
+
+#[component]
+fn RunnerView() -> impl IntoView {
+    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
+    let user_context =
+        use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");
+    let error_msg = RwSignal::new(None::<String>); // Fix the type
+
+    spawn_local(async move {
+        let response = fyn_api_client.get_runner_info().await;
+        match response {
+            Ok(runners) => {
+                user_context.update(|ctx| {
+                    if let Some(user) = ctx {
+                        user.runners = runners;
+                    }
+                });
+                error_msg.set(None);
+            }
+            Err(error) => {
+                error_msg.set(Some(format!("Failed to load runners: {}", error)));
+            }
+        }
+    });
+
+    view! {
+        <Table table={TableStruct {name : "Runner List".to_string(),
+                        data: TableData{
+                        col_def: vec![
+                            ColumnDefinition {
+                                name: "ID".to_string(),
+                                data_type: CellType::Text
+                            },
+                            ColumnDefinition {
+                                name: "Status".to_string(),
+                                data_type: CellType::Text
+                            },
+                            ColumnDefinition {
+                                name: "Last Contact".to_string(),
+                                data_type: CellType::Text
+                            },
+                            ColumnDefinition {
+                                name: "Created".to_string(),
+                                data_type: CellType::Text
+                            }
+                        ],
+                        rows: user_context.get().map(|ctx| ctx.runners)
+                            .unwrap_or_default()
+                            .iter()
+                            .map(|runner| {
+                                vec![
+                                    runner.id.to_string(),
+                                    format!("{:?}", runner.state),
+                                    runner.last_contact
+                                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                                        .unwrap_or_else(|| "Never".to_string()),
+                                    runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+                                ]
+                            })
+                            .collect::<Vec<Vec<String>>>()
+                    }
+                }
+            }>
+        </Table>
     }
 }
 
