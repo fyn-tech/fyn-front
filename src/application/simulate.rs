@@ -92,44 +92,49 @@ fn RunnerView() -> impl IntoView {
     });
 
     view! {
-        <Table table={TableStruct {name : "Runner List".to_string(),
-                        data: TableData{
+        {move || {
+            let runners = user_context.with(|ctx|
+                ctx.as_ref()
+                    .map(|c| c.runners.clone())
+                    .unwrap_or_default()
+            );
+
+            view! {
+                <Table table={TableStruct {
+                    name: "Runner List".to_string(),
+                    data: TableData {
                         col_def: vec![
-                            ColumnDefinition {
-                                name: "ID".to_string(),
-                                data_type: CellType::Text
-                            },
-                            ColumnDefinition {
-                                name: "Status".to_string(),
-                                data_type: CellType::Text
-                            },
-                            ColumnDefinition {
-                                name: "Last Contact".to_string(),
-                                data_type: CellType::Text
-                            },
-                            ColumnDefinition {
-                                name: "Created".to_string(),
-                                data_type: CellType::Text
-                            }
-                        ],
-                        rows: user_context.get().map(|ctx| ctx.runners)
-                            .unwrap_or_default()
-                            .iter()
-                            .map(|runner| {
-                                vec![
-                                    runner.id.to_string(),
-                                    format!("{:?}", runner.state),
-                                    runner.last_contact
-                                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                                        .unwrap_or_else(|| "Never".to_string()),
-                                    runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
-                                ]
-                            })
-                            .collect::<Vec<Vec<String>>>()
+                                ColumnDefinition {
+                                    name: "ID".to_string(),
+                                    data_type: CellType::Text
+                                },
+                                ColumnDefinition {
+                                    name: "Status".to_string(),
+                                    data_type: CellType::Text
+                                },
+                                ColumnDefinition {
+                                    name: "Last Contact".to_string(),
+                                    data_type: CellType::Text
+                                },
+                                ColumnDefinition {
+                                    name: "Created".to_string(),
+                                    data_type: CellType::Text
+                                }
+                            ],
+                            rows: runners.iter().map(|runner| {
+                            vec![
+                                runner.id.to_string(),
+                                format!("{:?}", runner.state),
+                                runner.last_contact
+                                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                                    .unwrap_or_else(|| "Never".to_string()),
+                                runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+                            ]
+                        }).collect::<Vec<Vec<String>>>()
                     }
-                }
-            }>
-        </Table>
+                }}/>
+            }
+        }}
     }
 }
 
