@@ -196,6 +196,7 @@ impl FynApiClient {
             .map(|run| {
                 RunnerInfoDomain::new_complete(
                     run.id,
+                    run.name.as_ref().unwrap().to_string(),
                     match run.state {
                         Some(StateEnum::Id) => RunnerStateDomain::Idle,
                         Some(StateEnum::Bs) => RunnerStateDomain::Busy,

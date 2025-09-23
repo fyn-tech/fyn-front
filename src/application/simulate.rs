@@ -105,9 +105,10 @@ fn RunnerView() -> impl IntoView {
                     data: TableData {
                         col_def: vec![
                                 ColumnDefinition {
-                                    name: "ID".to_string(),
+                                    name: "Name".to_string(),
                                     data_type: CellType::Text
                                 },
+
                                 ColumnDefinition {
                                     name: "Status".to_string(),
                                     data_type: CellType::Text
@@ -119,16 +120,21 @@ fn RunnerView() -> impl IntoView {
                                 ColumnDefinition {
                                     name: "Created".to_string(),
                                     data_type: CellType::Text
-                                }
+                                },
+                                ColumnDefinition {
+                                    name: "ID".to_string(),
+                                    data_type: CellType::Text
+                                },
                             ],
                             rows: runners.iter().map(|runner| {
                             vec![
-                                runner.id.to_string(),
+                                runner.name.clone(),
                                 format!("{:?}", runner.state),
                                 runner.last_contact
                                     .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                                     .unwrap_or_else(|| "Never".to_string()),
                                 runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+                                runner.id.to_string(),
                             ]
                         }).collect::<Vec<Vec<String>>>()
                     }
