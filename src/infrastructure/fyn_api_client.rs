@@ -27,7 +27,7 @@ use crate::domain::runner_info::{
     RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
 };
 use crate::domain::user_context::UserContext;
-use fyn_api::apis::accounts_api::accounts_users_create;
+use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
@@ -46,16 +46,18 @@ pub struct FynApiClient {
 impl FynApiClient {
     pub fn new() -> Self {
         let mut config = Configuration::new();
-        config.base_path = "http://localhost:8000".to_string();
+        config.base_path = "http://127.0.0.1:8000".to_string();
 
-        let mut context = Self {
+        // In WASM, cookies are handled automatically by the browser
+        // The reqwest client will automatically include cookies for same-origin requests
+
+        let context = Self {
             config: RwSignal::new(config),
             csrf_token: RwSignal::new(None),
             session_token: RwSignal::new(None),
             user_id: RwSignal::new(None),
             loading: RwSignal::new(true),
         };
-        context.config.base_path = "http://localhost:8000".to_string();
 
         spawn_local({
             let context = context.clone();
@@ -63,6 +65,7 @@ impl FynApiClient {
                 if let Err(e) = context.fetch_new_csrf_token().await {
                     leptos::logging::error!("Failed to fetch CSRF token: {:?}", e);
                     context.loading.set(false);
+                    return;
                 }
             }
         });
@@ -71,15 +74,17 @@ impl FynApiClient {
     }
 
     pub async fn fetch_new_csrf_token(&self) -> Result<(), String> {
+        leptos::logging::log!("Fetching CSRF token...");
         let response = auth_csrf_retrieve(&self.config.get())
             .await
             .map_err(|e| format!("API error: {:?}", e))?;
 
-        self.csrf_token.set(Some(
-            response
-                .csrf_token
-                .unwrap_or("Empty CSRF token from API".to_string()),
-        ));
+        let csrf_token = response
+            .csrf_token
+            .unwrap_or("Empty CSRF token from API".to_string());
+
+        leptos::logging::log!("CSRF token received: {}", csrf_token);
+        self.csrf_token.set(Some(csrf_token));
 
         self.loading.set(false);
         Ok(())
@@ -94,12 +99,18 @@ impl FynApiClient {
 
     pub async fn login(&self, username: String, password: String) -> Result<UserContext, String> {
         self.loading.set(true);
+        leptos::logging::log!("Attempting login for user: {}", username);
 
         let login_request = LoginRequest::new(username, password);
 
         let response = auth_user_login_create(&self.config.get(), login_request)
             .await
-            .map_err(|e| format!("API error: {:?}", e))?;
+            .map_err(|e| {
+                leptos::logging::error!("Login API error: {:?}", e);
+                format!("API error: {:?}", e)
+            })?;
+
+        leptos::logging::log!("Login response received: {:?}", response.status);
 
         let fetched_user_data = response
             .user_data
@@ -113,8 +124,30 @@ impl FynApiClient {
 
         self.user_id.set(fetched_user_data.id);
         self.session_token.set(response.token);
+        leptos::logging::log!("Login successful, session should be established");
         self.loading.set(false);
         Ok(new_user)
+    }
+
+    pub async fn restore_session(&self) -> Option<UserContext> {
+        match accounts_users_list(&self.config.get()).await {
+            Ok(response_) => {
+                let mut new_context = UserContext::new();
+                response_.first().map(|ret_user| {
+                    new_context.username = Some(ret_user.username.clone());
+                    new_context.first_name = ret_user.first_name.clone();
+                    new_context.last_name = ret_user.last_name.clone();
+                    new_context.email = ret_user.email.clone();
+                    new_context.company = Some(ret_user.company.clone());
+                    new_context.country = Some(ret_user.country.clone());
+                });
+                Some(new_context)
+            }
+            Err(_) => {
+                leptos::logging::log!("No valid session");
+                None
+            }
+        }
     }
 
     pub async fn register(
@@ -145,13 +178,17 @@ impl FynApiClient {
     pub async fn get_runner_info(&self) -> Result<Vec<RunnerInfoDomain>, String> {
         self.loading.set(true);
 
-        leptos::logging::log!("Making authenticated request using session cookie");
+        leptos::logging::log!("Making authenticated request for runner info...");
 
         // The sessionid cookie will automatically be sent with this request
         let _response = runner_manager_users_list(&self.config.get())
             .await
-            .map_err(|e| format!("API error: {:?}", e))?;
+            .map_err(|e| {
+                leptos::logging::error!("Runner info API error: {:?}", e);
+                format!("API error: {:?}", e)
+            })?;
 
+        leptos::logging::log!("Runner info response received successfully");
         self.loading.set(false);
 
         let runner_infos = _response

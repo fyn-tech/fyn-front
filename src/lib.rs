@@ -27,6 +27,7 @@ mod domain;
 mod infrastructure;
 
 use leptos::prelude::*;
+use leptos::reactive::spawn_local;
 use leptos_meta::*;
 use leptos_router::{components::*, path};
 
@@ -51,7 +52,11 @@ pub fn App() -> impl IntoView {
     let fyn_api_client_context = FynApiClient::new();
     provide_context(fyn_api_client_context.clone());
 
+    // recover session.
     let user_context: RwSignal<Option<UserContext>> = RwSignal::new(None);
+    spawn_local(async move {
+        user_context.set(fyn_api_client_context.restore_session().await);
+    });
     provide_context(user_context);
 
     view! {
