@@ -21,6 +21,7 @@
  */
 
 use chrono::{DateTime, Utc};
+use leptos::server_fn::codec::Json;
 use leptos::{prelude::*, reactive::spawn_local};
 
 use crate::domain::runner_info::{
@@ -28,6 +29,7 @@ use crate::domain::runner_info::{
 };
 use crate::domain::user_context::UserContext;
 use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
+use fyn_api::apis::application_registry_api::application_registry_list;
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
@@ -72,6 +74,10 @@ impl FynApiClient {
 
         context
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Authentication & Session Management
+    // ---------------------------------------------------------------------------------------------
 
     pub async fn fetch_new_csrf_token(&self) -> Result<(), String> {
         leptos::logging::log!("Fetching CSRF token...");
@@ -141,6 +147,10 @@ impl FynApiClient {
                     new_context.company = Some(ret_user.company.clone());
                     new_context.country = Some(ret_user.country.clone());
                 });
+                leptos::logging::log!(
+                    "restored session for {}",
+                    new_context.username.clone().unwrap()
+                );
                 Some(new_context)
             }
             Err(_) => {
@@ -149,6 +159,10 @@ impl FynApiClient {
             }
         }
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // User/Accounts
+    // ---------------------------------------------------------------------------------------------
 
     pub async fn register(
         &self,
@@ -174,6 +188,31 @@ impl FynApiClient {
         self.loading.set(false);
         Ok("Created new user".to_string())
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Applications
+    // ---------------------------------------------------------------------------------------------
+
+    pub async fn get_applications(&self) -> Option<Vec<(String, String)>> {
+        match application_registry_list(&self.config.get()).await {
+            Ok(list_of_apps) => Some(
+                list_of_apps
+                    .iter()
+                    .map(|app| (app.id.to_string(), app.name.clone()))
+                    .collect(),
+            ),
+            Err(e) => {
+                leptos::logging::error!("Application registry API error: {:?}", e);
+                None
+            }
+        }
+    }
+
+    // pub async fn get_app_schema(&self) -> Option<Json> {}
+
+    // ---------------------------------------------------------------------------------------------
+    // Runners
+    // ---------------------------------------------------------------------------------------------
 
     pub async fn get_runner_info(&self) -> Result<Vec<RunnerInfoDomain>, String> {
         self.loading.set(true);

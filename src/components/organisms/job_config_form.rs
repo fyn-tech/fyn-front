@@ -19,27 +19,57 @@
  * description: Job configuration form organism
  * ------------------------------------------------------------------------------------------------
  */
-
-
 use leptos::prelude::*;
 
 use crate::common::size::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
+use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::SchemaForm;
 use crate::components::molecules::section::*;
+use crate::infrastructure::fyn_api_client::FynApiClient;
 
 #[component]
 pub fn JobConfigForm() -> impl IntoView {
+    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+    let application = RwSignal::new(String::new());
+
+    // Use LocalResource instead of spawn_local + RwSignal
+    let application_list = LocalResource::new({
+        let api_client = fyn_api_client.clone();
+        move || {
+            let api_client = api_client.clone(); // Clone inside the closure
+            async move { api_client.get_applications().await }
+        }
+    });
+
     return view! {
-      <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
-          <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Name".to_string()}>
-              <SchemaForm schema_json={PLACEHOLDER_SCHEMA.to_string()}/>
-          </Section>
-          <Stack align=FlexAlign::Center>
-              <Button text="Submit Job".to_string()/>
-          </Stack>
-      </div>
+        <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
+            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Name".to_string()}>
+            // meta data
+            {move || {
+                let options = application_list.get()
+                    .flatten()
+                    .unwrap_or(vec![("...".to_string(), "Loading...".to_string())]);
+                view! {
+                    <FormField
+                        label={"Application".to_string()}
+                        key={"application".to_string()}
+                        input_type=InputType::SelectText {
+                            options: options,
+                            signal: application
+                        }
+                    />
+                }
+            }}
+            // actual input data collection
+            <SchemaForm schema_json={PLACEHOLDER_SCHEMA.to_string()}/>
+            </Section>
+            <Stack align=FlexAlign::Center>
+                <Button text="Submit Job".to_string()/>
+            </Stack>
+        </div>
     };
 }
 

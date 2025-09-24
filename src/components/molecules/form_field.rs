@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
 use crate::common::size::Size;
@@ -58,7 +57,7 @@ pub enum InputType {
         signal: RwSignal<bool>,
     },
     SelectText {
-        options: Vec<(String, String)>,
+        options: Vec<(String, String)>, // (value, display_text) pairs
         signal: RwSignal<String>,
     },
     SelectInteger {
