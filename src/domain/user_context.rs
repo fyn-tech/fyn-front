@@ -20,7 +20,8 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use fyn_api::models::App;
+use std::collections::HashMap;
+use uuid::Uuid;
 
 use crate::domain::application_info::*;
 use crate::domain::runner_info::*;
@@ -35,7 +36,7 @@ pub struct UserContext {
     pub country: Option<String>,
 
     // application related
-    pub apps: Vec<AppInfo>,
+    pub apps: HashMap<Uuid, AppInfo>,
 
     // runners related
     pub runners: Vec<RunnerInfo>,
@@ -58,7 +59,7 @@ impl UserContext {
             email: None,
             company: None,
             country: None,
-            apps: Vec::new(),
+            apps: HashMap::new(),
             runners: Vec::new(),
         }
     }

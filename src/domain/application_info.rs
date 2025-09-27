@@ -20,18 +20,17 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use uuid::Uuid;
 
-use crate::components::molecules::schema_form;
-
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AppInfo {
     pub id: Uuid,
     pub name: String,
     pub file_path: String,
     pub schema_path: Option<String>,
-    pub schema: Option<String>,
+    pub schema: Option<Value>,
 }
 
 impl AppInfo {

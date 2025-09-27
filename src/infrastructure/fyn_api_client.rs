@@ -20,9 +20,12 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
-use leptos::server_fn::codec::Json;
 use leptos::{prelude::*, reactive::spawn_local};
+use serde_json::Value;
+use uuid::Uuid;
 
 use crate::domain::application_info::AppInfo;
 use crate::domain::runner_info::{
@@ -30,7 +33,9 @@ use crate::domain::runner_info::{
 };
 use crate::domain::user_context::UserContext;
 use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
-use fyn_api::apis::application_registry_api::application_registry_list;
+use fyn_api::apis::application_registry_api::{
+    application_registry_list, application_registry_program_schema_retrieve,
+};
 use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::auth_api::auth_user_login_create;
 use fyn_api::apis::configuration::Configuration;
@@ -194,17 +199,20 @@ impl FynApiClient {
     // Applications
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn get_applications(&self) -> Option<Vec<AppInfo>> {
+    pub async fn get_applications(&self) -> Option<HashMap<Uuid, AppInfo>> {
         match application_registry_list(&self.config.get()).await {
             Ok(list_of_apps) => Some(
                 list_of_apps
                     .iter()
                     .map(|app| {
-                        AppInfo::new_basic(
+                        (
                             app.id,
-                            app.name.clone(),
-                            app.file_path.clone(),
-                            app.schema_path.clone(),
+                            AppInfo::new_basic(
+                                app.id,
+                                app.name.clone(),
+                                app.file_path.clone(),
+                                app.schema_path.clone(),
+                            ),
                         )
                     })
                     .collect(),
@@ -216,7 +224,17 @@ impl FynApiClient {
         }
     }
 
-    // pub async fn get_app_schema(&self) -> Option<Json> {}
+    pub async fn get_app_schema(&self, app_id: Uuid) -> Option<serde_json::Value> {
+        match application_registry_program_schema_retrieve(&self.config.get(), &app_id.to_string())
+            .await
+        {
+            Ok(json_string) => Some(json_string),
+            Err(e) => {
+                leptos::logging::error!("Application registry schema fecth error: {}", e);
+                None::<serde_json::Value>
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------
     // Runners
