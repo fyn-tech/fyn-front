@@ -20,12 +20,10 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 use serde::de::Error as ErrorDe;
 use serde_json::{Error, Value};
 use std::collections::HashMap;
-use std::default;
 
 use crate::common::size::*;
 use crate::components::atoms::layout::*;
@@ -136,45 +134,46 @@ fn build_float_form_field(
       step: (None) }/>};
 }
 
-fn schema_to_form_fields(schema_json: &str) -> Result<Vec<AnyView>, Error> {
+fn schema_to_form_fields(schema_json: &str, form_state: &mut SchemaFormState) -> Result<Vec<AnyView>, Error> {
     let schema: Value = serde_json::from_str(schema_json)?;
     let properties = schema["properties"]
         .as_object()
         .ok_or_else(move || ErrorDe::custom("Missing 'properties' field in schema"))?;
 
     let mut form_fields = Vec::new();
-    let mut form_state = SchemaFormState::default();
 
     for (field_key, object) in properties.iter() {
         let field_type = object["type"].as_str().unwrap_or("none");
 
         form_fields.push(match field_type {
             "string" => {
-                form_state
+                let signal = form_state
                     .text_signals
-                    .insert(field_key.clone(), RwSignal::new(String::new()));
-                build_string_form_field(field_key, object, form_state.text_signals[field_key])
+                    .entry(field_key.clone())
+                    .or_insert_with(|| RwSignal::new(String::new()));
+                build_string_form_field(field_key, object, *signal)
                     .into_any()
             }
             "integer" => {
-                form_state
+                let signal = form_state
                     .int_signals
-                    .insert(field_key.clone(), RwSignal::new(None));
-                build_integer_form_field(field_key, object, form_state.int_signals[field_key])
+                    .entry(field_key.clone())
+                    .or_insert_with(|| RwSignal::new(None));
+                build_integer_form_field(field_key, object, *signal)
                     .into_any()
             }
             "number" => {
-                form_state
+                let signal = form_state
                     .float_signals
-                    .insert(field_key.clone(), RwSignal::new(None));
-                build_float_form_field(field_key, object, form_state.float_signals[field_key])
+                    .entry(field_key.clone())
+                    .or_insert_with(|| RwSignal::new(None));
+                build_float_form_field(field_key, object, *signal)
                     .into_any()
             }
             _ => continue,
         });
     }
 
-    // For now, return empty vec to get it compiling
     return Ok(form_fields);
 }
 
@@ -186,14 +185,23 @@ pub struct SchemaFormState {
 }
 
 #[component]
-pub fn SchemaForm(schema_json: String) -> impl IntoView {
-    let field_views = match schema_to_form_fields(&schema_json) {
-        Ok(fields) => fields,
-        Err(e) => {
-            log::error!("Schema parsing error: {:?}", e);
-            vec![] // Return empty on error
-        }
+pub fn SchemaForm(schema_json: String, #[prop(optional)] key: String) -> impl IntoView {
+    // Use StoredValue to persist form state across re-renders
+    let form_state = StoredValue::new(SchemaFormState::default());
+
+    let field_views = {
+        let mut state = form_state.get_value();
+        let views = match schema_to_form_fields(&schema_json, &mut state) {
+            Ok(fields) => fields,
+            Err(e) => {
+                log::error!("Schema parsing error: {:?}", e);
+                vec![] // Return empty on error
+            }
+        };
+        form_state.set_value(state);
+        views
     };
+
     return view! {
         <Grid size={Size::Md} cols=1>
             {field_views.into_iter().collect::<Vec<_>>()}

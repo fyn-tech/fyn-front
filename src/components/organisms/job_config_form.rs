@@ -32,6 +32,7 @@ use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::SchemaForm;
 use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
+use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
@@ -40,12 +41,12 @@ fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
         move || async move {
             let fyn_api_client =
                 use_context::<FynApiClient>().expect("FynApiClient should be provided");
-            let mut user_context =
+            let user_context =
                 use_context::<RwSignal<Option<UserContext>>>().expect("user should be provided");
             if user_context.get().is_some() && user_context.get().unwrap().apps.len() == 0 {
                 let app_info: Option<HashMap<Uuid, AppInfo>> =
                     fyn_api_client.get_applications().await;
-                let mut user_cont = user_context.get();
+                let user_cont = user_context.get();
                 match user_cont {
                     Some(mut user) => {
                         user.apps = app_info.unwrap_or_default();
@@ -68,38 +69,42 @@ fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
 }
 
 fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Option<String>> {
-    LocalResource::new({
-        let app = application_id.clone();
-        move || async move {
-            let app_section = app.clone();
+    LocalResource::new(move || {
+        let app_id = application_id.get();
+        async move {
             let fyn_api_client =
                 use_context::<FynApiClient>().expect("FynApiClient should be provided");
 
             let user_context = use_context::<RwSignal<Option<UserContext>>>()
-                .expect("UserContext should be prodivde.");
-            let app_sele_id = match Uuid::from_str(&app_section.get()) {
+                .expect("UserContext should be provided.");
+
+            if app_id.is_empty() {
+                return None;
+            }
+
+            let app_selected_id = match Uuid::from_str(&app_id) {
                 Ok(ufs) => Some(ufs),
                 Err(_) => None,
             };
 
-            if app_sele_id.is_some() && user_context.get().is_some() {
-                let app_id = app_sele_id.unwrap();
+            if app_selected_id.is_some() && user_context.get().is_some() {
+                let selected_app_id = app_selected_id.unwrap();
                 let user = user_context.get().unwrap();
 
-                match user.apps.get(&app_id) {
+                match user.apps.get(&selected_app_id) {
                     Some(app_info) => {
                         match &app_info.schema {
                             Some(existing_schema) => Some(existing_schema.to_string()), // existing schema, don't fetch
                             None => {
                                 // need to fetch new value
-                                let new_schema = match fyn_api_client.get_app_schema(app_id).await {
+                                let new_schema = match fyn_api_client.get_app_schema(selected_app_id).await {
                                     Some(schema) => schema,
                                     None => serde_json::Value::Null,
                                 };
 
                                 // Update the user context with the new schema
                                 let mut updated_user = user.clone();
-                                if let Some(app) = updated_user.apps.get_mut(&app_id) {
+                                if let Some(app) = updated_user.apps.get_mut(&selected_app_id) {
                                     app.schema = Some(new_schema.clone());
                                 }
                                 user_context.set(Some(updated_user));
@@ -118,10 +123,14 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
 }
 
 #[component]
-pub fn JobConfigForm() -> impl IntoView {
+pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
     let application = RwSignal::new(String::new());
+    let runner_id = RwSignal::new(String::new());
     let application_list = get_application_list();
     let fetch_json_schema = get_application_schema(application);
+
+    // Clone for closure
+    let runner_list_clone = runner_list.clone();
 
     let submit_job = {};
 
@@ -150,18 +159,39 @@ pub fn JobConfigForm() -> impl IntoView {
             <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Setup".to_string()}>
             {move || {
                match fetch_json_schema.get() {
-                   Some(va) => match va {
-                    Some(value) => view! {
-                      <SchemaForm schema_json=value.to_string()/>
+                   Some(Some(value)) => view! {
+                      <SchemaForm schema_json=value.to_string() key=application.get()/>
+
+                      // Runner selection
+                      {
+                          let runner_options = match &runner_list_clone {
+                              Some(runners) => {
+                                  runners.iter().map(|(id, runner)| {
+                                      (id.to_string(), runner.name.clone())
+                                  }).collect::<Vec<(String, String)>>()
+                              },
+                              None => vec![("...".to_string(), "Loading runners...".to_string())]
+                          };
+
+                          view! {
+                              <FormField
+                                  label={"Runner".to_string()}
+                                  key={"runner".to_string()}
+                                  input_type=InputType::SelectText {
+                                      options: runner_options,
+                                      signal: runner_id
+                                  }
+                              />
+                          }
+                      }
+
                       <Stack align=FlexAlign::Center>
                           <Button
                             text="Submit Job".to_string()/>
 
                       </Stack>
                     }.into_any(),
-                    None=> view!{<P>"select an application..."</P>}.into_any()
-                  },
-                   None => view! {<P>"select an application..."</P>}.into_any(),
+                    Some(None) | None => view!{<P>"select an application..."</P>}.into_any()
                }
              }
             }

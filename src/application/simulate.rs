@@ -21,6 +21,8 @@
  */
 
 use leptos::prelude::*;
+use std::collections::HashMap;
+use uuid::Uuid;
 
 use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
@@ -29,6 +31,7 @@ use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
 use crate::components::organisms::navigation::*;
+use crate::domain::runner_info::RunnerInfo;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {
@@ -40,6 +43,7 @@ pub enum SimulateView {
 #[component]
 pub fn Simulate() -> impl IntoView {
     let (current_view, set_current_view) = signal(SimulateView::FormAndViewer);
+    let runners_resource = RunnerService::get_runners(false);
 
     view! {
         <Navigation/>
@@ -52,11 +56,16 @@ pub fn Simulate() -> impl IntoView {
 
             // Main content area - displays different components based on toolbar selection
             <div class="flex-1 flex flex-col">
-                {move || match current_view.get() {
-                    SimulateView::FormAndViewer => view! { <FormAndViewerLayout /> }.into_any(),
+                {move || {
+                    match current_view.get() {
+                        SimulateView::FormAndViewer => view! {
+                            <FormAndViewerLayout runners=runners_resource.get().flatten() />
+                        }.into_any(),
 
-                    SimulateView::RunnerStateViewer => view! { <RunnerView />}.into_any(),
-
+                        SimulateView::RunnerStateViewer => view! {
+                            <RunnerView runners=runners_resource.get().flatten() />
+                        }.into_any(),
+                    }
                 }}
             </div>
         </div>
@@ -64,15 +73,11 @@ pub fn Simulate() -> impl IntoView {
 }
 
 #[component]
-fn RunnerView() -> impl IntoView {
-    let runners_resource = RunnerService::get_runners(false);
-
+fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
     view! {
         {move || {
-            match runners_resource.get() {
-                Some(runner_map_opt) => {
-                    match runner_map_opt {
-                        Some(runner_map) => {
+            match &runners {
+                Some(runner_map) => {
                             let rows = runner_map.iter().map(|(_, runner)| {
                                 vec![
                                     runner.name.clone(),
@@ -115,9 +120,6 @@ fn RunnerView() -> impl IntoView {
                                     }
                                 }}/>
                             }.into_any()
-                        },
-                        None => view! { <div>"No runners available"</div> }.into_any()
-                    }
                 },
                 None => view! { <div>"Loading runners..."</div> }.into_any()
             }
@@ -127,7 +129,7 @@ fn RunnerView() -> impl IntoView {
 
 /// Form and 3D Viewer Layout Component with working resizable splitter
 #[component]
-fn FormAndViewerLayout() -> impl IntoView {
+fn FormAndViewerLayout(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
     let (splitter_x, set_splitter_x) = signal(400.0);
     let (is_dragging, set_is_dragging) = signal(false);
 
@@ -138,7 +140,7 @@ fn FormAndViewerLayout() -> impl IntoView {
                 class="absolute top-0 left-0 h-full bg-white dark:bg-surface-800 border-r border-surface-200 dark:border-surface-700 overflow-hidden"
                 style:width=move || format!("{}px", splitter_x.get())
             >
-                <JobConfigForm />
+                <JobConfigForm runner_list=runners.clone() />
             </div>
 
             // Draggable vertical splitter line
