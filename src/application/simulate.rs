@@ -21,18 +21,14 @@
  */
 
 use leptos::prelude::*;
-use leptos::reactive::signal;
-use leptos::reactive::spawn_local;
 
+use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
 use crate::components::atoms::button::*;
 use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
 use crate::components::organisms::navigation::*;
-use crate::domain::user_context::UserContext;
-
-use crate::infrastructure::fyn_api_client::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {
@@ -69,76 +65,61 @@ pub fn Simulate() -> impl IntoView {
 
 #[component]
 fn RunnerView() -> impl IntoView {
-    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
-    let user_context =
-        use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");
-    let error_msg = RwSignal::new(None::<String>); // Fix the type
-
-    spawn_local(async move {
-        let response = fyn_api_client.get_runner_info().await;
-        match response {
-            Ok(runners) => {
-                user_context.update(|ctx| {
-                    if let Some(user) = ctx {
-                        user.runners = runners;
-                    }
-                });
-                error_msg.set(None);
-            }
-            Err(error) => {
-                error_msg.set(Some(format!("Failed to load runners: {}", error)));
-            }
-        }
-    });
+    let runners_resource = RunnerService::get_runners(false);
 
     view! {
         {move || {
-            let runners = user_context.with(|ctx|
-                ctx.as_ref()
-                    .map(|c| c.runners.clone())
-                    .unwrap_or_default()
-            );
+            match runners_resource.get() {
+                Some(runner_map_opt) => {
+                    match runner_map_opt {
+                        Some(runner_map) => {
+                            let rows = runner_map.iter().map(|(_, runner)| {
+                                vec![
+                                    runner.name.clone(),
+                                    format!("{:?}", runner.state),
+                                    runner.last_contact
+                                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                                        .unwrap_or_else(|| "Never".to_string()),
+                                    runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+                                    runner.id.to_string(),
+                                ]
+                            }).collect::<Vec<Vec<String>>>();
 
-            view! {
-                <Table table={TableStruct {
-                    name: "Runner List".to_string(),
-                    data: TableData {
-                        col_def: vec![
-                                ColumnDefinition {
-                                    name: "Name".to_string(),
-                                    data_type: CellType::Text
-                                },
-
-                                ColumnDefinition {
-                                    name: "Status".to_string(),
-                                    data_type: CellType::Text
-                                },
-                                ColumnDefinition {
-                                    name: "Last Contact".to_string(),
-                                    data_type: CellType::Text
-                                },
-                                ColumnDefinition {
-                                    name: "Created".to_string(),
-                                    data_type: CellType::Text
-                                },
-                                ColumnDefinition {
-                                    name: "ID".to_string(),
-                                    data_type: CellType::Text
-                                },
-                            ],
-                            rows: runners.iter().map(|runner| {
-                            vec![
-                                runner.name.clone(),
-                                format!("{:?}", runner.state),
-                                runner.last_contact
-                                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                                    .unwrap_or_else(|| "Never".to_string()),
-                                runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
-                                runner.id.to_string(),
-                            ]
-                        }).collect::<Vec<Vec<String>>>()
+                            view! {
+                                <Table table={TableStruct {
+                                    name: "Runner List".to_string(),
+                                    data: TableData {
+                                        col_def: vec![
+                                            ColumnDefinition {
+                                                name: "Name".to_string(),
+                                                data_type: CellType::Text
+                                            },
+                                            ColumnDefinition {
+                                                name: "Status".to_string(),
+                                                data_type: CellType::Text
+                                            },
+                                            ColumnDefinition {
+                                                name: "Last Contact".to_string(),
+                                                data_type: CellType::Text
+                                            },
+                                            ColumnDefinition {
+                                                name: "Created".to_string(),
+                                                data_type: CellType::Text
+                                            },
+                                            ColumnDefinition {
+                                                name: "ID".to_string(),
+                                                data_type: CellType::Text
+                                            },
+                                        ],
+                                        rows
+                                    }
+                                }}/>
+                            }.into_any()
+                        },
+                        None => view! { <div>"No runners available"</div> }.into_any()
                     }
-                }}/>
+                },
+                None => view! { <div>"Loading runners..."</div> }.into_any()
             }
         }}
     }

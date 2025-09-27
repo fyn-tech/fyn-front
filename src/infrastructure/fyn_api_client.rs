@@ -23,6 +23,7 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
+use fyn_api::apis::job_manager_api::job_manager_resources_users_create;
 use leptos::{prelude::*, reactive::spawn_local};
 use serde_json::Value;
 use uuid::Uuid;
@@ -237,10 +238,18 @@ impl FynApiClient {
     }
 
     // ---------------------------------------------------------------------------------------------
+    // Job
+    // ---------------------------------------------------------------------------------------------
+
+    // pub async fn submit_new_job(&self) -> Option<serde_json::Value> {
+    //     // job_manager_resources_users_create(configuration, job_resource_request)
+    // }
+
+    // ---------------------------------------------------------------------------------------------
     // Runners
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn get_runner_info(&self) -> Result<Vec<RunnerInfoDomain>, String> {
+    pub async fn get_runner_info(&self) -> Result<HashMap<Uuid, RunnerInfoDomain>, String> {
         self.loading.set(true);
 
         leptos::logging::log!("Making authenticated request for runner info...");
@@ -259,24 +268,27 @@ impl FynApiClient {
         let runner_infos = _response
             .iter()
             .map(|run| {
-                RunnerInfoDomain::new_complete(
+                (
                     run.id,
-                    run.name.as_ref().unwrap().to_string(),
-                    match run.state {
-                        Some(StateEnum::Id) => RunnerStateDomain::Idle,
-                        Some(StateEnum::Bs) => RunnerStateDomain::Busy,
-                        Some(StateEnum::Of) => RunnerStateDomain::Offline,
-                        Some(StateEnum::Ur) => RunnerStateDomain::Unregistered,
-                        None => RunnerStateDomain::Unknown,
-                    },
-                    run.created_at.parse::<DateTime<Utc>>().unwrap(),
-                    run.last_contact
-                        .as_ref()
-                        .flatten()
-                        .and_then(|s| s.parse::<DateTime<Utc>>().ok()),
+                    RunnerInfoDomain::new_complete(
+                        run.id,
+                        run.name.as_ref().unwrap().to_string(),
+                        match run.state {
+                            Some(StateEnum::Id) => RunnerStateDomain::Idle,
+                            Some(StateEnum::Bs) => RunnerStateDomain::Busy,
+                            Some(StateEnum::Of) => RunnerStateDomain::Offline,
+                            Some(StateEnum::Ur) => RunnerStateDomain::Unregistered,
+                            None => RunnerStateDomain::Unknown,
+                        },
+                        run.created_at.parse::<DateTime<Utc>>().unwrap(),
+                        run.last_contact
+                            .as_ref()
+                            .flatten()
+                            .and_then(|s| s.parse::<DateTime<Utc>>().ok()),
+                    ),
                 )
             })
-            .collect::<Vec<RunnerInfoDomain>>();
+            .collect::<HashMap<Uuid, RunnerInfoDomain>>();
 
         Ok(runner_infos)
     }
