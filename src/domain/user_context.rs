@@ -39,7 +39,7 @@ pub struct UserContext {
     pub apps: HashMap<Uuid, AppInfo>,
 
     // runners related
-    pub runners: Vec<RunnerInfo>,
+    pub runners: Option<HashMap<Uuid, RunnerInfo>>,
 }
 
 impl UserContext {
@@ -60,7 +60,7 @@ impl UserContext {
             company: None,
             country: None,
             apps: HashMap::new(),
-            runners: Vec::new(),
+            runners: None,
         }
     }
 }

@@ -1,7 +1,3 @@
-use std::collections::HashMap;
-use std::default;
-use std::str::FromStr;
-
 /* ------------------------------------------------------------------------------------------------
  * Fyn-Front: Modern CFD/CAE Web Interface
  * Copyright (C) 2025 Fyn-Front Authors
@@ -24,6 +20,8 @@ use std::str::FromStr;
  * ------------------------------------------------------------------------------------------------
  */
 use leptos::prelude::*;
+use std::collections::HashMap;
+use std::str::FromStr;
 use uuid::Uuid;
 
 use crate::common::size::*;
@@ -122,9 +120,10 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
 #[component]
 pub fn JobConfigForm() -> impl IntoView {
     let application = RwSignal::new(String::new());
-
     let application_list = get_application_list();
     let fetch_json_schema = get_application_schema(application);
+
+    let submit_job = {};
 
     return view! {
         <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
@@ -147,16 +146,17 @@ pub fn JobConfigForm() -> impl IntoView {
             }}
             </Section>
 
-
-            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Setup".to_string()}>
             // actual input data collection
+            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Setup".to_string()}>
             {move || {
                match fetch_json_schema.get() {
                    Some(va) => match va {
                     Some(value) => view! {
                       <SchemaForm schema_json=value.to_string()/>
                       <Stack align=FlexAlign::Center>
-                          <Button text="Submit Job".to_string()/>
+                          <Button
+                            text="Submit Job".to_string()/>
+
                       </Stack>
                     }.into_any(),
                     None=> view!{<P>"select an application..."</P>}.into_any()
@@ -171,60 +171,3 @@ pub fn JobConfigForm() -> impl IntoView {
         </div>
     };
 }
-
-pub const PLACEHOLDER_SCHEMA: &str = r#"
-{
-  "type": "object",
-  "properties": {
-    "analysis_name": {
-      "type": "string",
-      "title": "Analysis Name",
-      "description": "Name for this analysis"
-    },
-    "dim": {
-      "type": "integer",
-      "title": "Dimensions",
-      "enum": [2, 3] 
-    },
-    "cells_x": {
-      "type": "integer",
-      "title": "Cells X",
-      "minimum": 1,
-      "maximum": 1000
-    },
-    "cells_y": {
-      "type": "integer",
-      "title": "Cells Y",
-      "minimum": 1,
-      "maximum": 1000
-    },
-    "time_step_size": {
-      "type": "number",
-      "title": "Time Step Size",
-      "minimum": 0.0001,
-      "maximum": 1.0
-    },
-    "time_begin": {
-      "type": "number",
-      "title": "Start Time",
-      "minimum": 0.0
-    },
-    "time_end": {
-      "type": "number",
-      "title": "End Time",
-      "minimum": 0.1
-    },
-    "density": {
-      "type": "number",
-      "title": "Density",
-      "minimum": 0.1
-    },
-    "viscosity": {
-      "type": "number",
-      "title": "Viscosity",
-      "minimum": 0.001
-    }
-  },
-  "required": ["analysis_name", "time_step_size", "time_end", "density", "viscosity"]
-}
-"#;
