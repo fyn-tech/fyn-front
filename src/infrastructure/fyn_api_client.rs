@@ -24,6 +24,7 @@ use chrono::{DateTime, Utc};
 use leptos::server_fn::codec::Json;
 use leptos::{prelude::*, reactive::spawn_local};
 
+use crate::domain::application_info::AppInfo;
 use crate::domain::runner_info::{
     RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
 };
@@ -193,12 +194,19 @@ impl FynApiClient {
     // Applications
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn get_applications(&self) -> Option<Vec<(String, String)>> {
+    pub async fn get_applications(&self) -> Option<Vec<AppInfo>> {
         match application_registry_list(&self.config.get()).await {
             Ok(list_of_apps) => Some(
                 list_of_apps
                     .iter()
-                    .map(|app| (app.id.to_string(), app.name.clone()))
+                    .map(|app| {
+                        AppInfo::new_basic(
+                            app.id,
+                            app.name.clone(),
+                            app.file_path.clone(),
+                            app.schema_path.clone(),
+                        )
+                    })
                     .collect(),
             ),
             Err(e) => {

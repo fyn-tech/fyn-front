@@ -27,22 +27,45 @@ use crate::components::atoms::layout::*;
 use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::SchemaForm;
 use crate::components::molecules::section::*;
+use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+
+fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
+    LocalResource::new({
+        move || async move {
+            let fyn_api_client =
+                use_context::<FynApiClient>().expect("FynApiClient should be provided");
+            let mut user_context =
+                use_context::<RwSignal<Option<UserContext>>>().expect("user should be provided");
+            if user_context.get().is_some() && user_context.get().unwrap().apps.len() == 0 {
+                let app_info: Option<Vec<crate::domain::application_info::AppInfo>> =
+                    fyn_api_client.get_applications().await;
+                let mut user_cont = user_context.get();
+                match user_cont {
+                    Some(mut user) => {
+                        user.apps = app_info.unwrap_or_default();
+                        user_context.set(Some(user));
+                    }
+                    None => {}
+                }
+            }
+            Some(
+                user_context
+                    .get()
+                    .unwrap_or_default()
+                    .apps
+                    .iter()
+                    .map(|app| (app.id.to_string(), app.name.clone()))
+                    .collect(),
+            )
+        }
+    })
+}
 
 #[component]
 pub fn JobConfigForm() -> impl IntoView {
-    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
-
     let application = RwSignal::new(String::new());
-
-    // Use LocalResource instead of spawn_local + RwSignal
-    let application_list = LocalResource::new({
-        let api_client = fyn_api_client.clone();
-        move || {
-            let api_client = api_client.clone(); // Clone inside the closure
-            async move { api_client.get_applications().await }
-        }
-    });
+    let application_list = get_application_list();
 
     return view! {
         <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>

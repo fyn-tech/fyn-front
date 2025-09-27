@@ -15,11 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: mod.rs
- * description: Domain layer module exports
+ * filename: application_info.rs
+ * description: Domain entity representing the application information context
  * ------------------------------------------------------------------------------------------------
  */
 
-pub mod application_info;
-pub mod runner_info;
-pub mod user_context;
+use chrono::{DateTime, Utc};
+use uuid::Uuid;
+
+use crate::components::molecules::schema_form;
+
+#[derive(Clone, Debug, Default)]
+pub struct AppInfo {
+    pub id: Uuid,
+    pub name: String,
+    pub file_path: String,
+    pub schema_path: Option<String>,
+    pub schema: Option<String>,
+}
+
+impl AppInfo {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn new_basic(
+        id: Uuid,
+        name: String,
+        file_path: String,
+        schema_path: Option<String>,
+    ) -> Self {
+        Self {
+            id,
+            name,
+            file_path,
+            schema_path,
+            schema: None,
+        }
+    }
+}

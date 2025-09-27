@@ -20,6 +20,9 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+use fyn_api::models::App;
+
+use crate::domain::application_info::*;
 use crate::domain::runner_info::*;
 
 #[derive(Clone, Debug, Default)]
@@ -31,7 +34,10 @@ pub struct UserContext {
     pub company: Option<String>,
     pub country: Option<String>,
 
-    // related runners
+    // application related
+    pub apps: Vec<AppInfo>,
+
+    // runners related
     pub runners: Vec<RunnerInfo>,
 }
 
@@ -52,6 +58,7 @@ impl UserContext {
             email: None,
             company: None,
             country: None,
+            apps: Vec::new(),
             runners: Vec::new(),
         }
     }
