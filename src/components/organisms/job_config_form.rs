@@ -32,8 +32,10 @@ use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::SchemaForm;
 use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
+use crate::domain::job_context::*;
 use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
 fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
@@ -97,10 +99,11 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
                             Some(existing_schema) => Some(existing_schema.to_string()), // existing schema, don't fetch
                             None => {
                                 // need to fetch new value
-                                let new_schema = match fyn_api_client.get_app_schema(selected_app_id).await {
-                                    Some(schema) => schema,
-                                    None => serde_json::Value::Null,
-                                };
+                                let new_schema =
+                                    match fyn_api_client.get_app_schema(selected_app_id).await {
+                                        Some(schema) => schema,
+                                        None => serde_json::Value::Null,
+                                    };
 
                                 // Update the user context with the new schema
                                 let mut updated_user = user.clone();
@@ -124,15 +127,69 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
 
 #[component]
 pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
-    let application = RwSignal::new(String::new());
+    let job_name = RwSignal::new(String::new());
+    let job_priority = RwSignal::new(Some(0i64));
+    let application_id = RwSignal::new(String::new());
     let runner_id = RwSignal::new(String::new());
     let application_list = get_application_list();
-    let fetch_json_schema = get_application_schema(application);
+    let fetch_json_schema = get_application_schema(application_id);
 
     // Clone for closure
     let runner_list_clone = runner_list.clone();
 
-    let submit_job = {};
+    let submit_job = move || {
+        async move {
+            // Helper for UUID parsing
+            let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
+                Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
+            };
+
+            let runner_uuid = match parse_uuid(&application_id.get(), "application UUID") {
+                Ok(id) => id,
+                Err(e) => {
+                    leptos::logging::error!("{}", e);
+                    return;
+                }
+            };
+
+            let app_uuid = match parse_uuid(&application_id.get(), "application UUID") {
+                Ok(id) => id,
+                Err(e) => {
+                    leptos::logging::error!("{}", e);
+                    return;
+                }
+            };
+
+            let new_job_request = match JobInfo::new_job(
+                job_name.get(),
+                app_uuid,
+                runner_uuid,
+                job_priority.get().unwrap_or(0),
+                "executable".to_string(),
+                None,
+                0,
+                vec![],
+            ) {
+                Ok(job) => job,
+                Err(e) => {
+                    leptos::logging::error!("Failed to create job: {:?}", e);
+                    return;
+                }
+            };
+
+            let fyn_api_client =
+                use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+            match fyn_api_client.submit_new_job(new_job_request).await {
+                Some(created_job) => {
+                    leptos::logging::log!("Job created: {:?}", created_job.id);
+                }
+                None => {
+                    leptos::logging::error!("Failed to submit job");
+                }
+            }
+        };
+    };
 
     return view! {
         <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
@@ -144,11 +201,25 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     .unwrap_or(vec![("...".to_string(), "Loading...".to_string())]);
                 view! {
                     <FormField
+                        label={"Job Name".to_string()}
+                        key={"job_name".to_string()}
+                        placeholder={"name".to_string()}
+                        input_type=InputType::Text {
+                            signal: job_name
+                        }
+                    />
+                    <FormField
+                        label={"Job Priority".to_string()}
+                        key={"job_priority".to_string()}
+                        placeholder={"0".to_string()}
+                        input_type=InputType::Integer { signal: job_priority, min: Some(0), max: Some(100), step: Some(1) }
+                    />
+                    <FormField
                         label={"Application".to_string()}
                         key={"application".to_string()}
                         input_type=InputType::SelectText {
                             options: options,
-                            signal: application
+                            signal: application_id
                         }
                     />
                 }
@@ -160,7 +231,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             {move || {
                match fetch_json_schema.get() {
                    Some(Some(value)) => view! {
-                      <SchemaForm schema_json=value.to_string() key=application.get()/>
+                      <SchemaForm schema_json=value.to_string() key=application_id.get()/>
 
                       // Runner selection
                       {
