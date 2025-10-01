@@ -21,5 +21,6 @@
  */
 
 pub mod application_info;
+pub mod job_context;
 pub mod runner_info;
 pub mod user_context;

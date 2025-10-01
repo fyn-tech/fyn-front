@@ -19,11 +19,12 @@
  * description: Domain entity representing the job context
  * ------------------------------------------------------------------------------------------------
  */
-use std::default;
 use std::path::PathBuf;
+use std::{default, f32::consts::E};
 
 use chrono::{DateTime, Utc};
 use leptos::error::throw;
+use serde_json::Value;
 use uuid::Uuid;
 
 // -------------------------------------------------------------------------------------------------
@@ -35,7 +36,9 @@ pub enum JobStatus {
     UploadingInputResources,
     Queued,
     Preparing,
+    FetchingResources,
     Starting,
+    Running,
     Paused,
     CleaningUp,
     UploadingResults,
@@ -70,33 +73,36 @@ pub struct JobInfo {
     pub priority: i64,
     pub runner_id: Uuid,
     pub executable: String,
-    pub command_line_args: String,
+    pub command_line_args: Option<Value>, // needs to be a list of values as the root node
     pub exit_code: i64,
     pub resources: Vec<JobResource>,
 }
 
 impl JobInfo {
-    fn new_job(
+    pub fn new_job(
         name: String,
         app_id: Uuid,
         runner_id: Uuid,
         priority: i64,
         executable: String,
-        cl_args: String,
+        cl_args: Option<Value>,
         exit_code: i64,
         resources: Vec<JobResource>,
-    ) -> JobInfo {
-        Self {
-            id: Uuid::nil(),
-            name: name,
-            status: JobStatus::UploadingInputResources,
-            application_id: app_id,
-            priority: priority,
-            runner_id: runner_id,
-            executable: executable,
-            command_line_args: cl_args,
-            exit_code: exit_code,
-            resources: resources,
+    ) -> Result<JobInfo, String> {
+        match validate_cl_args(&cl_args) {
+            Ok(_) => Ok(Self {
+                id: Uuid::nil(),
+                name: name,
+                status: JobStatus::UploadingInputResources,
+                application_id: app_id,
+                priority: priority,
+                runner_id: runner_id,
+                executable: executable,
+                command_line_args: cl_args,
+                exit_code: exit_code,
+                resources: resources,
+            }),
+            Err(e) => Err(e),
         }
     }
 
@@ -144,5 +150,27 @@ impl JobResource {
         }
         self.id = id;
         Ok(())
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Support Functions
+// -------------------------------------------------------------------------------------------------
+
+/// Validates that a serde_json::Value is a list of strings only
+fn validate_cl_args(option_value: &Option<Value>) -> Result<(), String> {
+    match option_value {
+        Some(value) => match value.as_array() {
+            Some(arr) => {
+                for item in arr {
+                    if !item.is_string() {
+                        return Err("Command line args must contain only strings".to_string());
+                    }
+                }
+                Ok(())
+            }
+            None => Err("Command line args must be a list".to_string()),
+        },
+        None => Ok(()),
     }
 }
