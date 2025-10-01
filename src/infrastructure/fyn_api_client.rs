@@ -21,18 +21,25 @@
  */
 
 use std::collections::HashMap;
+use std::f64::consts::E;
 
 use chrono::{DateTime, Utc};
-use fyn_api::apis::job_manager_api::job_manager_resources_users_create;
+use fyn_api::apis::job_manager_api::{
+    job_manager_resources_users_create, job_manager_users_create,
+};
 use leptos::{prelude::*, reactive::spawn_local};
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::domain::application_info::AppInfo;
+use crate::domain::job_context::{
+    JobInfo as JobInfoDomain, JobResource as JobResourceDomain, JobStatus as JobStatusDomain,
+};
 use crate::domain::runner_info::{
     RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
 };
 use crate::domain::user_context::UserContext;
+
 use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
 use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
@@ -241,9 +248,34 @@ impl FynApiClient {
     // Job
     // ---------------------------------------------------------------------------------------------
 
-    // pub async fn submit_new_job(&self) -> Option<serde_json::Value> {
-    //     // job_manager_resources_users_create(configuration, job_resource_request)
-    // }
+    pub async fn submit_new_job(&self, new_job: JobInfoDomain) -> Option<JobInfoDomain> {
+        let mut job_request = JobInfoRequest::new(new_job.application_id);
+        job_request.name = Some(new_job.name.clone());
+        job_request.priority = Some(new_job.priority as i32);
+        job_request.command_line_args = Some(new_job.command_line_args.clone());
+        job_request.status = Some(domain_api_job_status(new_job.status));
+        job_request.assigned_runner = Some(Some(new_job.runner_id));
+
+        let response = job_manager_users_create(&self.config.get(), job_request).await;
+
+        match response {
+            Ok(job_info) => {
+                let mut updated_new_job = new_job;
+                match updated_new_job.set_id(job_info.id) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        leptos::logging::error!("Error setting job id {:?}", e);
+                        return None;
+                    }
+                };
+                Some(updated_new_job)
+            }
+            Err(e) => {
+                leptos::logging::error!("job_manager_users_create failed: {:?}", e);
+                None
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------
     // Runners
@@ -273,13 +305,7 @@ impl FynApiClient {
                     RunnerInfoDomain::new_complete(
                         run.id,
                         run.name.as_ref().unwrap().to_string(),
-                        match run.state {
-                            Some(StateEnum::Id) => RunnerStateDomain::Idle,
-                            Some(StateEnum::Bs) => RunnerStateDomain::Busy,
-                            Some(StateEnum::Of) => RunnerStateDomain::Offline,
-                            Some(StateEnum::Ur) => RunnerStateDomain::Unregistered,
-                            None => RunnerStateDomain::Unknown,
-                        },
+                        api_domain_runner_state(run.state),
                         run.created_at.parse::<DateTime<Utc>>().unwrap(),
                         run.last_contact
                             .as_ref()
@@ -291,5 +317,70 @@ impl FynApiClient {
             .collect::<HashMap<Uuid, RunnerInfoDomain>>();
 
         Ok(runner_infos)
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Front-Back End Enum Mapping
+// -------------------------------------------------------------------------------------------------
+
+fn domain_api_job_status(domain_status: JobStatusDomain) -> StatusEnum {
+    match domain_status {
+        JobStatusDomain::UploadingInputResources => StatusEnum::Ui,
+        JobStatusDomain::Queued => StatusEnum::Qd,
+        JobStatusDomain::Preparing => StatusEnum::Pr,
+        JobStatusDomain::FetchingResources => StatusEnum::Fr,
+        JobStatusDomain::Starting => StatusEnum::St,
+        JobStatusDomain::Running => StatusEnum::Rn,
+        JobStatusDomain::Paused => StatusEnum::Pd,
+        JobStatusDomain::CleaningUp => StatusEnum::Cu,
+        JobStatusDomain::UploadingResults => StatusEnum::Ur,
+        JobStatusDomain::Succeeded => StatusEnum::Sd,
+        JobStatusDomain::Failed => StatusEnum::Fd,
+        JobStatusDomain::FailedResourceError => StatusEnum::Fs,
+        JobStatusDomain::FailedTerminated => StatusEnum::Fm,
+        JobStatusDomain::FailedTimeout => StatusEnum::Fo,
+        JobStatusDomain::FailedRunnerException => StatusEnum::Fe,
+    }
+}
+
+fn api_domain_job_status(api_status: Option<StatusEnum>) -> JobStatusDomain {
+    match api_status {
+        Some(StatusEnum::Ui) => JobStatusDomain::UploadingInputResources,
+        Some(StatusEnum::Qd) => JobStatusDomain::Queued,
+        Some(StatusEnum::Pr) => JobStatusDomain::Preparing,
+        Some(StatusEnum::Fr) => JobStatusDomain::FetchingResources,
+        Some(StatusEnum::St) => JobStatusDomain::Starting,
+        Some(StatusEnum::Rn) => JobStatusDomain::Running,
+        Some(StatusEnum::Pd) => JobStatusDomain::Paused,
+        Some(StatusEnum::Cu) => JobStatusDomain::CleaningUp,
+        Some(StatusEnum::Ur) => JobStatusDomain::UploadingResults,
+        Some(StatusEnum::Sd) => JobStatusDomain::Succeeded,
+        Some(StatusEnum::Fd) => JobStatusDomain::Failed,
+        Some(StatusEnum::Fs) => JobStatusDomain::FailedResourceError,
+        Some(StatusEnum::Fm) => JobStatusDomain::FailedTerminated,
+        Some(StatusEnum::Fo) => JobStatusDomain::FailedTimeout,
+        Some(StatusEnum::Fe) => JobStatusDomain::FailedRunnerException,
+        None => JobStatusDomain::Queued, // Default to Queued if None
+    }
+}
+
+fn domain_api_runner_state(domain_state: RunnerStateDomain) -> StateEnum {
+    match domain_state {
+        RunnerStateDomain::Idle => StateEnum::Id,
+        RunnerStateDomain::Busy => StateEnum::Bs,
+        RunnerStateDomain::Offline => StateEnum::Of,
+        RunnerStateDomain::Unregistered => StateEnum::Ur,
+        RunnerStateDomain::Unknown => StateEnum::Of, // Map Unknown to Offline
+    }
+}
+
+fn api_domain_runner_state(api_state: Option<StateEnum>) -> RunnerStateDomain {
+    match api_state {
+        Some(StateEnum::Id) => RunnerStateDomain::Idle,
+        Some(StateEnum::Bs) => RunnerStateDomain::Busy,
+        Some(StateEnum::Of) => RunnerStateDomain::Offline,
+        Some(StateEnum::Ur) => RunnerStateDomain::Unregistered,
+        None => RunnerStateDomain::Unknown,
     }
 }
