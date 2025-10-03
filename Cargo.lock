@@ -618,7 +618,9 @@ dependencies = [
  "const_format",
  "futures",
  "fyn_api",
+ "gloo-net",
  "indexmap 2.11.4",
+ "js-sys",
  "leptos",
  "leptos_meta",
  "leptos_router",
@@ -638,7 +640,6 @@ dependencies = [
 name = "fyn_api"
 version = "1.0.0"
 dependencies = [
- "gloo-net",
  "reqwest",
  "serde",
  "serde_json",
@@ -646,7 +647,6 @@ dependencies = [
  "serde_with",
  "url",
  "uuid",
- "web-sys",
 ]
 
 [[package]]
