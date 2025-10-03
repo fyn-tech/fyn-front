@@ -1,3 +1,4 @@
+use leptos::attr::Value;
 /* ------------------------------------------------------------------------------------------------
  * Fyn-Front: Modern CFD/CAE Web Interface
  * Copyright (C) 2025 Fyn-Front Authors
@@ -19,7 +20,8 @@
  * description: Job configuration form organism
  * ------------------------------------------------------------------------------------------------
  */
-use leptos::prelude::*;
+use leptos::{prelude::*, reactive::spawn_local};
+use serde_json::json;
 use std::collections::HashMap;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -138,13 +140,18 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     let runner_list_clone = runner_list.clone();
 
     let submit_job = move || {
-        async move {
+        leptos::logging::log!("Clicked");
+
+        let fyn_api_client =
+            use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+        spawn_local(async move {
             // Helper for UUID parsing
             let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
                 Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
             };
 
-            let runner_uuid = match parse_uuid(&application_id.get(), "application UUID") {
+            let runner_uuid = match parse_uuid(&runner_id.get(), "runner UUID") {
                 Ok(id) => id,
                 Err(e) => {
                     leptos::logging::error!("{}", e);
@@ -166,7 +173,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 runner_uuid,
                 job_priority.get().unwrap_or(0),
                 "executable".to_string(),
-                None,
+                Some(json!(["arg1", "arg2", "arg3"])),
                 0,
                 vec![],
             ) {
@@ -177,9 +184,6 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            let fyn_api_client =
-                use_context::<FynApiClient>().expect("FynApiClient should be provided");
-
             match fyn_api_client.submit_new_job(new_job_request).await {
                 Some(created_job) => {
                     leptos::logging::log!("Job created: {:?}", created_job.id);
@@ -188,7 +192,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     leptos::logging::error!("Failed to submit job");
                 }
             }
-        };
+        });
     };
 
     return view! {
@@ -258,7 +262,9 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
 
                       <Stack align=FlexAlign::Center>
                           <Button
-                            text="Submit Job".to_string()/>
+                            text="Submit Job".to_string()
+                            on_click={Box::new(submit_job)}
+                            />
 
                       </Stack>
                     }.into_any(),

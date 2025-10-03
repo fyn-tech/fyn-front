@@ -255,6 +255,10 @@ echo "   Converting accounts_api functions..."
 convert_function "$FYN_API_DIR/src/apis/accounts_api.rs" "accounts_users_list" "get" "{}/accounts/users/" "false"
 convert_function "$FYN_API_DIR/src/apis/accounts_api.rs" "accounts_users_create" "post" "{}/accounts/users/" "true"
 
+echo "   Converting job_manager_api functions..."
+convert_function "$FYN_API_DIR/src/apis/job_manager_api.rs" "job_manager_users_list" "get" "{}/accounts/users/" "false"
+convert_function "$FYN_API_DIR/src/apis/job_manager_api.rs" "job_manager_users_create" "post" "{}/job_manager/users/" "true"
+
 # Step 5: Verify the conversion worked
 echo "Step 5: Verifying conversion..."
 
