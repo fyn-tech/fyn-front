@@ -460,8 +460,8 @@ impl FynApiClient {
 
         // Build request with JWT Bearer token using web-sys
         let mut opts = web_sys::RequestInit::new();
-        opts.method("POST");
-        opts.body(Some(form_data.as_ref()));
+        opts.set_method("POST");
+        opts.set_body(form_data.as_ref());
 
         let url = format!("{}/job_manager/resources/users/", base_url);
         let request = web_sys::Request::new_with_str_and_init(&url, &opts)
@@ -486,6 +486,33 @@ impl FynApiClient {
         } else {
             Err(format!("Upload failed with status: {}", response.status()))
         }
+    }
+
+    /// Create a web_sys::File from JSON data
+    ///
+    /// This is useful for uploading JSON configuration files to the backend.
+    /// The file will have the content-type "application/json".
+    pub fn create_json_file(
+        json_data: &serde_json::Value,
+        filename: &str,
+    ) -> Result<web_sys::File, String> {
+        use wasm_bindgen::JsCast;
+
+        // Convert JSON to pretty-printed string
+        let json_string = serde_json::to_string_pretty(json_data)
+            .map_err(|e| format!("JSON serialization failed: {:?}", e))?;
+
+        // Create a JS Array with the JSON string
+        let array = js_sys::Array::new();
+        array.push(&wasm_bindgen::JsValue::from_str(&json_string));
+
+        // Create file options
+        let mut file_options = web_sys::FilePropertyBag::new();
+        file_options.set_type("application/json");
+
+        // Create the File object
+        web_sys::File::new_with_blob_sequence_and_options(&array, filename, &file_options)
+            .map_err(|e| format!("Failed to create File: {:?}", e))
     }
 
     // ---------------------------------------------------------------------------------------------

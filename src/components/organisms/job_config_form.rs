@@ -31,7 +31,7 @@ use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::components::molecules::form_field::*;
-use crate::components::molecules::schema_form::SchemaForm;
+use crate::components::molecules::schema_form::{SchemaForm, SchemaFormState};
 use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::*;
@@ -136,6 +136,9 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     let application_list = get_application_list();
     let fetch_json_schema = get_application_schema(application_id);
 
+    // Signal to receive form data from SchemaForm
+    let schema_form_state: RwSignal<Option<SchemaFormState>> = RwSignal::new(None);
+
     // Clone for closure
     let runner_list_clone = runner_list.clone();
 
@@ -184,13 +187,46 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            match fyn_api_client.submit_new_job(new_job_request).await {
-                Some(created_job) => {
-                    leptos::logging::log!("Job created: {:?}", created_job.id);
+            let created_job = match fyn_api_client.submit_new_job(new_job_request).await {
+                Some(job) => {
+                    leptos::logging::log!("Job created: {:?}", job.id);
+                    job
                 }
                 None => {
                     leptos::logging::error!("Failed to submit job");
+                    return;
                 }
+            };
+
+            // Upload config file if we have form data
+            if let Some(form_state) = schema_form_state.get() {
+                let config_json = form_state.to_json();
+                leptos::logging::log!("Creating config file from form data");
+
+                match FynApiClient::create_json_file(&config_json, "config_file.json") {
+                    Ok(config_file) => {
+                        leptos::logging::log!("Uploading config file for job {}", created_job.id);
+
+                        match fyn_api_client.upload_job_resource_file(
+                            created_job.id,
+                            config_file,
+                            "CFG",  // CONFIG resource type
+                            Some("Application configuration file"),
+                        ).await {
+                            Ok(_) => {
+                                leptos::logging::log!("Config file uploaded successfully");
+                            }
+                            Err(e) => {
+                                leptos::logging::error!("Failed to upload config file: {}", e);
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        leptos::logging::error!("Failed to create config file: {}", e);
+                    }
+                }
+            } else {
+                leptos::logging::log!("No form data to upload");
             }
         });
     };
@@ -235,7 +271,11 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             {move || {
                match fetch_json_schema.get() {
                    Some(Some(value)) => view! {
-                      <SchemaForm schema_json=value.to_string() key=application_id.get()/>
+                      <SchemaForm
+                        schema_json=value.to_string()
+                        key=application_id.get()
+                        form_state_out=schema_form_state
+                      />
 
                       // Runner selection
                       {

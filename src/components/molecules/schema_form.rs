@@ -184,8 +184,45 @@ pub struct SchemaFormState {
     int_signals: HashMap<String, RwSignal<Option<i64>>>,
 }
 
+impl SchemaFormState {
+    /// Export form data as JSON Value
+    pub fn to_json(&self) -> serde_json::Value {
+        let mut map = serde_json::Map::new();
+
+        // Add text fields
+        for (key, signal) in &self.text_signals {
+            let value = signal.get();
+            if !value.is_empty() {
+                map.insert(key.clone(), serde_json::Value::String(value));
+            }
+        }
+
+        // Add integer fields
+        for (key, signal) in &self.int_signals {
+            if let Some(value) = signal.get() {
+                map.insert(key.clone(), serde_json::Value::Number(value.into()));
+            }
+        }
+
+        // Add float fields
+        for (key, signal) in &self.float_signals {
+            if let Some(value) = signal.get() {
+                if let Some(num) = serde_json::Number::from_f64(value) {
+                    map.insert(key.clone(), serde_json::Value::Number(num));
+                }
+            }
+        }
+
+        serde_json::Value::Object(map)
+    }
+}
+
 #[component]
-pub fn SchemaForm(schema_json: String, #[prop(optional)] key: String) -> impl IntoView {
+pub fn SchemaForm(
+    schema_json: String,
+    #[prop(optional)] key: String,
+    #[prop(optional)] form_state_out: Option<RwSignal<Option<SchemaFormState>>>,
+) -> impl IntoView {
     // Use StoredValue to persist form state across re-renders
     let form_state = StoredValue::new(SchemaFormState::default());
 
@@ -198,7 +235,13 @@ pub fn SchemaForm(schema_json: String, #[prop(optional)] key: String) -> impl In
                 vec![] // Return empty on error
             }
         };
-        form_state.set_value(state);
+        form_state.set_value(state.clone());
+
+        // Expose form state to parent if signal provided
+        if let Some(signal) = form_state_out {
+            signal.set(Some(state));
+        }
+
         views
     };
 
