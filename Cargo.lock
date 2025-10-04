@@ -618,7 +618,6 @@ dependencies = [
  "const_format",
  "futures",
  "fyn_api",
- "gloo-net",
  "indexmap 2.11.4",
  "js-sys",
  "leptos",

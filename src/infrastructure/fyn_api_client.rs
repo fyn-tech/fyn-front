@@ -23,14 +23,16 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
-use fyn_api::apis::job_manager_api::job_manager_users_create;
+use fyn_api::apis::job_manager_api::{
+    job_manager_resources_users_create, job_manager_users_create,
+};
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::{
-    JobInfo as JobInfoDomain, JobStatus as JobStatusDomain,
+    JobInfo as JobInfoDomain, JobResource as JobResourceDomain, JobStatus as JobStatusDomain,
     ResourceType,
 };
 use crate::domain::runner_info::{
@@ -141,12 +143,11 @@ impl FynApiClient {
             return Err(format!("Login failed: {}", error_text));
         }
 
-        let tokens: TokenResponse = response.json().await
-            .map_err(|e| {
-                leptos::logging::error!("Token parse error: {:?}", e);
-                self.loading.set(false);
-                format!("Failed to parse tokens: {:?}", e)
-            })?;
+        let tokens: TokenResponse = response.json().await.map_err(|e| {
+            leptos::logging::error!("Token parse error: {:?}", e);
+            self.loading.set(false);
+            format!("Failed to parse tokens: {:?}", e)
+        })?;
 
         leptos::logging::log!("JWT tokens received successfully");
 
@@ -175,13 +176,18 @@ impl FynApiClient {
     }
 
     pub async fn refresh_access_token(&self) -> Result<(), String> {
-        let refresh_token = self.refresh_token.get()
+        let refresh_token = self
+            .refresh_token
+            .get()
             .ok_or("No refresh token available")?;
 
         leptos::logging::log!("Refreshing access token...");
 
         let response = reqwest::Client::new()
-            .post(&format!("{}/api/token/refresh/", self.config.get().base_path))
+            .post(&format!(
+                "{}/api/token/refresh/",
+                self.config.get().base_path
+            ))
             .json(&serde_json::json!({
                 "refresh": refresh_token
             }))
@@ -193,7 +199,9 @@ impl FynApiClient {
             return Err("Token refresh failed - please login again".to_string());
         }
 
-        let new_token: TokenRefreshResponse = response.json().await
+        let new_token: TokenRefreshResponse = response
+            .json()
+            .await
             .map_err(|e| format!("Failed to parse refreshed token: {:?}", e))?;
 
         // Update stored token
@@ -243,8 +251,7 @@ impl FynApiClient {
             .await
             .map_err(|e| format!("Failed to get user: {:?}", e))?;
 
-        let user = users.first()
-            .ok_or("No user data returned")?;
+        let user = users.first().ok_or("No user data returned")?;
 
         let mut context = UserContext::new();
         context.username = Some(user.username.clone());
@@ -263,7 +270,7 @@ impl FynApiClient {
             if let Ok(Some(storage)) = window.local_storage() {
                 if let (Ok(Some(access)), Ok(Some(refresh))) = (
                     storage.get_item("access_token"),
-                    storage.get_item("refresh_token")
+                    storage.get_item("refresh_token"),
                 ) {
                     leptos::logging::log!("Restoring session from localStorage");
                     self.access_token.set(Some(access.clone()));
@@ -409,9 +416,11 @@ impl FynApiClient {
     /// Upload a web File as a job resource (for browser-based uploads)
     ///
     /// NOTE: This bypasses the generated OpenAPI client because:
-    /// 1. The generated client uses reqwest which doesn't support File uploads in WASM
-    /// 2. The backend expects multipart/form-data, not JSON
-    /// 3. Browser File objects can't be converted to PathBuf
+    /// 1. The generated client doesn't properly support multipart/form-data file uploads
+    /// 2. The backend expects multipart/form-data with file uploads
+    /// 3. Browser File objects need special handling in WASM
+    ///
+    /// Uses web-sys fetch API with JWT Bearer token authentication
     pub async fn upload_job_resource_file(
         &self,
         job_id: Uuid,
@@ -419,18 +428,21 @@ impl FynApiClient {
         resource_type: &str,
         description: Option<&str>,
     ) -> Result<(), String> {
-        use gloo_net::http::Request;
+        use wasm_bindgen::JsCast;
+        use wasm_bindgen_futures::JsFuture;
 
-        let csrf_token = self.get_csrf_token().unwrap_or_default();
-        let access_token = self.access_token.get().unwrap_or_default();
+        let access_token = self.access_token.get()
+            .ok_or("No access token available - please login first")?;
+
         let base_url = &self.config.get().base_path;
 
+        // Create multipart form
         let form_data = web_sys::FormData::new()
             .map_err(|_| "Failed to create FormData".to_string())?;
 
         form_data
             .append_with_str("job", &job_id.to_string())
-            .map_err(|_| "Failed to append job".to_string())?;
+            .map_err(|_| "Failed to append job ID".to_string())?;
 
         form_data
             .append_with_str("resource_type", resource_type)
@@ -446,16 +458,30 @@ impl FynApiClient {
                 .map_err(|_| "Failed to append description".to_string())?;
         }
 
-        let response = Request::post(&format!("{}/job_manager/resources/users/", base_url))
-            .header("Authorization", &format!("Bearer {}", access_token))
-            .header("X-CSRFToken", &csrf_token)
-            .body(form_data)
-            .map_err(|e| format!("Failed to build request: {:?}", e))?
-            .send()
+        // Build request with JWT Bearer token using web-sys
+        let mut opts = web_sys::RequestInit::new();
+        opts.method("POST");
+        opts.body(Some(form_data.as_ref()));
+
+        let url = format!("{}/job_manager/resources/users/", base_url);
+        let request = web_sys::Request::new_with_str_and_init(&url, &opts)
+            .map_err(|_| "Failed to create request".to_string())?;
+
+        request.headers()
+            .set("Authorization", &format!("Bearer {}", access_token))
+            .map_err(|_| "Failed to set Authorization header".to_string())?;
+
+        // Execute fetch
+        let window = web_sys::window().ok_or("No window object")?;
+        let resp_value = JsFuture::from(window.fetch_with_request(&request))
             .await
-            .map_err(|e| format!("Request failed: {:?}", e))?;
+            .map_err(|e| format!("Fetch failed: {:?}", e))?;
+
+        let response: web_sys::Response = resp_value.dyn_into()
+            .map_err(|_| "Failed to cast to Response".to_string())?;
 
         if response.ok() {
+            leptos::logging::log!("Job resource uploaded successfully");
             Ok(())
         } else {
             Err(format!("Upload failed with status: {}", response.status()))
