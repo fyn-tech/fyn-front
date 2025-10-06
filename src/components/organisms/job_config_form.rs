@@ -1,3 +1,4 @@
+use fyn_api::models::StatusEnum;
 use leptos::attr::Value;
 /* ------------------------------------------------------------------------------------------------
  * Fyn-Front: Modern CFD/CAE Web Interface
@@ -34,9 +35,9 @@ use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::{SchemaForm, SchemaFormState};
 use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
-use crate::domain::job_context::*;
 use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
+use crate::domain::{job_context::*, user_context};
 use crate::infrastructure::fyn_api_client;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
@@ -170,15 +171,13 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            let new_job_request = match JobInfo::new_job(
+            let new_job_request = match JobInfo::new_request(
                 job_name.get(),
                 app_uuid,
-                runner_uuid,
+                Some(runner_uuid),
                 job_priority.get().unwrap_or(0),
                 "executable".to_string(),
                 Some(json!(["arg1", "arg2", "arg3"])),
-                0,
-                vec![],
             ) {
                 Ok(job) => job,
                 Err(e) => {
@@ -187,13 +186,13 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            let created_job = match fyn_api_client.submit_new_job(new_job_request).await {
-                Some(job) => {
+            let mut created_job = match fyn_api_client.submit_new_job(new_job_request).await {
+                Ok(job) => {
                     leptos::logging::log!("Job created: {:?}", job.id);
                     job
                 }
-                None => {
-                    leptos::logging::error!("Failed to submit job");
+                Err(e) => {
+                    leptos::logging::error!("Failed to submit new job: {}", e);
                     return;
                 }
             };
@@ -207,12 +206,15 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     Ok(config_file) => {
                         leptos::logging::log!("Uploading config file for job {}", created_job.id);
 
-                        match fyn_api_client.upload_job_resource_file(
-                            created_job.id,
-                            config_file,
-                            "CFG",  // CONFIG resource type
-                            Some("Application configuration file"),
-                        ).await {
+                        match fyn_api_client
+                            .upload_job_resource_file(
+                                created_job.id,
+                                config_file,
+                                "CFG", // CONFIG resource type
+                                Some("Application configuration file"),
+                            )
+                            .await
+                        {
                             Ok(_) => {
                                 leptos::logging::log!("Config file uploaded successfully");
                             }
@@ -228,6 +230,22 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             } else {
                 leptos::logging::log!("No form data to upload");
             }
+
+            // place into queued state to trigger runner pick up
+            created_job.status = JobStatus::Queued;
+            match fyn_api_client.patch_job(created_job).await {
+                Ok(job_info) => {
+                    leptos::logging::log!("Job {} ({}) set to queued", job_info.name, job_info.id);
+                }
+                Err(e) => {
+                    leptos::logging::error!(
+                        "Error setting job {} ({}) to queue: {}",
+                        created_job.name,
+                        created_job.id,
+                        e
+                    );
+                }
+            };
         });
     };
 

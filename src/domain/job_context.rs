@@ -71,23 +71,50 @@ pub struct JobInfo {
     pub status: JobStatus,
     pub application_id: Uuid,
     pub priority: i64,
-    pub runner_id: Uuid,
+    pub runner_id: Option<Uuid>,
     pub executable: String,
     pub command_line_args: Option<Value>, // needs to be a list of values as the root node
-    pub exit_code: i64,
-    pub resources: Vec<JobResource>,
+    pub exit_code: Option<i64>,
+    pub resources: Vec<Uuid>,
 }
 
 impl JobInfo {
-    pub fn new_job(
+    pub fn new(
+        id: Uuid,
         name: String,
+        status: JobStatus,
         app_id: Uuid,
-        runner_id: Uuid,
+        runner_id: Option<Uuid>,
         priority: i64,
         executable: String,
         cl_args: Option<Value>,
-        exit_code: i64,
-        resources: Vec<JobResource>,
+        exit_code: Option<i64>,
+        resources: Vec<Uuid>,
+    ) -> Result<JobInfo, String> {
+        match validate_cl_args(&cl_args) {
+            Ok(_) => Ok(Self {
+                id: id,
+                name: name,
+                status: status,
+                application_id: app_id,
+                priority: priority,
+                runner_id: runner_id,
+                executable: executable,
+                command_line_args: cl_args,
+                exit_code: exit_code,
+                resources: resources,
+            }),
+            Err(e) => Err(e),
+        }
+    }
+
+    pub fn new_request(
+        name: String,
+        app_id: Uuid,
+        runner_id: Option<Uuid>,
+        priority: i64,
+        executable: String,
+        cl_args: Option<Value>,
     ) -> Result<JobInfo, String> {
         match validate_cl_args(&cl_args) {
             Ok(_) => Ok(Self {
@@ -99,8 +126,8 @@ impl JobInfo {
                 runner_id: runner_id,
                 executable: executable,
                 command_line_args: cl_args,
-                exit_code: exit_code,
-                resources: resources,
+                exit_code: None,
+                resources: vec![],
             }),
             Err(e) => Err(e),
         }

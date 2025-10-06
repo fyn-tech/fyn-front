@@ -21,11 +21,11 @@
  */
 
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use fyn_api::apis::job_manager_api::{
-    job_manager_resources_users_create, job_manager_users_create,
-};
+use fyn_api::apis::job_manager_api::*;
+use leptos::html::S;
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -44,7 +44,6 @@ use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
 use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
 };
-use fyn_api::apis::auth_api::auth_csrf_retrieve;
 use fyn_api::apis::configuration::Configuration;
 use fyn_api::apis::runner_manager_api::runner_manager_users_list;
 use fyn_api::models::*;
@@ -84,11 +83,9 @@ impl FynApiClient {
             loading: RwSignal::new(true),
         };
 
-        // Optionally fetch CSRF token on init (if still using forms)
         spawn_local({
             let context = context.clone();
             async move {
-                let _ = context.fetch_csrf_token().await;
                 context.loading.set(false);
             }
         });
@@ -99,24 +96,6 @@ impl FynApiClient {
     // ---------------------------------------------------------------------------------------------
     // Authentication & Session Management
     // ---------------------------------------------------------------------------------------------
-
-    pub async fn fetch_csrf_token(&self) -> Result<(), String> {
-        leptos::logging::log!("Fetching CSRF token...");
-
-        // CSRF still useful for forms, but NOT for API auth anymore
-        let response = auth_csrf_retrieve(&self.config.get())
-            .await
-            .map_err(|e| format!("CSRF fetch error: {:?}", e))?;
-
-        let csrf_token = response
-            .csrf_token
-            .unwrap_or("Empty CSRF token".to_string());
-
-        leptos::logging::log!("CSRF token received: {}", csrf_token);
-        self.csrf_token.set(Some(csrf_token));
-
-        Ok(())
-    }
 
     pub async fn login(&self, username: String, password: String) -> Result<UserContext, String> {
         self.loading.set(true);
@@ -384,33 +363,22 @@ impl FynApiClient {
     // Job
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn submit_new_job(&self, new_job: JobInfoDomain) -> Option<JobInfoDomain> {
-        let mut job_request = JobInfoRequest::new(new_job.application_id);
-        job_request.name = Some(new_job.name.clone());
-        job_request.priority = Some(new_job.priority as i32);
-        job_request.command_line_args = Some(new_job.command_line_args.clone());
-        job_request.status = Some(domain_api_job_status(new_job.status));
-        job_request.assigned_runner = Some(Some(new_job.runner_id));
-
-        let response = job_manager_users_create(&self.config.get(), job_request).await;
-
-        match response {
-            Ok(job_info) => {
-                let mut updated_new_job = new_job;
-                match updated_new_job.set_id(job_info.id) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        leptos::logging::error!("Error setting job id {:?}", e);
-                        return None;
-                    }
-                };
-                Some(updated_new_job)
-            }
-            Err(e) => {
-                leptos::logging::error!("job_manager_users_create failed: {:?}", e);
-                None
-            }
+    pub async fn submit_new_job(&self, new_job: JobInfoDomain) -> Result<JobInfoDomain, String> {
+        match job_manager_users_create(&self.config.get(), new_job.to_api_request()).await {
+            Ok(job_info) => job_info.to_domain(),
+            Err(e) => Err(format!("job_manager_users_create failed: {:?}", e)),
         }
+    }
+
+    pub async fn patch_job(&self, job: JobInfoDomain) -> Result<JobInfoDomain, String> {
+        let response = job_manager_users_partial_update(
+            &self.config.get(),
+            &job.id.to_string(),
+            Some(job.to_api_patch()),
+        )
+        .await
+        .map_err(|e| format!("Error setting updating job status {:?}", e))?;
+        response.to_domain()
     }
 
     /// Upload a web File as a job resource (for browser-based uploads)
@@ -431,14 +399,16 @@ impl FynApiClient {
         use wasm_bindgen::JsCast;
         use wasm_bindgen_futures::JsFuture;
 
-        let access_token = self.access_token.get()
+        let access_token = self
+            .access_token
+            .get()
             .ok_or("No access token available - please login first")?;
 
         let base_url = &self.config.get().base_path;
 
         // Create multipart form
-        let form_data = web_sys::FormData::new()
-            .map_err(|_| "Failed to create FormData".to_string())?;
+        let form_data =
+            web_sys::FormData::new().map_err(|_| "Failed to create FormData".to_string())?;
 
         form_data
             .append_with_str("job", &job_id.to_string())
@@ -467,7 +437,8 @@ impl FynApiClient {
         let request = web_sys::Request::new_with_str_and_init(&url, &opts)
             .map_err(|_| "Failed to create request".to_string())?;
 
-        request.headers()
+        request
+            .headers()
             .set("Authorization", &format!("Bearer {}", access_token))
             .map_err(|_| "Failed to set Authorization header".to_string())?;
 
@@ -477,7 +448,8 @@ impl FynApiClient {
             .await
             .map_err(|e| format!("Fetch failed: {:?}", e))?;
 
-        let response: web_sys::Response = resp_value.dyn_into()
+        let response: web_sys::Response = resp_value
+            .dyn_into()
             .map_err(|_| "Failed to cast to Response".to_string())?;
 
         if response.ok() {
@@ -513,29 +485,6 @@ impl FynApiClient {
         // Create the File object
         web_sys::File::new_with_blob_sequence_and_options(&array, filename, &file_options)
             .map_err(|e| format!("Failed to create File: {:?}", e))
-    }
-
-    // ---------------------------------------------------------------------------------------------
-    // Utility Methods
-    // ---------------------------------------------------------------------------------------------
-
-    /// Get CSRF token from browser cookies (for Django CSRF protection on forms)
-    fn get_csrf_token(&self) -> Option<String> {
-        use wasm_bindgen::JsCast;
-
-        let window = web_sys::window()?;
-        let document = window.document()?;
-        let html_document = document.dyn_into::<web_sys::HtmlDocument>().ok()?;
-        let cookie = html_document.cookie().ok()?;
-
-        cookie.split(';').find_map(|c| {
-            let parts: Vec<&str> = c.trim().splitn(2, '=').collect();
-            if parts.len() == 2 && parts[0] == "csrftoken" {
-                Some(parts[1].to_string())
-            } else {
-                None
-            }
-        })
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -669,5 +618,68 @@ fn api_domain_runner_state(api_state: StateEnum) -> RunnerStateDomain {
         StateEnum::Bs => RunnerStateDomain::Busy,
         StateEnum::Of => RunnerStateDomain::Offline,
         StateEnum::Ur => RunnerStateDomain::Unregistered,
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Model Mapping
+// -------------------------------------------------------------------------------------------------
+trait APIDomainTraits {
+    type Patch;
+    type Request;
+    fn to_api_patch(&self) -> Self::Patch;
+    fn to_api_request(&self) -> Self::Request;
+}
+
+impl APIDomainTraits for JobInfoDomain {
+    type Patch = PatchedJobInfoRequest;
+    type Request = JobInfoRequest;
+    fn to_api_patch(&self) -> Self::Patch {
+        let mut new_patch = PatchedJobInfoRequest::new();
+        new_patch.name = Some(self.name.clone());
+        new_patch.priority = self.priority.try_into().ok();
+        new_patch.status = Some(domain_api_job_status(self.status));
+        new_patch.assigned_runner = Some(self.runner_id);
+        new_patch.application_id = Some(self.application_id);
+        new_patch.executable = Some(self.executable.clone());
+        new_patch.command_line_args = Some(self.command_line_args.clone());
+        new_patch.exit_code = Some(self.exit_code);
+        new_patch.resources = Some(self.resources.clone());
+        new_patch
+    }
+
+    fn to_api_request(&self) -> Self::Request {
+        let mut new_request = JobInfoRequest::new(self.application_id, self.resources.clone());
+        new_request.name = Some(self.name.clone());
+        new_request.priority = self.priority.try_into().ok();
+        new_request.status = Some(domain_api_job_status(self.status));
+        new_request.assigned_runner = Some(self.runner_id);
+        new_request.executable = Some(self.executable.clone());
+        new_request.command_line_args = Some(self.command_line_args.clone());
+        new_request.exit_code = Some(self.exit_code);
+        new_request
+    }
+}
+
+trait DomainAPITraits {
+    type Domain;
+    fn to_domain(&self) -> Result<Self::Domain, String>;
+}
+
+impl DomainAPITraits for JobInfo {
+    type Domain = JobInfoDomain;
+    fn to_domain(&self) -> Result<Self::Domain, String> {
+        JobInfoDomain::new(
+            self.id,
+            self.name.clone().unwrap_or("un-named".to_string()),
+            api_domain_job_status(self.status.unwrap()),
+            self.application_id,
+            self.assigned_runner.unwrap_or(None),
+            self.priority.unwrap_or(-1i32) as i64,
+            self.executable.clone().unwrap_or("none".to_string()),
+            self.command_line_args.clone().unwrap_or(None),
+            self.exit_code.unwrap_or(None),
+            self.resources.clone(),
+        )
     }
 }
