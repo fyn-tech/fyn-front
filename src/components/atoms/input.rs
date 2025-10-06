@@ -303,7 +303,7 @@ pub fn SelectText(
                 view! {
                     <option
                         value={value.clone()}
-                        selected={signal.get() == value}
+                        selected={move || signal.get() == value}
                     >
                         {text}
                     </option>
