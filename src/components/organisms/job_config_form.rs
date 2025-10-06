@@ -186,7 +186,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            let mut created_job = match fyn_api_client.submit_new_job(new_job_request).await {
+            let mut created_job = match fyn_api_client.submit_new_job(&new_job_request).await {
                 Ok(job) => {
                     leptos::logging::log!("Job created: {:?}", job.id);
                     job
@@ -233,7 +233,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
 
             // place into queued state to trigger runner pick up
             created_job.status = JobStatus::Queued;
-            match fyn_api_client.patch_job(created_job).await {
+            match fyn_api_client.patch_job(&created_job).await {
                 Ok(job_info) => {
                     leptos::logging::log!("Job {} ({}) set to queued", job_info.name, job_info.id);
                 }

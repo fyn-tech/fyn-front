@@ -363,14 +363,14 @@ impl FynApiClient {
     // Job
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn submit_new_job(&self, new_job: JobInfoDomain) -> Result<JobInfoDomain, String> {
+    pub async fn submit_new_job(&self, new_job: &JobInfoDomain) -> Result<JobInfoDomain, String> {
         match job_manager_users_create(&self.config.get(), new_job.to_api_request()).await {
             Ok(job_info) => job_info.to_domain(),
             Err(e) => Err(format!("job_manager_users_create failed: {:?}", e)),
         }
     }
 
-    pub async fn patch_job(&self, job: JobInfoDomain) -> Result<JobInfoDomain, String> {
+    pub async fn patch_job(&self, job: &JobInfoDomain) -> Result<JobInfoDomain, String> {
         let response = job_manager_users_partial_update(
             &self.config.get(),
             &job.id.to_string(),
