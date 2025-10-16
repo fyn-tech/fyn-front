@@ -144,8 +144,6 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     let runner_list_clone = runner_list.clone();
 
     let submit_job = move || {
-        leptos::logging::log!("Clicked");
-
         let fyn_api_client =
             use_context::<FynApiClient>().expect("FynApiClient should be provided");
 
