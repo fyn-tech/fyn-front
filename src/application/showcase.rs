@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
 use crate::common::size::*;
@@ -161,8 +160,6 @@ pub fn Showcase() -> impl IntoView {
                                 <Button variant=Variant::Primary text="Primary".to_string() />
                                 <Button variant=Variant::Secondary text="Secondary".to_string() />
                                 <Button variant=Variant::Tertiary text="Tertiary".to_string() />
-                                <Button variant=Variant::Warning text="Warning".to_string() />
-                                <Button variant=Variant::Success text="Success".to_string() />
                             </Stack>
                         </Section>
 
@@ -172,6 +169,8 @@ pub fn Showcase() -> impl IntoView {
                                 <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
                                 <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
                                 <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
+                                <Button variant=Variant::Primary state=State::Success text="Success".to_string() />
+                                <Button variant=Variant::Primary state=State::Error text="Error".to_string() />
                             </Stack>
                         </Section>
 

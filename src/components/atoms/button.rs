@@ -27,7 +27,7 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::{text_size, FONT_CLR, FONT_STR};
 
 // ------------------------------------------------------------------------------------------------
-//  Variant
+//  Variant & State
 // ------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
@@ -35,8 +35,6 @@ pub enum Variant {
     Primary,
     Secondary,
     Tertiary,
-    Success,
-    Warning,
 }
 
 impl Variant {
@@ -45,8 +43,6 @@ impl Variant {
             Variant::Primary => "bg-primary-500 dark:bg-primary-950",
             Variant::Secondary => "bg-primary-300 dark:bg-primary-700",
             Variant::Tertiary => "bg-accent-300 dark:bg-accent-500",
-            Variant::Success => "bg-semantic-success",
-            Variant::Warning => "bg-semantic-warning",
         }
     }
 
@@ -55,10 +51,49 @@ impl Variant {
             Variant::Primary => "hover:bg-primary-300 dark:hover:bg-primary-700",
             Variant::Secondary => "hover:bg-primary-50 dark:hover:bg-primary-500",
             Variant::Tertiary => "hover:bg-accent-50 dark:hover:bg-accent-300",
-            Variant::Success => "",
-            Variant::Warning => "",
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum State {
+    Default,
+    Loading,
+    Disabled,
+    Active,
+    Success,
+    Error,
+}
+
+fn build_class_format(variant: &Variant, state: &State) -> String {
+    let mut classes = Vec::new();
+
+    // color
+    match state {
+        State::Default | State::Active | State::Disabled | State::Loading => {
+            classes.push(variant.base_colour())
+        }
+        State::Success => classes.push("bg-semantic-success"),
+        State::Error => classes.push("bg-semantic-error"),
+    }
+
+    // accent/effect (non-hover)
+    match state {
+        State::Default | State::Success | State::Error => classes.push(""),
+        State::Active => classes.push("ring-2 ring-primary-950 dark:ring-primary-300"),
+        State::Disabled => classes.push("opacity-50 cursor-not-allowed"),
+        State::Loading => classes.push("opacity-75"),
+    }
+
+    // hover
+    match state {
+        State::Default => classes.push(variant.hover_colour()),
+        State::Active | State::Disabled | State::Loading | State::Success | State::Error => {
+            classes.push("")
+        }
+    }
+
+    classes.join(" ")
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -76,18 +111,6 @@ pub enum Type {
 }
 
 // ------------------------------------------------------------------------------------------------
-//  State
-// ------------------------------------------------------------------------------------------------
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum State {
-    Default,
-    Loading,
-    Disabled,
-    Active,
-}
-
-// ------------------------------------------------------------------------------------------------
 //  Components
 // ------------------------------------------------------------------------------------------------
 
@@ -101,23 +124,11 @@ pub fn Button(
 ) -> impl IntoView {
     let padding = padding(size);
 
-    let (state_modifiers, hover) = match state {
-        State::Default => ("", variant.hover_colour()),
-        State::Active => (
-            "ring-2 ring-primary-950 dark:ring-primary-300",
-            variant.hover_colour(),
-        ),
-        State::Disabled => ("opacity-50 cursor-not-allowed", ""),
-        State::Loading => ("opacity-75", ""),
-    };
-
     let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
 
     let button_classes = format!(
-        "{} {} {} {} {} {}",
-        variant.base_colour(),
-        hover,
-        state_modifiers,
+        "{} {} {} {}",
+        build_class_format(&variant, &state),
         ROUND_BORDER,
         padding,
         text_format
@@ -147,16 +158,14 @@ pub fn GroupButton(
 ) -> impl IntoView {
     let padding = padding(size);
 
-    let (state_modifiers, hover) = match state {
-        State::Default => ("", Variant::Primary.hover_colour()),
-        State::Active => ("ring-2 ring-primary-300", Variant::Primary.hover_colour()),
-        State::Disabled => ("opacity-50 cursor-not-allowed", ""),
-        State::Loading => ("opacity-75", ""),
-    };
-
     let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
 
-    let button_classes = format!("{} {} {} {}", hover, state_modifiers, padding, text_format);
+    let button_classes = format!(
+        "{} {} {}",
+        build_class_format(&Variant::Primary, &state),
+        padding,
+        text_format
+    );
 
     return view! {
         <button
