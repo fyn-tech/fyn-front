@@ -47,6 +47,11 @@ impl RunnerInfo {
         Self::default()
     }
 
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = name.into();
+        self
+    }
+
     pub fn new_complete(
         id: Uuid,
         name: String,

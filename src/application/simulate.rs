@@ -24,13 +24,14 @@ use leptos::prelude::*;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::application::job_service::JobService;
 use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
 use crate::components::atoms::button::*;
-use crate::components::atoms::typography::*;
 use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
+use crate::components::organisms::job_manager_view::*;
 use crate::components::organisms::navigation::*;
 use crate::domain::runner_info::RunnerInfo;
 
@@ -46,6 +47,7 @@ pub enum SimulateView {
 pub fn Simulate() -> impl IntoView {
     let (current_view, set_current_view) = signal(SimulateView::FormAndViewer);
     let runners_resource = RunnerService::get_runners(false);
+    let jobs = JobService::get_jobs(false);
 
     view! {
         <Navigation/>
@@ -68,7 +70,7 @@ pub fn Simulate() -> impl IntoView {
                             <RunnerView runners=runners_resource.get().flatten() />
                         }.into_any(),
                         SimulateView::JobManagerView => view! {
-                            <JobManagerView />
+                           <JobManagerView jobs=jobs.get().flatten() runners=runners_resource.get().flatten() />
                         }.into_any(),
                     }
                 }}
@@ -130,11 +132,6 @@ fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
             }
         }}
     }
-}
-
-#[component]
-fn JobManagerView() -> impl IntoView {
-    view! {<P>"Coming Soon..."</P> }
 }
 
 /// Form and 3D Viewer Layout Component with working resizable splitter

@@ -33,6 +33,7 @@ pub struct AppInfo {
     pub schema: Option<Value>,
 }
 
+#[allow(dead_code)]
 impl AppInfo {
     pub fn new() -> Self {
         Self::default()

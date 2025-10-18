@@ -19,6 +19,9 @@
  * description: Domain entity representing the job context
  * ------------------------------------------------------------------------------------------------
  */
+
+use std::fmt;
+
 use serde_json::Value;
 use std::path::PathBuf;
 use uuid::Uuid;
@@ -45,6 +48,28 @@ pub enum JobStatus {
     FailedTerminated,
     FailedTimeout,
     FailedRunnerException,
+}
+
+impl fmt::Display for JobStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            JobStatus::UploadingInputResources => write!(f, "Uploading Input Resources"),
+            JobStatus::Queued => write!(f, "Queued"),
+            JobStatus::Preparing => write!(f, "Preparing"),
+            JobStatus::FetchingResources => write!(f, "Fetching Resources"),
+            JobStatus::Starting => write!(f, "Starting"),
+            JobStatus::Running => write!(f, "Running"),
+            JobStatus::Paused => write!(f, "Paused"),
+            JobStatus::CleaningUp => write!(f, "Cleaning Up"),
+            JobStatus::UploadingResults => write!(f, "Uploading Results"),
+            JobStatus::Succeeded => write!(f, "Succeeded"),
+            JobStatus::Failed => write!(f, "Failed"),
+            JobStatus::FailedResourceError => write!(f, "Failed - Resource Error"),
+            JobStatus::FailedTerminated => write!(f, "Failed - Terminated"),
+            JobStatus::FailedTimeout => write!(f, "Failed - Timeout"),
+            JobStatus::FailedRunnerException => write!(f, "Failed - Runner Exception"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
