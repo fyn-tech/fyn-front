@@ -20,20 +20,16 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use std::collections::HashMap;
-use std::str::FromStr;
-
 use chrono::{DateTime, Utc};
 use fyn_api::apis::job_manager_api::*;
-use leptos::html::S;
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::{
-    JobInfo as JobInfoDomain, JobResource as JobResourceDomain, JobStatus as JobStatusDomain,
-    ResourceType,
+    JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
 };
 use crate::domain::runner_info::{
     RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
