@@ -20,6 +20,7 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+use fyn_api::models::JobInfo;
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -40,6 +41,9 @@ pub struct UserContext {
 
     // runners related
     pub runners: Option<HashMap<Uuid, RunnerInfo>>,
+
+    // job related
+    pub jobs: Option<HashMap<Uuid, JobInfo>>,
 }
 
 impl UserContext {
@@ -47,20 +51,18 @@ impl UserContext {
         Self::default()
     }
 
-    pub fn new_partial(
-        username: Option<String>,
-        first_name: Option<String>,
-        last_name: Option<String>,
-    ) -> Self {
-        Self {
-            username,
-            first_name,
-            last_name,
-            email: None,
-            company: None,
-            country: None,
-            apps: HashMap::new(),
-            runners: None,
-        }
+    pub fn username(mut self, username: &str) -> Self {
+        self.username = Some(username.to_string());
+        self
+    }
+
+    pub fn first_name(mut self, first_name: &str) -> Self {
+        self.first_name = Some(first_name.to_string());
+        self
+    }
+
+    pub fn last_name(mut self, last_name: &str) -> Self {
+        self.last_name = Some(last_name.to_string());
+        self
     }
 }
