@@ -190,32 +190,26 @@ pub fn Button(#[prop(default = ButtonData::new())] button_data: ButtonData) -> i
 }
 
 #[component]
-pub fn GroupButton(
-    #[prop(default = RwSignal::new(State::Default))] state_signal: RwSignal<State>,
-    #[prop(default = Size::Md)] size: Size,
-    #[prop(default = "Click me".to_string())] text: String,
-    #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
-) -> impl IntoView {
-    let padding = padding(size);
-
-    let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
+pub fn GroupButton(#[prop(default = ButtonData::new())] button_data: ButtonData) -> impl IntoView {
+    let padding = padding(button_data.size);
+    let text_format = format!("{} {} {}", FONT_STR, text_size(button_data.size), FONT_CLR);
 
     return view! {
         <button
-            id=format!("btn-{:?}", size)
+            id=format!("btn-{:?}", button_data.size)
             class={move || format!(
                 "{} {} {}",
-                build_class_format(&Variant::Primary, &state_signal.get()),
+                build_class_format(&Variant::Primary, &button_data.state_signal.get()),
                 padding,
                 text_format
             )}
             on:click=move |_| {
-                if let Some(ref action) = on_click {
-                    action;
+                if let Some(ref action) = button_data.on_click {
+                    action.run(());
                 }
             }
         >
-            {text}
+            {button_data.text_signal.get()}
         </button>
     };
 }

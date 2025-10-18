@@ -239,14 +239,14 @@ pub fn Showcase() -> impl IntoView {
                         <Section level=SectionLevel::H3 is_first=true title="Button Bars".to_string()>
                             <Grid cols=1 fill_space=false>
                                 <ButtonBar items=vec![
-                                    view! {<GroupButton text="First".to_string() />},
-                                    view! {<GroupButton text="Second".to_string() />},
-                                    view! {<GroupButton text="Third".to_string() />}
+                                    view! {<GroupButton button_data=ButtonData::new().text("First") />},
+                                    view! {<GroupButton button_data=ButtonData::new().text("Second") />},
+                                    view! {<GroupButton button_data=ButtonData::new().text("Third") />}
                                 ]/>
                                 <ButtonBar horizontal=false items=vec![
-                                    view! {<GroupButton text="First".to_string() />},
-                                    view! {<GroupButton text="Second".to_string() />},
-                                    view! {<GroupButton text="Third".to_string() />}
+                                    view! {<GroupButton button_data=ButtonData::new().text("First") />},
+                                    view! {<GroupButton button_data=ButtonData::new().text("Second") />},
+                                    view! {<GroupButton button_data=ButtonData::new().text("Third") />}
                                 ]/>
                             </Grid>
                         </Section>

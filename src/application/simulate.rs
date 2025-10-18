@@ -50,8 +50,8 @@ pub fn Simulate() -> impl IntoView {
 
         <div class="h-screen w-full flex bg-surface-50 dark:bg-surface-950">
             <ButtonBar horizontal=false items = vec![
-                view! {<GroupButton text="SM".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::FormAndViewer);})/>},
-                view! {<GroupButton text="RS".to_string() size=Size::Md on_click=Box::new(move || {set_current_view.set(SimulateView::RunnerStateViewer);})/>},
+                view! {<GroupButton button_data=ButtonData::new().size(Size::Md).text("SM").on_click(Box::new(move || {set_current_view.set(SimulateView::FormAndViewer);}))/>},
+                view! {<GroupButton button_data=ButtonData::new().size(Size::Md).text("RS").on_click(Box::new(move || {set_current_view.set(SimulateView::RunnerStateViewer);}))/>},
             ] />
 
             // Main content area - displays different components based on toolbar selection
