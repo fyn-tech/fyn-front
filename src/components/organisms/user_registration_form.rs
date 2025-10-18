@@ -61,14 +61,13 @@ impl RegisterForm {
     }
 
     fn to_user_context(&self) -> UserContext {
-        let mut user = UserContext::new();
-        user.first_name = Some(self.first_name.get());
-        user.last_name = Some(self.last_name.get());
-        user.username = Some(self.username.get());
-        user.email = Some(self.email.get());
-        user.company = Some(self.company.get());
-        user.country = Some(self.country.get());
-        return user;
+        UserContext::new()
+            .first_name(&self.first_name.get())
+            .last_name(&self.last_name.get())
+            .username(&self.username.get())
+            .email(&self.email.get())
+            .company(&self.company.get())
+            .country(&self.country.get())
     }
 
     fn validate(&self) -> Result<(), String> {

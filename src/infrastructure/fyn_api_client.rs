@@ -228,15 +228,13 @@ impl FynApiClient {
 
         let user = users.first().ok_or("No user data returned")?;
 
-        let mut context = UserContext::new();
-        context.username = Some(user.username.clone());
-        context.first_name = user.first_name.clone();
-        context.last_name = user.last_name.clone();
-        context.email = user.email.clone();
-        context.company = Some(user.company.clone());
-        context.country = Some(user.country.clone());
-
-        Ok(context)
+        Ok(UserContext::new()
+            .username(&user.username)
+            .maybe_first_name(user.first_name.clone())
+            .maybe_last_name(user.last_name.clone())
+            .maybe_email(user.email.clone())
+            .company(&user.company)
+            .country(&user.country))
     }
 
     pub async fn restore_session(&self) -> Option<UserContext> {
