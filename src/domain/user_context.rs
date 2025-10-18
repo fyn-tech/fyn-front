@@ -46,6 +46,7 @@ pub struct UserContext {
     pub jobs: Option<HashMap<Uuid, JobInfo>>,
 }
 
+#[allow(dead_code)]
 impl UserContext {
     pub fn new() -> Self {
         Self::default()
