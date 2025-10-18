@@ -21,6 +21,7 @@
  */
 
 pub mod home;
+pub mod job_service;
 pub mod not_found;
 pub mod register;
 pub mod runner_service;
