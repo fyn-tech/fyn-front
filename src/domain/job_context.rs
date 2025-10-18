@@ -19,21 +19,18 @@
  * description: Domain entity representing the job context
  * ------------------------------------------------------------------------------------------------
  */
-use std::path::PathBuf;
-use std::{default, f32::consts::E};
-
-use chrono::{DateTime, Utc};
-use leptos::error::throw;
 use serde_json::Value;
+use std::path::PathBuf;
 use uuid::Uuid;
 
 // -------------------------------------------------------------------------------------------------
 // Job Related Enums
 // -------------------------------------------------------------------------------------------------
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum JobStatus {
-    UploadingInputResources,
+    #[default]
+    UploadingInputResources, // used as default -> does not trigger backend (i.e. is inert)
     Queued,
     Preparing,
     FetchingResources,
@@ -64,7 +61,7 @@ pub enum ResourceType {
 // JobInfo
 // -------------------------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct JobInfo {
     pub id: Uuid,
     pub name: String,
@@ -78,64 +75,85 @@ pub struct JobInfo {
     pub resources: Vec<Uuid>,
 }
 
+#[allow(dead_code)]
 impl JobInfo {
-    pub fn new(
-        id: Uuid,
-        name: String,
-        status: JobStatus,
-        app_id: Uuid,
-        runner_id: Option<Uuid>,
-        priority: i64,
-        executable: String,
-        cl_args: Option<Value>,
-        exit_code: Option<i64>,
-        resources: Vec<Uuid>,
-    ) -> Result<JobInfo, String> {
-        match validate_cl_args(&cl_args) {
-            Ok(_) => Ok(Self {
-                id: id,
-                name: name,
-                status: status,
-                application_id: app_id,
-                priority: priority,
-                runner_id: runner_id,
-                executable: executable,
-                command_line_args: cl_args,
-                exit_code: exit_code,
-                resources: resources,
-            }),
-            Err(e) => Err(e),
-        }
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    pub fn new_request(
-        name: String,
-        app_id: Uuid,
-        runner_id: Option<Uuid>,
-        priority: i64,
-        executable: String,
-        cl_args: Option<Value>,
-    ) -> Result<JobInfo, String> {
-        match validate_cl_args(&cl_args) {
-            Ok(_) => Ok(Self {
-                id: Uuid::nil(),
-                name: name,
-                status: JobStatus::UploadingInputResources,
-                application_id: app_id,
-                priority: priority,
-                runner_id: runner_id,
-                executable: executable,
-                command_line_args: cl_args,
-                exit_code: None,
-                resources: vec![],
-            }),
-            Err(e) => Err(e),
-        }
+    pub fn id(mut self, id: Uuid) -> Self {
+        self.id = id;
+        self
+    }
+
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = name.into();
+        self
+    }
+
+    pub fn status(mut self, status: JobStatus) -> Self {
+        self.status = status;
+        self
+    }
+
+    pub fn application_id(mut self, application_id: Uuid) -> Self {
+        self.application_id = application_id;
+        self
+    }
+
+    pub fn priority(mut self, priority: i64) -> Self {
+        self.priority = priority;
+        self
+    }
+
+    pub fn runner_id(mut self, runner_id: Uuid) -> Self {
+        self.runner_id = Some(runner_id);
+        self
+    }
+
+    pub fn maybe_runner_id(mut self, runner_id: Option<Uuid>) -> Self {
+        self.runner_id = runner_id;
+        self
+    }
+
+    pub fn executable(mut self, executable: impl Into<String>) -> Self {
+        self.executable = executable.into();
+        self
+    }
+
+    pub fn command_line_args(mut self, command_line_args: &Value) -> Self {
+        self.command_line_args = Some(command_line_args.clone());
+        self
+    }
+
+    pub fn maybe_command_line_args(mut self, command_line_args: &Option<Value>) -> Self {
+        self.command_line_args = command_line_args.clone();
+        self
+    }
+
+    pub fn exit_code(mut self, exit_code: i64) -> Self {
+        self.exit_code = Some(exit_code);
+        self
+    }
+
+    pub fn maybe_exit_code(mut self, exit_code: Option<i64>) -> Self {
+        self.exit_code = exit_code;
+        self
+    }
+
+    pub fn resources(mut self, resources: &Vec<Uuid>) -> Self {
+        self.resources = resources.clone();
+        self
+    }
+
+    pub fn build(self) -> Result<Self, String> {
+        validate_cl_args(&self.command_line_args)?;
+        Ok(self)
     }
 
     pub fn set_id(&mut self, id: Uuid) -> Result<(), String> {
         if self.id != Uuid::nil() {
-            return Err("Job Resource ID must be nil".to_string());
+            return Err("Job Resource ID must not be nil".to_string());
         }
         self.id = id;
         Ok(())

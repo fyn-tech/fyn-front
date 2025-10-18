@@ -20,11 +20,11 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use fyn_api::models::JobInfo;
 use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::domain::application_info::*;
+use crate::domain::job_context::*;
 use crate::domain::runner_info::*;
 
 #[derive(Clone, Debug, Default)]

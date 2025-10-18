@@ -186,14 +186,15 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
             };
 
-            let new_job_request = match JobInfo::new_request(
-                job_name.get(),
-                app_uuid,
-                Some(runner_uuid),
-                job_priority.get().unwrap_or(0),
-                "executable".to_string(),
-                Some(json!(["arg1", "arg2", "arg3"])),
-            ) {
+            let new_job_request = match JobInfo::new()
+                .name(job_name.get())
+                .application_id(app_uuid)
+                .runner_id(runner_uuid)
+                .priority(job_priority.get().unwrap_or(0))
+                .executable("executable")
+                .command_line_args(&json!(["arg1", "arg2", "arg3"]))
+                .build()
+            {
                 Ok(job) => job,
                 Err(e) => {
                     error_signal.set(Some(format!("Failed to create job: {:?}", e)));

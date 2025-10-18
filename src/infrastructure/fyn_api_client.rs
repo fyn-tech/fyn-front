@@ -21,7 +21,6 @@
  */
 
 use chrono::{DateTime, Utc};
-use fyn_api::apis::job_manager_api::*;
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -41,6 +40,7 @@ use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
 };
 use fyn_api::apis::configuration::Configuration;
+use fyn_api::apis::job_manager_api::*;
 use fyn_api::apis::runner_manager_api::runner_manager_users_list;
 use fyn_api::models::*;
 
@@ -375,6 +375,20 @@ impl FynApiClient {
         response.to_domain()
     }
 
+    pub async fn get_jobs(&self) -> Result<HashMap<Uuid, JobInfoDomain>, String> {
+        self.loading.set(true);
+        leptos::logging::log!("Fetching job info...");
+        let response = job_manager_users_list(&self.config.get())
+            .await
+            .map_err(|e| format!("API error: {:?}", e))?;
+        self.loading.set(false);
+
+        response
+            .iter()
+            .map(|job| job.to_domain().map(|domain| (job.id, domain)))
+            .collect::<Result<HashMap<Uuid, JobInfoDomain>, String>>()
+    }
+
     /// Upload a web File as a job resource (for browser-based uploads)
     ///
     /// NOTE: This bypasses the generated OpenAPI client because:
@@ -488,7 +502,7 @@ impl FynApiClient {
     pub async fn get_runner_info(&self) -> Result<HashMap<Uuid, RunnerInfoDomain>, String> {
         self.loading.set(true);
 
-        leptos::logging::log!("Fetching runner info with JWT auth...");
+        leptos::logging::log!("Fetching runner info...");
 
         // The bearer_access_token in config automatically adds:
         // Authorization: Bearer <token>
@@ -663,17 +677,17 @@ trait DomainAPITraits {
 impl DomainAPITraits for JobInfo {
     type Domain = JobInfoDomain;
     fn to_domain(&self) -> Result<Self::Domain, String> {
-        JobInfoDomain::new(
-            self.id,
-            self.name.clone().unwrap_or("un-named".to_string()),
-            api_domain_job_status(self.status.unwrap()),
-            self.application_id,
-            self.assigned_runner.unwrap_or(None),
-            self.priority.unwrap_or(-1i32) as i64,
-            self.executable.clone().unwrap_or("none".to_string()),
-            self.command_line_args.clone().unwrap_or(None),
-            self.exit_code.unwrap_or(None),
-            self.resources.clone(),
-        )
+        JobInfoDomain::new()
+            .id(self.id)
+            .name(self.name.clone().unwrap_or("unnamed".to_string()))
+            .status(api_domain_job_status(self.status.unwrap()))
+            .application_id(self.application_id)
+            .maybe_runner_id(self.assigned_runner.unwrap())
+            .priority(self.priority.unwrap_or(-1i32) as i64)
+            .executable(self.executable.clone().unwrap_or("none".to_string()))
+            .maybe_command_line_args(&self.command_line_args.as_ref().unwrap())
+            .maybe_exit_code(self.exit_code.unwrap())
+            .resources(&self.resources)
+            .build()
     }
 }
