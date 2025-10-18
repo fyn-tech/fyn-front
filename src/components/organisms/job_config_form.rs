@@ -1,5 +1,3 @@
-use fyn_api::models::StatusEnum;
-use leptos::attr::Value;
 /* ------------------------------------------------------------------------------------------------
  * Fyn-Front: Modern CFD/CAE Web Interface
  * Copyright (C) 2025 Fyn-Front Authors
@@ -37,8 +35,7 @@ use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
 use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
-use crate::domain::{job_context::*, user_context};
-use crate::infrastructure::fyn_api_client;
+use crate::domain::job_context::*;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
 fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
@@ -143,20 +140,27 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     // Clone for closure
     let runner_list_clone = runner_list.clone();
 
-    let submit_job = move || {
+    // Button state signal (created outside so it persists across renders)
+    let button_state_signal = RwSignal::new(State::Default);
+
+    // Button click handler
+    let on_submit_click = move || {
         let fyn_api_client =
             use_context::<FynApiClient>().expect("FynApiClient should be provided");
+        let clone2_state = button_state_signal.clone();
 
         spawn_local(async move {
             // Helper for UUID parsing
             let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
                 Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
             };
+            clone2_state.set(State::Loading);
 
             let runner_uuid = match parse_uuid(&runner_id.get(), "runner UUID") {
                 Ok(id) => id,
                 Err(e) => {
                     leptos::logging::error!("{}", e);
+                    clone2_state.set(State::Error);
                     return;
                 }
             };
@@ -165,6 +169,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 Ok(id) => id,
                 Err(e) => {
                     leptos::logging::error!("{}", e);
+                    clone2_state.set(State::Error);
                     return;
                 }
             };
@@ -180,6 +185,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 Ok(job) => job,
                 Err(e) => {
                     leptos::logging::error!("Failed to create job: {:?}", e);
+                    clone2_state.set(State::Error);
                     return;
                 }
             };
@@ -191,6 +197,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                 }
                 Err(e) => {
                     leptos::logging::error!("Failed to submit new job: {}", e);
+                    clone2_state.set(State::Error);
                     return;
                 }
             };
@@ -218,11 +225,13 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                             }
                             Err(e) => {
                                 leptos::logging::error!("Failed to upload config file: {}", e);
+                                clone2_state.set(State::Error);
                             }
                         }
                     }
                     Err(e) => {
                         leptos::logging::error!("Failed to create config file: {}", e);
+                        clone2_state.set(State::Error);
                     }
                 }
             } else {
@@ -242,8 +251,11 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                         created_job.id,
                         e
                     );
+                    clone2_state.set(State::Error);
+                    return;
                 }
             };
+            clone2_state.set(State::Success);
         });
     };
 
@@ -317,11 +329,14 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                       }
 
                       <Stack align=FlexAlign::Center>
-                          <Button
-                            text="Submit Job".to_string()
-                            on_click={Box::new(submit_job)}
-                            />
-
+                          <Button button_data={
+                              let mut btn = ButtonData::new()
+                                  .text("Submit")
+                                  .size(Size::Md)
+                                  .on_click(on_submit_click);
+                              btn.state_signal = button_state_signal;
+                              btn
+                          } />
                       </Stack>
                     }.into_any(),
                     Some(None) | None => view!{<P>"select an application..."</P>}.into_any()

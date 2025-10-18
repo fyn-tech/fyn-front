@@ -114,44 +114,84 @@ pub enum Type {
 //  Components
 // ------------------------------------------------------------------------------------------------
 
+pub struct ButtonData {
+    variant: Variant,
+    size: Size,
+    pub state_signal: RwSignal<State>,
+    pub text_signal: RwSignal<String>,
+    on_click: Option<Callback<()>>,
+}
+
+impl ButtonData {
+    pub fn default() -> Self {
+        Self {
+            variant: Variant::Primary,
+            size: Size::Md,
+            state_signal: RwSignal::new(State::Default),
+            text_signal: RwSignal::new("Click Me".to_string()),
+            on_click: None,
+        }
+    }
+
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn variant(mut self, variant: Variant) -> Self {
+        self.variant = variant;
+        self
+    }
+
+    pub fn size(mut self, size: Size) -> Self {
+        self.size = size;
+        self
+    }
+
+    pub fn state(self, state: State) -> Self {
+        self.state_signal.set(state);
+        self
+    }
+
+    pub fn text(self, text: &str) -> Self {
+        self.text_signal.set(text.to_string());
+        self
+    }
+
+    pub fn on_click(mut self, f: impl Fn() + Send + Sync + 'static) -> Self {
+        self.on_click = Some(Callback::new(move |_| f()));
+        self
+    }
+}
+
 #[component]
-pub fn Button(
-    #[prop(default = Variant::Primary)] variant: Variant,
-    #[prop(default = State::Default)] state: State,
-    #[prop(default = Size::Md)] size: Size,
-    #[prop(default = "Click me".to_string())] text: String,
-    #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
-) -> impl IntoView {
-    let padding = padding(size);
-
-    let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
-
-    let button_classes = format!(
-        "{} {} {} {}",
-        build_class_format(&variant, &state),
-        ROUND_BORDER,
-        padding,
-        text_format
-    );
+pub fn Button(#[prop(default = ButtonData::new())] button_data: ButtonData) -> impl IntoView {
+    let padding = padding(button_data.size);
+    let text_format = format!("{} {} {}", FONT_STR, text_size(button_data.size), FONT_CLR);
 
     return view! {
         <button
-            id=format!("btn-{:?}", size)
-            class={button_classes}
+            id=format!("btn-{:?}", button_data.size)
+            class={move || format!(
+                    "{} {} {} {}",
+                    build_class_format(&button_data.variant, &button_data.state_signal.get()),
+                    ROUND_BORDER,
+                    padding,
+                    text_format
+                )}
             on:click=move |_| {
-                if let Some(ref action) = on_click {
-                    action();
+                if let Some(ref action) = button_data.on_click {
+                    action.run(());
                 }
             }
         >
-            {text}
+            {button_data.text_signal.get()}
         </button>
     };
 }
 
 #[component]
 pub fn GroupButton(
-    #[prop(default = State::Default)] state: State,
+    #[prop(default = RwSignal::new(State::Default))] state_signal: RwSignal<State>,
     #[prop(default = Size::Md)] size: Size,
     #[prop(default = "Click me".to_string())] text: String,
     #[prop(optional)] on_click: Option<Box<dyn Fn() + 'static>>,
@@ -160,20 +200,18 @@ pub fn GroupButton(
 
     let text_format = format!("{} {} {}", FONT_STR, text_size(size), FONT_CLR);
 
-    let button_classes = format!(
-        "{} {} {}",
-        build_class_format(&Variant::Primary, &state),
-        padding,
-        text_format
-    );
-
     return view! {
         <button
             id=format!("btn-{:?}", size)
-            class={button_classes}
+            class={move || format!(
+                "{} {} {}",
+                build_class_format(&Variant::Primary, &state_signal.get()),
+                padding,
+                text_format
+            )}
             on:click=move |_| {
                 if let Some(ref action) = on_click {
-                    action();
+                    action;
                 }
             }
         >

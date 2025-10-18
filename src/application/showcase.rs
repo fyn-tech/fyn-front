@@ -49,20 +49,21 @@ pub fn Showcase() -> impl IntoView {
                 // Header with title and dark mode toggle
                 <div class="flex justify-between items-center mb-8">
                     <H1>"Fynbos Design System"</H1>
-                    <Button
-                        variant=Variant::Secondary
-                        text="Toggle Dark Mode".to_string()
-                        on_click=Box::new(|| {
-                            let window = web_sys::window().expect("should have a window");
-                            let document = window.document().expect("should have a document");
-                            let html_element = document.document_element().expect("should have html element");
+                    <Button button_data=
+                        ButtonData::new()
+                        .variant(Variant::Secondary)
+                        .text("Toggle Dark Mode")
+                         .on_click(Box::new(|| {
+                             let window = web_sys::window().expect("should have a window");
+                             let document = window.document().expect("should have a document");
+                             let html_element = document.document_element().expect("should have html element");
+                             if html_element.class_list().contains("dark") {
+                                 html_element.class_list().remove_1("dark").expect("should remove dark class");
+                             } else {
+                                 html_element.class_list().add_1("dark").expect("should add dark class");
+                             }
+                         }))
 
-                            if html_element.class_list().contains("dark") {
-                                html_element.class_list().remove_1("dark").expect("should remove dark class");
-                            } else {
-                                html_element.class_list().add_1("dark").expect("should add dark class");
-                            }
-                        })
                     />
                 </div>
 
@@ -157,30 +158,31 @@ pub fn Showcase() -> impl IntoView {
                     <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
                         <Section level=SectionLevel::H3 is_first=true title="Button Variants".to_string()>
                             <Stack horizontal=true>
-                                <Button variant=Variant::Primary text="Primary".to_string() />
-                                <Button variant=Variant::Secondary text="Secondary".to_string() />
-                                <Button variant=Variant::Tertiary text="Tertiary".to_string() />
+                                <Button button_data=ButtonData::new().variant(Variant::Primary).text("Primary") />
+                                <Button button_data=ButtonData::new().variant(Variant::Secondary).text("Secondary") />
+                                <Button button_data=ButtonData::new().variant(Variant::Tertiary).text("Tertiary") />
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Button States".to_string()>
                             <Stack horizontal=true>
-                                <Button variant=Variant::Primary state=State::Default text="Default".to_string() />
-                                <Button variant=Variant::Primary state=State::Active text="Active".to_string() />
-                                <Button variant=Variant::Primary state=State::Disabled text="Disabled".to_string() />
-                                <Button variant=Variant::Primary state=State::Loading text="Loading".to_string() />
-                                <Button variant=Variant::Primary state=State::Success text="Success".to_string() />
-                                <Button variant=Variant::Primary state=State::Error text="Error".to_string() />
+                                <Button button_data=ButtonData::new().text("Default") />
+                                <Button button_data=ButtonData::new().state(State::Active).text("Active") />
+                                <Button button_data=ButtonData::new().state(State::Disabled).text("Disabled") />
+                                <Button button_data=ButtonData::new().state(State::Loading).text("Loading") />
+                                <Button button_data=ButtonData::new().state(State::Success).text("Success") />
+                                <Button button_data=ButtonData::new().state(State::Error).text("Error") />
                             </Stack>
                         </Section>
 
                         <Section level=SectionLevel::H3 title="Button Sizes".to_string()>
                             <Stack horizontal=true align=FlexAlign::End>
-                                <Button variant=Variant::Primary size=Size::Xl text="Xl".to_string() />
-                                <Button variant=Variant::Primary size=Size::Lg text="Lg".to_string() />
-                                <Button variant=Variant::Primary size=Size::Md text="Md".to_string() />
-                                <Button variant=Variant::Primary size=Size::Sm text="Sm".to_string() />
-                                <Button variant=Variant::Primary size=Size::Xs text="Xs".to_string() />
+                                <Button button_data=ButtonData::new().size(Size::Xl2).text("Xl2") />
+                                <Button button_data=ButtonData::new().size(Size::Xl).text("Xl") />
+                                <Button button_data=ButtonData::new().size(Size::Lg).text("Lg") />
+                                <Button button_data=ButtonData::new().size(Size::Md).text("Md") />
+                                <Button button_data=ButtonData::new().size(Size::Sm).text("Sm") />
+                                <Button button_data=ButtonData::new().size(Size::Xs).text("Xs") />
                             </Stack>
                         </Section>
                     </BorderedDiv>

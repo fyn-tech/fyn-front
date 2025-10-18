@@ -105,8 +105,7 @@ pub fn UserSignIn() -> impl IntoView {
             </Section>
             <Stack align=FlexAlign::Center>
                 <Button
-                    text={"Sign In".to_string()}
-                    on_click=Box::new(handle_login)
+                    button_data=ButtonData::new().text("Sign In").on_click(Box::new(handle_login))
                 />
             </Stack>
         </form>

@@ -193,9 +193,9 @@ pub fn UserRegisterForm() -> impl IntoView {
             </Section>
 
             <Stack align=FlexAlign::Center>
-                <Button
-                    text={"Create Account".to_string()}
-                    on_click=Box::new(move || handle_register())
+                <Button button_data=ButtonData::new()
+                .text("Create Account")
+                .on_click(Box::new(move || handle_register()))
                 />
             </Stack>
         </form>
