@@ -184,7 +184,7 @@ pub fn Button(#[prop(default = ButtonData::new())] button_data: ButtonData) -> i
                 }
             }
         >
-            {button_data.text_signal.get()}
+            {move || button_data.text_signal.get()}
         </button>
     };
 }

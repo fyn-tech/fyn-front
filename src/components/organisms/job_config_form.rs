@@ -26,6 +26,7 @@ use std::str::FromStr;
 use uuid::Uuid;
 
 use crate::common::size::*;
+use crate::components::atoms::alert::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
@@ -33,10 +34,14 @@ use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::{SchemaForm, SchemaFormState};
 use crate::components::molecules::section::*;
 use crate::domain::application_info::AppInfo;
+use crate::domain::job_context::*;
 use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
-use crate::domain::job_context::*;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+
+// -------------------------------------------------------------------------------------------------
+// Support Functions
+// -------------------------------------------------------------------------------------------------
 
 fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
     LocalResource::new({
@@ -125,6 +130,10 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
     })
 }
 
+// -------------------------------------------------------------------------------------------------
+// Component
+// -------------------------------------------------------------------------------------------------
+
 #[component]
 pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
     let job_name = RwSignal::new(String::new());
@@ -133,6 +142,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     let runner_id = RwSignal::new(String::new());
     let application_list = get_application_list();
     let fetch_json_schema = get_application_schema(application_id);
+    let error_message = RwSignal::new(None::<String>);
 
     // Signal to receive form data from SchemaForm
     let schema_form_state: RwSignal<Option<SchemaFormState>> = RwSignal::new(None);
@@ -140,27 +150,29 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
     // Clone for closure
     let runner_list_clone = runner_list.clone();
 
-    // Button state signal (created outside so it persists across renders)
+    // Button state signal
     let button_state_signal = RwSignal::new(State::Default);
-
-    // Button click handler
+    let button_text_signal = RwSignal::new("Submit".to_string());
     let on_submit_click = move || {
         let fyn_api_client =
             use_context::<FynApiClient>().expect("FynApiClient should be provided");
-        let clone2_state = button_state_signal.clone();
+        let cl_button_state_signal = button_state_signal.clone();
+        let cl_button_text_signal = button_text_signal.clone();
 
         spawn_local(async move {
             // Helper for UUID parsing
             let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
                 Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
             };
-            clone2_state.set(State::Loading);
+            cl_button_state_signal.set(State::Loading);
+            let error_signal = error_message.clone();
+            error_signal.set(None);
 
             let runner_uuid = match parse_uuid(&runner_id.get(), "runner UUID") {
                 Ok(id) => id,
                 Err(e) => {
-                    leptos::logging::error!("{}", e);
-                    clone2_state.set(State::Error);
+                    error_signal.set(Some(format!("{}", e)));
+                    cl_button_state_signal.set(State::Error);
                     return;
                 }
             };
@@ -168,8 +180,8 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             let app_uuid = match parse_uuid(&application_id.get(), "application UUID") {
                 Ok(id) => id,
                 Err(e) => {
-                    leptos::logging::error!("{}", e);
-                    clone2_state.set(State::Error);
+                    error_signal.set(Some(format!("{}", e)));
+                    cl_button_state_signal.set(State::Error);
                     return;
                 }
             };
@@ -184,20 +196,20 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             ) {
                 Ok(job) => job,
                 Err(e) => {
-                    leptos::logging::error!("Failed to create job: {:?}", e);
-                    clone2_state.set(State::Error);
+                    error_signal.set(Some(format!("Failed to create job: {:?}", e)));
+                    cl_button_state_signal.set(State::Error);
                     return;
                 }
             };
 
             let mut created_job = match fyn_api_client.submit_new_job(&new_job_request).await {
                 Ok(job) => {
-                    leptos::logging::log!("Job created: {:?}", job.id);
+                    leptos::logging::log!("Job created: {}", job.id);
                     job
                 }
                 Err(e) => {
-                    leptos::logging::error!("Failed to submit new job: {}", e);
-                    clone2_state.set(State::Error);
+                    error_signal.set(Some(format!("Failed to submit new job: {}", e)));
+                    cl_button_state_signal.set(State::Error);
                     return;
                 }
             };
@@ -224,14 +236,15 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                                 leptos::logging::log!("Config file uploaded successfully");
                             }
                             Err(e) => {
-                                leptos::logging::error!("Failed to upload config file: {}", e);
-                                clone2_state.set(State::Error);
+                                error_signal
+                                    .set(Some(format!("Failed to upload config file: {}", e)));
+                                cl_button_state_signal.set(State::Error);
                             }
                         }
                     }
                     Err(e) => {
-                        leptos::logging::error!("Failed to create config file: {}", e);
-                        clone2_state.set(State::Error);
+                        error_signal.set(Some(format!("Failed to create config file: {}", e)));
+                        cl_button_state_signal.set(State::Error);
                     }
                 }
             } else {
@@ -245,17 +258,16 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     leptos::logging::log!("Job {} ({}) set to queued", job_info.name, job_info.id);
                 }
                 Err(e) => {
-                    leptos::logging::error!(
-                        "Error setting job {} ({}) to queue: {}",
-                        created_job.name,
-                        created_job.id,
-                        e
-                    );
-                    clone2_state.set(State::Error);
+                    error_signal.set(Some(format!(
+                        "Error setting job {} ({}) to queue: {:?}",
+                        created_job.name, created_job.id, e
+                    )));
+                    cl_button_state_signal.set(State::Error);
                     return;
                 }
             };
-            clone2_state.set(State::Success);
+            cl_button_text_signal.set("Success".to_string());
+            cl_button_state_signal.set(State::Success);
         });
     };
 
@@ -268,6 +280,14 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     .flatten()
                     .unwrap_or(vec![("...".to_string(), "Loading...".to_string())]);
                 view! {
+                    <FormField
+                        label={"Application".to_string()}
+                        key={"application".to_string()}
+                        input_type=InputType::SelectText {
+                            options: options,
+                            signal: application_id
+                        }
+                    />
                     <FormField
                         label={"Job Name".to_string()}
                         key={"job_name".to_string()}
@@ -282,14 +302,6 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                         placeholder={"0".to_string()}
                         input_type=InputType::Integer { signal: job_priority, min: Some(0), max: Some(100), step: Some(1) }
                     />
-                    <FormField
-                        label={"Application".to_string()}
-                        key={"application".to_string()}
-                        input_type=InputType::SelectText {
-                            options: options,
-                            signal: application_id
-                        }
-                    />
                 }
             }}
             </Section>
@@ -297,45 +309,44 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
             // actual input data collection
             <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Setup".to_string()}>
             {move || {
-               match fetch_json_schema.get() {
-                   Some(Some(value)) => view! {
-                      <SchemaForm
-                        schema_json=value.to_string()
-                        key=application_id.get()
-                        form_state_out=schema_form_state
-                      />
+                match fetch_json_schema.get() {
+                    Some(Some(value)) => view! {
+                        <SchemaForm
+                            schema_json=value.to_string()
+                            key=application_id.get()
+                            form_state_out=schema_form_state
+                        />
 
-                      // Runner selection
-                      {
-                          let runner_options = match &runner_list_clone {
-                              Some(runners) => {
-                                  runners.iter().map(|(id, runner)| {
-                                      (id.to_string(), runner.name.clone())
-                                  }).collect::<Vec<(String, String)>>()
-                              },
-                              None => vec![("...".to_string(), "Loading runners...".to_string())]
-                          };
+                        // Runner selection
+                        {
+                            let runner_options = match &runner_list_clone {
+                                Some(runners) => {
+                                    runners.iter().map(|(id, runner)| {
+                                        (id.to_string(), runner.name.clone())
+                                    }).collect::<Vec<(String, String)>>()
+                                },
+                                None => vec![("...".to_string(), "Loading runners...".to_string())]
+                            };
 
-                          view! {
-                              <FormField
-                                  label={"Runner".to_string()}
-                                  key={"runner".to_string()}
-                                  input_type=InputType::SelectText {
-                                      options: runner_options,
-                                      signal: runner_id
-                                  }
-                              />
-                          }
-                      }
+                            view! {
+                                <FormField
+                                    label={"Runner".to_string()}
+                                    key={"runner".to_string()}
+                                    input_type=InputType::SelectText {
+                                        options: runner_options,
+                                        signal: runner_id
+                                    }
+                                />
+                            }
+                        }
 
                       <Stack align=FlexAlign::Center>
-                          <Button button_data={
-                              let mut btn = ButtonData::new()
-                                  .text("Submit")
-                                  .size(Size::Md)
-                                  .on_click(on_submit_click);
-                              btn.state_signal = button_state_signal;
-                              btn
+                            <ErrorAlert message={error_message.read_only()} />
+                            <Button button_data={
+                              let mut button_data = ButtonData::new().on_click(on_submit_click);
+                              button_data.state_signal = button_state_signal;
+                              button_data.text_signal = button_text_signal;
+                              button_data
                           } />
                       </Stack>
                     }.into_any(),

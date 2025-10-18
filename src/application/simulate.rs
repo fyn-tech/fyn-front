@@ -27,6 +27,7 @@ use uuid::Uuid;
 use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
 use crate::components::atoms::button::*;
+use crate::components::atoms::typography::*;
 use crate::components::molecules::button_bar::*;
 use crate::components::molecules::table::*;
 use crate::components::organisms::job_config_form::*;
@@ -37,6 +38,7 @@ use crate::domain::runner_info::RunnerInfo;
 pub enum SimulateView {
     FormAndViewer,
     RunnerStateViewer,
+    JobManagerView,
 }
 
 /// Simulate Page - Left toolbar template with dynamic content area
@@ -52,6 +54,7 @@ pub fn Simulate() -> impl IntoView {
             <ButtonBar horizontal=false items = vec![
                 view! {<GroupButton button_data=ButtonData::new().size(Size::Md).text("SM").on_click(Box::new(move || {set_current_view.set(SimulateView::FormAndViewer);}))/>},
                 view! {<GroupButton button_data=ButtonData::new().size(Size::Md).text("RS").on_click(Box::new(move || {set_current_view.set(SimulateView::RunnerStateViewer);}))/>},
+                view! {<GroupButton button_data=ButtonData::new().size(Size::Md).text("JM").on_click(Box::new(move || {set_current_view.set(SimulateView::JobManagerView);}))/>},
             ] />
 
             // Main content area - displays different components based on toolbar selection
@@ -61,9 +64,11 @@ pub fn Simulate() -> impl IntoView {
                         SimulateView::FormAndViewer => view! {
                             <FormAndViewerLayout runners=runners_resource.get().flatten() />
                         }.into_any(),
-
                         SimulateView::RunnerStateViewer => view! {
                             <RunnerView runners=runners_resource.get().flatten() />
+                        }.into_any(),
+                        SimulateView::JobManagerView => view! {
+                            <JobManagerView />
                         }.into_any(),
                     }
                 }}
@@ -125,6 +130,11 @@ fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
             }
         }}
     }
+}
+
+#[component]
+fn JobManagerView() -> impl IntoView {
+    view! {<P>"Coming Soon..."</P> }
 }
 
 /// Form and 3D Viewer Layout Component with working resizable splitter
