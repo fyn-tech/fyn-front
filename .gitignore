@@ -16,3 +16,6 @@ fyn_api_client.yaml
 
 # remove lock file
 .lock
+
+# claude setup
+.claude
