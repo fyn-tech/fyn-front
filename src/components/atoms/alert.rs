@@ -31,6 +31,7 @@ use crate::components::atoms::typography::{text_size, FONT_STR};
 // ------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum AlertType {
     Error,
     Warning,

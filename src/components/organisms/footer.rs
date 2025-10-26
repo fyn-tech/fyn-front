@@ -20,9 +20,9 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
+#[component]
 pub fn Footer() -> impl IntoView {
     return view! {
       <footer class="w-full bg-surface-100 dark:bg-surface-900">

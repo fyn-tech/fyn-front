@@ -28,6 +28,7 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::{FONT_CLR, H4_CLASS};
 
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum InputType {
     Text {
         signal: RwSignal<String>,
