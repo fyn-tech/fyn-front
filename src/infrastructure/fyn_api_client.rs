@@ -67,7 +67,6 @@ pub struct FynApiClient {
 impl FynApiClient {
     pub fn new() -> Self {
         let mut config = Configuration::new();
-        config.base_path = "http://127.0.0.1:8000".to_string();
 
         let context = Self {
             config: RwSignal::new(config),
