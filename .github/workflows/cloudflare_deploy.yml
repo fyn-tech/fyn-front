@@ -1,0 +1,60 @@
+name: Deploy Frontend to Cloudflare Pages
+
+on:
+  push:
+    branches: [ main ]
+
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download OpenAPI schema
+        run: |
+          curl -o fyn_api_client.yaml http://13.49.71.107:8000/schema/
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install OpenAPI Generator
+        run: npm install -g @openapitools/openapi-generator-cli
+      
+      - name: Generate Rust API client
+        run: |
+          openapi-generator-cli generate \
+            -i fyn_api_client.yaml \
+            -g rust \
+            -o ./fyn_api \
+            --additional-properties=packageName=fyn_api,packageVersion=1.0.0
+      
+      - name: Fix generated code
+        run: |
+          find ./fyn_api/src -name "*.rs" -type f -exec sed -i 's/models::models::/models::/g' {} \;
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+      
+      - name: Install trunk
+        run: cargo install trunk
+      
+      - name: Build Leptos app
+        run: trunk build --release
+      
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: fyn-front
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
