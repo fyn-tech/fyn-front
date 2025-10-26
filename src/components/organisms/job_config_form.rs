@@ -314,7 +314,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                     Some(Some(value)) => view! {
                         <SchemaForm
                             schema_json=value.to_string()
-                            key=application_id.get()
+                            _key=application_id.get()
                             form_state_out=schema_form_state
                         />
 
