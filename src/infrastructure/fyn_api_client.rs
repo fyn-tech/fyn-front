@@ -60,7 +60,6 @@ pub struct FynApiClient {
     config: RwSignal<Configuration>,
     access_token: RwSignal<Option<String>>,
     refresh_token: RwSignal<Option<String>>,
-    csrf_token: RwSignal<Option<String>>,
     user_id: RwSignal<Option<String>>,
     loading: RwSignal<bool>,
 }
@@ -74,7 +73,6 @@ impl FynApiClient {
             config: RwSignal::new(config),
             access_token: RwSignal::new(None),
             refresh_token: RwSignal::new(None),
-            csrf_token: RwSignal::new(None),
             user_id: RwSignal::new(None),
             loading: RwSignal::new(true),
         };

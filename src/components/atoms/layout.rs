@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
 use crate::common::size::*;
@@ -50,6 +49,7 @@ impl std::fmt::Display for Align {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum FlexAlign {
     Start,
     Center,
@@ -106,6 +106,7 @@ pub fn padding(size: Size) -> String {
 pub const ROUND_BORDER: &str = "rounded-lg";
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum BorderColor {
     Surface,
     Primary,

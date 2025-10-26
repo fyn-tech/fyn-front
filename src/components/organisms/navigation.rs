@@ -26,6 +26,7 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::domain::user_context::UserContext;
 
+#[component]
 pub fn Navigation() -> impl IntoView {
     let user_context =
         use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");

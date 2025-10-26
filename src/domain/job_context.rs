@@ -190,6 +190,7 @@ impl JobInfo {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct JobResource {
     pub id: Uuid,
     pub resource_type: ResourceType,
@@ -198,6 +199,7 @@ pub struct JobResource {
     pub original_file_path: PathBuf,
 }
 
+#[allow(dead_code)]
 impl JobResource {
     pub fn new_resource(
         resource_type: ResourceType,

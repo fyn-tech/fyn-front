@@ -23,6 +23,7 @@
 use leptos::prelude::*;
 
 use crate::common::size::*;
+use crate::components::atoms::alert::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::input::*;
 use crate::components::atoms::layout::*;
@@ -151,6 +152,16 @@ pub fn Showcase() -> impl IntoView {
                                 Post-processing results indicate that the drag coefficient increased nonlinearly with angle of attack, while lift coefficient exhibited the characteristic stall behavior at 18 degrees. 
                                 These findings validate the numerical methodology for future parametric studies involving geometric optimization of the airfoil section."
                             </P>
+                        </Stack>
+                    </BorderedDiv>
+
+                    <BorderedDiv class="mb-8 p-6 bg-surface-100 dark:bg-surface-900".to_string()>
+                        <H3>"Alerts"</H3>
+                        <Stack>
+                            <InfoAlert message={RwSignal::new(Some("InfoAlert".to_string())).read_only()} />
+                            <SuccessAlert message={RwSignal::new(Some("SuccessAlert".to_string())).read_only()} />
+                            <WarningAlert message={RwSignal::new(Some("WarningAlert".to_string())).read_only()} />
+                            <ErrorAlert message={RwSignal::new(Some("ErrorAlert".to_string())).read_only()} />
                         </Stack>
                     </BorderedDiv>
 
