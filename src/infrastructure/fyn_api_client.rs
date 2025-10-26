@@ -66,7 +66,7 @@ pub struct FynApiClient {
 
 impl FynApiClient {
     pub fn new() -> Self {
-        let mut config = Configuration::new();
+        let config = Configuration::new();
 
         let context = Self {
             config: RwSignal::new(config),
