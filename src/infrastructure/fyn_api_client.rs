@@ -662,7 +662,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_request.assigned_runner = Some(self.runner_id);
         new_request.executable = Some(self.executable.clone());
         new_request.command_line_args = Some(self.command_line_args.clone());
-        new_request.exit_code = Some(self.exit_code);
+        new_request.exit_code = Some(self.exit_code.map(|v| v as i32));
         new_request
     }
 }
@@ -684,7 +684,7 @@ impl DomainAPITraits for JobInfo {
             .priority(self.priority.unwrap_or(-1i32) as i64)
             .executable(self.executable.clone().unwrap_or("none".to_string()))
             .maybe_command_line_args(&self.command_line_args.as_ref().unwrap())
-            .maybe_exit_code(self.exit_code.flatten())
+            .maybe_exit_code(self.exit_code.flatten().map(|v| v as i64))
             .resources(&self.resources)
             .build()
     }
