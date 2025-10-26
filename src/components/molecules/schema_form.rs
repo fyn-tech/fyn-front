@@ -134,7 +134,10 @@ fn build_float_form_field(
       step: (None) }/>};
 }
 
-fn schema_to_form_fields(schema_json: &str, form_state: &mut SchemaFormState) -> Result<Vec<AnyView>, Error> {
+fn schema_to_form_fields(
+    schema_json: &str,
+    form_state: &mut SchemaFormState,
+) -> Result<Vec<AnyView>, Error> {
     let schema: Value = serde_json::from_str(schema_json)?;
     let properties = schema["properties"]
         .as_object()
@@ -151,24 +154,21 @@ fn schema_to_form_fields(schema_json: &str, form_state: &mut SchemaFormState) ->
                     .text_signals
                     .entry(field_key.clone())
                     .or_insert_with(|| RwSignal::new(String::new()));
-                build_string_form_field(field_key, object, *signal)
-                    .into_any()
+                build_string_form_field(field_key, object, *signal).into_any()
             }
             "integer" => {
                 let signal = form_state
                     .int_signals
                     .entry(field_key.clone())
                     .or_insert_with(|| RwSignal::new(None));
-                build_integer_form_field(field_key, object, *signal)
-                    .into_any()
+                build_integer_form_field(field_key, object, *signal).into_any()
             }
             "number" => {
                 let signal = form_state
                     .float_signals
                     .entry(field_key.clone())
                     .or_insert_with(|| RwSignal::new(None));
-                build_float_form_field(field_key, object, *signal)
-                    .into_any()
+                build_float_form_field(field_key, object, *signal).into_any()
             }
             _ => continue,
         });
@@ -220,7 +220,7 @@ impl SchemaFormState {
 #[component]
 pub fn SchemaForm(
     schema_json: String,
-    #[prop(optional)] key: String,
+    #[prop(optional)] _key: String,
     #[prop(optional)] form_state_out: Option<RwSignal<Option<SchemaFormState>>>,
 ) -> impl IntoView {
     // Use StoredValue to persist form state across re-renders

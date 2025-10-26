@@ -437,7 +437,7 @@ impl FynApiClient {
         }
 
         // Build request with JWT Bearer token using web-sys
-        let mut opts = web_sys::RequestInit::new();
+        let opts = web_sys::RequestInit::new();
         opts.set_method("POST");
         opts.set_body(form_data.as_ref());
 
@@ -476,8 +476,6 @@ impl FynApiClient {
         json_data: &serde_json::Value,
         filename: &str,
     ) -> Result<web_sys::File, String> {
-        use wasm_bindgen::JsCast;
-
         // Convert JSON to pretty-printed string
         let json_string = serde_json::to_string_pretty(json_data)
             .map_err(|e| format!("JSON serialization failed: {:?}", e))?;
@@ -487,7 +485,7 @@ impl FynApiClient {
         array.push(&wasm_bindgen::JsValue::from_str(&json_string));
 
         // Create file options
-        let mut file_options = web_sys::FilePropertyBag::new();
+        let file_options = web_sys::FilePropertyBag::new();
         file_options.set_type("application/json");
 
         // Create the File object
@@ -651,7 +649,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_patch.application_id = Some(self.application_id);
         new_patch.executable = Some(self.executable.clone());
         new_patch.command_line_args = Some(self.command_line_args.clone());
-        new_patch.exit_code = Some(self.exit_code);
+        new_patch.exit_code = Some(self.exit_code as Option<i64>);
         new_patch.resources = Some(self.resources.clone());
         new_patch
     }
@@ -664,7 +662,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_request.assigned_runner = Some(self.runner_id);
         new_request.executable = Some(self.executable.clone());
         new_request.command_line_args = Some(self.command_line_args.clone());
-        new_request.exit_code = Some(self.exit_code);
+        new_request.exit_code = Some(self.exit_code as Option<i64>);
         new_request
     }
 }
