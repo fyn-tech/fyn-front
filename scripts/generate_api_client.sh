@@ -24,6 +24,6 @@ openapi-generator-cli generate \
 # Fix the models::models bug in generated code
 echo "Fixing models::models bug..."
 find ./${CLIENT_NAME}/src -name "*.rs" -type f -exec sed -i 's/models::models::/models::/g' {} \;
+find ./${CLIENT_NAME}/src -name "*.rs" -type f -exec sed -i 's/let p_form_file/let _p_form_file/g' {} \;
 
 echo "API client generated successfully!"
-echo "✅ No modifications needed - JWT bearer tokens work natively!"

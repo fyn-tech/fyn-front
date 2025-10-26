@@ -36,7 +36,8 @@ jobs:
       - name: Fix generated code
         run: |
           find ./fyn_api/src -name "*.rs" -type f -exec sed -i 's/models::models::/models::/g' {} \;
-      
+          find ./fyn_api/src -name "*.rs" -type f -exec sed -i 's/let p_form_file/let _p_form_file/g' {} \;
+          
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -44,8 +45,10 @@ jobs:
           target: wasm32-unknown-unknown
       
       - name: Install trunk
-        run: cargo install trunk
-      
+        run: |                                                                    
+          wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+          sudo mv trunk /usr/local/bin/
+                
       - name: Build Leptos app
         run: trunk build --release
       
