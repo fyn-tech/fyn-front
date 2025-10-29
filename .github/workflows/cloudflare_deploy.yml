@@ -19,7 +19,7 @@ jobs:
       
       - name: Download OpenAPI schema
         run: |
-          curl -o fyn_api_client.yaml http://13.49.71.107:8000/schema/
+          curl -o fyn_api_client.yaml http://api.fyn-tech.com/schema/
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
