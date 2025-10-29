@@ -24,12 +24,46 @@ use leptos::prelude::*;
 
 use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
+use crate::components::molecules::drop_down::*;
 use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
+
+fn logout_user_update() {
+    LocalResource::new(move || async move {
+        let fyn_api_client =
+            use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+        let user_context = use_context::<RwSignal<Option<UserContext>>>()
+            .expect("UserContext should be provided.");
+        fyn_api_client.logout().await;
+        user_context.set(None);
+    });
+}
 
 #[component]
 pub fn Navigation() -> impl IntoView {
+    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
     let user_context =
         use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");
+
+    let user_initials = Memo::new(move |_| {
+        user_context
+            .get()
+            .map(|user| {
+                let first = user
+                    .first_name
+                    .as_ref()
+                    .and_then(|s| s.chars().next())
+                    .unwrap_or('?');
+                let last = user
+                    .last_name
+                    .as_ref()
+                    .and_then(|s| s.chars().next())
+                    .unwrap_or('?');
+                format!("{}{}", first, last)
+            })
+            .unwrap_or_default()
+    });
 
     return view! {
       <header class="w-full bg-surface-800">
@@ -43,20 +77,17 @@ pub fn Navigation() -> impl IntoView {
               <A href={"/simulate".to_string()} text_class={H4_CLASS.to_string()}>"Simulate"</A>
               { move || {
                 match user_context.get() {
-                  Some(user) =>{
-                      let first_initial = user
-                          .first_name
-                          .as_ref()
-                          .and_then(|s| s.chars().next());
-                      let last_initial = user
-                          .last_name
-                          .as_ref()
-                          .and_then(|s| s.chars().next());
-                  view! {
-                      <H4 color={LINK_CLR.to_string()}>{
-                        format!("{}{}", first_initial.unwrap_or('?'), last_initial.unwrap_or('?'))}
-                      </H4>
-                  }.into_any()},
+                  Some(_) => view! {
+                    <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
+                      <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
+                      <div
+                          class="cursor-pointer"
+                          on:click=move |_| {logout_user_update(); }
+                      >
+                      <A href={"/".to_string()} text_class={H4_CLASS.to_string()}>"Sign Out"</A>
+                      </div>
+                    </DropDown>
+                  }.into_any(),
                   None => view! {
                       <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Register"</A>
                       <A href={"/sign_in".to_string()} text_class={H4_CLASS.to_string()}>"Sign In"</A>

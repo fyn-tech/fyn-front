@@ -25,8 +25,31 @@ use leptos::prelude::*;
 use crate::common::size::*;
 
 // ------------------------------------------------------------------------------------------------
-//  Alignment
+// Placement
 // ------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
+pub enum Position {
+    Static, // default
+    Relative,
+    Absolute,
+    Fixed,
+    Sticky,
+}
+
+impl std::fmt::Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let class = match self {
+            Position::Static => "static",
+            Position::Relative => "relative",
+            Position::Absolute => "absolute",
+            Position::Fixed => "fixed",
+            Position::Sticky => "sticky",
+        };
+        write!(f, "{}", class)
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Align {
@@ -141,6 +164,7 @@ pub fn standard_border(colour: Option<BorderColor>) -> String {
 pub fn Stack(
     #[prop(default = Size::Sm)] size: Size,
     #[prop(default = false)] horizontal: bool,
+    #[prop(default = Position::Static)] position: Position,
     #[prop(default = true)] fill_space: bool,
     #[prop(default = FlexAlign::Stretch)] align: FlexAlign,
     #[prop(optional)] add_class: Option<String>,
@@ -149,7 +173,8 @@ pub fn Stack(
     let additional_class = add_class.unwrap_or_default();
 
     let class_str = format!(
-        "{} flex-{} gap-{} {} {}",
+        "{} {} flex-{} gap-{} {} {}",
+        position,
         if fill_space { "flex" } else { "inline-flex" },
         if horizontal { "row" } else { "col" },
         spacing(size),
@@ -198,6 +223,7 @@ pub fn Grid(
 
 #[component]
 pub fn BorderedDiv(
+    #[prop(default = Position::Static)] position: Position,
     #[prop(default = BorderColor::Surface)] border: BorderColor,
     #[prop(optional)] class: Option<String>,
     children: Children,
@@ -205,7 +231,7 @@ pub fn BorderedDiv(
     let additional_class = class.unwrap_or_default();
 
     view! {
-        <div class=format!("overflow-hidden {} {}", standard_border(Some(border)), additional_class)>
+        <div class=format!("overflow-hidden {} {} {}", position, standard_border(Some(border)), additional_class)>
             {children()}
         </div>
     }
