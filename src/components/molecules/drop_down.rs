@@ -15,47 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: button_bar.rs
- * description: Button bar molecule component
+ * filename: drop_down.rs
+ * description: Form field molecule component
  * ------------------------------------------------------------------------------------------------
  */
-
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
 
 #[component]
-pub fn ButtonBar(
-    #[prop(default = Variant::Primary)] variant: Variant,
-    #[prop(default = true)] horizontal: bool,
-    items: Vec<impl IntoView + 'static>,
-) -> impl IntoView {
-    let class_str = format!(
-        "overflow-hidden  justify-self-start {} {}",
-        ROUND_BORDER,
-        variant.base_colour()
-    );
-    let dividers = format!(
-        "bg-surface-300 dark:bg-surface-700 {}",
-        if horizontal { "w-px" } else { "h-px" },
-    );
+pub fn DropDown(trigger: impl IntoView + 'static, children: Children) -> impl IntoView {
+    let show = RwSignal::new(false);
+    let menu_content = children();
 
-    return view! {
-      <Stack size={Size::None} horizontal={horizontal} fill_space={false} add_class={class_str}>{
-        items.into_iter().enumerate().map(|(i, item)| {
-          view!{
-            {if i > 0 {
-              view! {<div class={dividers.clone()}></div> }.into_any()
-            }
-            else {
-              view! { }.into_any()
-            }}
-            {item}
-          }
-        }).collect::<Vec<_>>()
-      }
-      </Stack>
-    };
+    view! {
+        <Stack position={Position::Relative} fill_space={false} size={Size::None}>
+            <div
+                class="cursor-pointer"
+                on:click=move |_| show.update(|open| *open = !*open)
+            >
+                {trigger}
+            </div>
+            <div
+                class=move || format!("absolute top-full right-0 z-50 {}",
+                    if show.get() { "" } else { "hidden" }
+                )
+            >
+                <Stack
+                    fill_space={false}
+                    size={Size::Sm}
+                    add_class={"bg-surface-700 shadow-lg rounded-lg p-2".to_string()}
+                >
+                    {menu_content}
+                </Stack>
+            </div>
+        </Stack>
+    }
 }
