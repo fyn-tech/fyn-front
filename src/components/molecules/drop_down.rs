@@ -45,7 +45,7 @@ pub fn DropDown(trigger: impl IntoView + 'static, children: Children) -> impl In
                 <Stack
                     fill_space={false}
                     size={Size::Sm}
-                    add_class={"bg-surface-700 shadow-lg rounded-lg p-2".to_string()}
+                    add_class={"bg-surface-700 dark:bg-surface-300 shadow-lg rounded-lg p-2".to_string()}
                 >
                     {menu_content}
                 </Stack>

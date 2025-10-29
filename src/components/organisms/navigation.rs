@@ -26,9 +26,23 @@ use crate::components::atoms::layout::*;
 use crate::components::atoms::typography::*;
 use crate::components::molecules::drop_down::*;
 use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
+
+fn logout_user_update() {
+    LocalResource::new(move || async move {
+        let fyn_api_client =
+            use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+        let user_context = use_context::<RwSignal<Option<UserContext>>>()
+            .expect("UserContext should be provided.");
+        fyn_api_client.logout().await;
+        user_context.set(None);
+    });
+}
 
 #[component]
 pub fn Navigation() -> impl IntoView {
+    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
     let user_context =
         use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");
 
@@ -66,7 +80,12 @@ pub fn Navigation() -> impl IntoView {
                   Some(_) => view! {
                     <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
                       <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
-                      <A href={"/sign_in".to_string()} text_class={H4_CLASS.to_string()}>"Sign Out"</A>
+                      <div
+                          class="cursor-pointer"
+                          on:click=move |_| {logout_user_update(); }
+                      >
+                      <A href={"/".to_string()} text_class={H4_CLASS.to_string()}>"Sign Out"</A>
+                      </div>
                     </DropDown>
                   }.into_any(),
                   None => view! {
