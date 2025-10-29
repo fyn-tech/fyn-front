@@ -1,0 +1,57 @@
+name: Rust
+
+on: [push]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download OpenAPI schema
+        run: |
+          curl -o fyn_api_client.yaml http://api.fyn-tech.com/schema/
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install OpenAPI Generator
+        run: npm install -g @openapitools/openapi-generator-cli
+      
+      - name: Generate Rust API client
+        run: |
+          openapi-generator-cli generate \
+            -i fyn_api_client.yaml \
+            -g rust \
+            -o ./fyn_api \
+            --additional-properties=packageName=fyn_api,packageVersion=1.0.0
+      
+      - name: Fix generated code
+        run: |
+          find ./fyn_api/src -name "*.rs" -type f -exec sed -i 's/models::models::/models::/g' {} \;
+          find ./fyn_api/src -name "*.rs" -type f -exec sed -i 's/let p_form_file/let _p_form_file/g' {} \;
+          
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+      
+      - name: Install trunk
+        run: |                                                                    
+          wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+          sudo mv trunk /usr/local/bin/
+                
+      - name: Build Leptos app
+        run: trunk build --release

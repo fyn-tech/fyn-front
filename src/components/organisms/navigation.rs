@@ -42,7 +42,6 @@ fn logout_user_update() {
 
 #[component]
 pub fn Navigation() -> impl IntoView {
-    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
     let user_context =
         use_context::<RwSignal<Option<UserContext>>>().expect("User context should be provided");
 
