@@ -133,7 +133,7 @@ pub fn UserRegisterForm() -> impl IntoView {
 
                 match response {
                     Ok(_) => {
-                        nav_fn("/login", Default::default()); // Navigate to login after successful registration
+                        nav_fn("/sign_in", Default::default()); // Navigate to login after successful registration
                     }
                     Err(error) => {
                         form.set_error(format!("Registration failed: {}", error));

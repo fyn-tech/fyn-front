@@ -15,10 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: mod.rs
- * description: Common utilities module exports
+ * filename: token.rs
+ * description: Token utilities for decoding base64url-encoded token payloads
  * ------------------------------------------------------------------------------------------------
  */
 
-pub mod size;
-pub mod base64_utils;
+use base64::Engine;
+use serde::de::DeserializeOwned;
+
+pub fn decode_base64_json<T>(input: &str) -> Result<T, String>
+where
+    T: DeserializeOwned,
+{
+    let input_standard = input.replace('-', "+").replace('_', "/");
+    let padding = match input_standard.len() % 4 {
+        2 => "==",
+        3 => "=",
+        _ => "",
+    };
+    let input_padded = format!("{}{}", input_standard, padding);
+
+    let decoded = base64::engine::general_purpose::STANDARD
+        .decode(input_padded.as_bytes())
+        .map_err(|e| format!("Failed to decode base64: {:?}", e))?;
+
+    serde_json::from_slice(&decoded)
+        .map_err(|e| format!("Failed to parse JSON: {:?}", e))
+}
