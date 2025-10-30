@@ -23,9 +23,11 @@
 use chrono::{DateTime, Utc};
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::common::base64_utils::*;
 use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::{
     JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
@@ -35,7 +37,7 @@ use crate::domain::runner_info::{
 };
 use crate::domain::user_context::UserContext;
 
-use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_list};
+use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_retrieve};
 use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
 };
@@ -63,6 +65,7 @@ pub struct FynApiClient {
     user_id: RwSignal<Option<String>>,
     loading: RwSignal<bool>,
 }
+
 
 impl FynApiClient {
     pub fn new() -> Self {
@@ -123,15 +126,17 @@ impl FynApiClient {
 
         leptos::logging::log!("JWT tokens received successfully");
 
-        // Store tokens
+        // Decode user_id from token payload
+        let user_id = decode_token_user_id(&tokens.access)?;
+
         self.access_token.set(Some(tokens.access.clone()));
         self.refresh_token.set(Some(tokens.refresh.clone()));
-
-        // Store tokens in localStorage for persistence
+        self.user_id.set(Some(user_id.clone()));
         if let Some(window) = web_sys::window() {
             if let Ok(Some(storage)) = window.local_storage() {
                 let _ = storage.set_item("access_token", &tokens.access);
                 let _ = storage.set_item("refresh_token", &tokens.refresh);
+                let _ = storage.set_item("user_id", &user_id);
             }
         }
 
@@ -140,8 +145,8 @@ impl FynApiClient {
             c.bearer_access_token = Some(tokens.access.clone());
         });
 
-        // Fetch user details using the new token
-        let user = self.get_current_user().await?;
+        // Fetch user details using the new token and decoded user_id
+        let user = self.get_current_user(&user_id).await?;
 
         self.loading.set(false);
         Ok(user)
@@ -208,6 +213,7 @@ impl FynApiClient {
             if let Ok(Some(storage)) = window.local_storage() {
                 let _ = storage.remove_item("access_token");
                 let _ = storage.remove_item("refresh_token");
+                let _ = storage.remove_item("user_id");
             }
         }
 
@@ -217,13 +223,11 @@ impl FynApiClient {
         });
     }
 
-    async fn get_current_user(&self) -> Result<UserContext, String> {
+    async fn get_current_user(&self, user_id: &str) -> Result<UserContext, String> {
         // Use the generated API client - it automatically adds the Bearer token!
-        let users = accounts_users_list(&self.config.get())
+        let user = accounts_users_retrieve(&self.config.get(), user_id)
             .await
             .map_err(|e| format!("Failed to get user: {:?}", e))?;
-
-        let user = users.first().ok_or("No user data returned")?;
 
         Ok(UserContext::new()
             .username(&user.username)
@@ -238,46 +242,45 @@ impl FynApiClient {
         // Try to restore tokens from localStorage
         if let Some(window) = web_sys::window() {
             if let Ok(Some(storage)) = window.local_storage() {
-                if let (Ok(Some(access)), Ok(Some(refresh))) = (
+                if let (Ok(Some(access)), Ok(Some(refresh)), Ok(Some(user_id))) = (
                     storage.get_item("access_token"),
                     storage.get_item("refresh_token"),
+                    storage.get_item("user_id"),
                 ) {
                     leptos::logging::log!("Restoring session from localStorage");
                     self.access_token.set(Some(access.clone()));
                     self.refresh_token.set(Some(refresh));
+                    self.user_id.set(Some(user_id.clone()));
 
                     // Update config
                     self.config.update(|c| {
                         c.bearer_access_token = Some(access);
                     });
+
+                    // Try to get user info
+                    match self.get_current_user(&user_id).await {
+                        Ok(user) => {
+                            leptos::logging::log!("Session restored for: {:?}", user.username);
+                            return Some(user);
+                        }
+                        Err(e) => {
+                            leptos::logging::log!("Session restore failed: {}", e);
+                            // Token might be expired, try refresh
+                            if self.refresh_access_token().await.is_ok() {
+                                // Retry getting user
+                                return self.get_current_user(&user_id).await.ok();
+                            } else {
+                                // Clear invalid tokens
+                                self.logout().await;
+                                return None;
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // Check if we have tokens
-        if self.access_token.get().is_none() {
-            return None;
-        }
-
-        // Try to get user info
-        match self.get_current_user().await {
-            Ok(user) => {
-                leptos::logging::log!("Session restored for: {:?}", user.username);
-                Some(user)
-            }
-            Err(e) => {
-                leptos::logging::log!("Session restore failed: {}", e);
-                // Token might be expired, try refresh
-                if self.refresh_access_token().await.is_ok() {
-                    // Retry getting user
-                    self.get_current_user().await.ok()
-                } else {
-                    // Clear invalid tokens
-                    self.logout().await;
-                    None
-                }
-            }
-        }
+        None
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -535,6 +538,35 @@ impl FynApiClient {
 }
 
 // -------------------------------------------------------------------------------------------------
+//  JWT token helpers
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct JwtClaims {
+    pub user_id: String,
+    pub exp: i64,
+    #[serde(flatten)]
+    pub other: serde_json::Value,
+}
+
+fn decode_jwt<T>(token: &str) -> Result<T, String>
+where
+    T: DeserializeOwned,
+{
+    let parts: Vec<&str> = token.split('.').collect();
+    if parts.len() != 3 {
+        return Err("Invalid JWT format".to_string());
+    }
+
+    decode_base64_json(parts[1])
+}
+
+fn decode_token_user_id(token: &str) -> Result<String, String> {
+    let claims: JwtClaims = decode_jwt(token)?;
+    Ok(claims.user_id)
+}
+
+// -------------------------------------------------------------------------------------------------
 // Front-Back End Enum Mapping
 // -------------------------------------------------------------------------------------------------
 
@@ -646,7 +678,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_patch.application_id = Some(self.application_id);
         new_patch.executable = Some(self.executable.clone());
         new_patch.command_line_args = Some(self.command_line_args.clone());
-        new_patch.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_patch.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_patch.resources = Some(self.resources.clone());
         new_patch
     }
@@ -659,7 +691,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_request.assigned_runner = Some(self.runner_id);
         new_request.executable = Some(self.executable.clone());
         new_request.command_line_args = Some(self.command_line_args.clone());
-        new_request.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_request.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_request
     }
 }
