@@ -22,13 +22,13 @@
 
 use chrono::{DateTime, Utc};
 use leptos::{prelude::*, reactive::spawn_local};
-use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::common::base64_utils::*;
-use crate::domain::application_info::AppInfo;
+use crate::domain::application_info::*;
 use crate::domain::job_context::{
     JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
 };
@@ -57,7 +57,7 @@ struct TokenRefreshResponse {
     access: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct FynApiClient {
     config: RwSignal<Configuration>,
     access_token: RwSignal<Option<String>>,
@@ -65,7 +65,6 @@ pub struct FynApiClient {
     user_id: RwSignal<Option<String>>,
     loading: RwSignal<bool>,
 }
-
 
 impl FynApiClient {
     pub fn new() -> Self {
@@ -316,28 +315,16 @@ impl FynApiClient {
     // Applications
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn get_applications(&self) -> Option<HashMap<Uuid, AppInfo>> {
+    pub async fn get_applications(&self) -> Result<HashMap<Uuid, AppInfo>, String> {
         match application_registry_list(&self.config.get()).await {
-            Ok(list_of_apps) => Some(
-                list_of_apps
-                    .iter()
-                    .map(|app| {
-                        (
-                            app.id,
-                            AppInfo::new_basic(
-                                app.id,
-                                app.name.clone(),
-                                app.file_path.clone(),
-                                app.schema_path.clone(),
-                            ),
-                        )
-                    })
-                    .collect(),
-            ),
-            Err(e) => {
-                leptos::logging::error!("Application registry API error: {:?}", e);
-                None
-            }
+            Ok(list_of_apps) => list_of_apps
+                .iter()
+                .map(|app_api| match app_api.to_domain() {
+                    Ok(app) => Ok((app.id, app)),
+                    Err(e) => Err(format!("Failed to convert app: {:?}", e)),
+                })
+                .collect(),
+            Err(e) => Err(format!("Application registry API error: {:?}", e)),
         }
     }
 
@@ -571,6 +558,28 @@ fn decode_token_user_id(token: &str) -> Result<String, String> {
 // -------------------------------------------------------------------------------------------------
 
 #[allow(dead_code)]
+fn domain_api_application_type(application_type: AppType) -> ApplicationTypeEnum {
+    match application_type {
+        AppType::Unknown => ApplicationTypeEnum::Unknown,
+        AppType::PythonScript => ApplicationTypeEnum::Python,
+        AppType::LinuxBinary => ApplicationTypeEnum::LinuxBinary,
+        AppType::WindowBinary => ApplicationTypeEnum::WindowsBinary,
+        AppType::ShellScript => ApplicationTypeEnum::Shell,
+    }
+}
+
+#[allow(dead_code)]
+fn api_domain_application_type(application_type: ApplicationTypeEnum) -> AppType {
+    match application_type {
+        ApplicationTypeEnum::Unknown => AppType::Unknown,
+        ApplicationTypeEnum::Python => AppType::PythonScript,
+        ApplicationTypeEnum::LinuxBinary => AppType::LinuxBinary,
+        ApplicationTypeEnum::WindowsBinary => AppType::WindowBinary,
+        ApplicationTypeEnum::Shell => AppType::ShellScript,
+    }
+}
+
+#[allow(dead_code)]
 fn domain_api_job_status(domain_status: JobStatusDomain) -> StatusEnum {
     match domain_status {
         JobStatusDomain::UploadingInputResources => StatusEnum::Ui,
@@ -659,6 +668,7 @@ fn api_domain_runner_state(api_state: StateEnum) -> RunnerStateDomain {
 // -------------------------------------------------------------------------------------------------
 // Model Mapping
 // -------------------------------------------------------------------------------------------------
+
 trait APIDomainTraits {
     type Patch;
     type Request;
@@ -716,5 +726,23 @@ impl DomainAPITraits for JobInfo {
             .maybe_exit_code(self.exit_code.flatten().map(|v| v as i64))
             .resources(&self.resources)
             .build()
+    }
+}
+
+impl DomainAPITraits for App {
+    type Domain = AppInfo;
+    fn to_domain(&self) -> Result<Self::Domain, String> {
+        Ok(AppInfo::new()
+            .id(self.id)
+            .name(self.name.clone())
+            .file_path(self.file_path.clone())
+            .app_type(api_domain_application_type(
+                self.application_type
+                    .unwrap_or(ApplicationTypeEnum::Unknown),
+            ))
+            .maybe_schema_path(self.schema_path.clone())
+            .executable_name(self.executable_name.clone())
+            .default_cli_args(self.default_cli_args.clone())
+            .use_mpi(self.use_mpi.unwrap_or(false)))
     }
 }

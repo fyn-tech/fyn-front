@@ -24,6 +24,7 @@ use leptos::prelude::*;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::application::application_service::AppService;
 use crate::application::job_service::JobService;
 use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
@@ -49,6 +50,16 @@ pub fn Simulate() -> impl IntoView {
     let runners_resource = RunnerService::get_runners(false);
     let jobs = JobService::get_jobs(false);
 
+    // Application setting
+    let application_service = AppService::new();
+    let application_id = RwSignal::new(String::new());
+
+    // App config
+    let apps_config = ApplicationSchemaConfig {
+        id: application_id,
+        list: application_service.get_application_list(),
+        schema: application_service.get_application_schema(application_id),
+    };
     view! {
         <Navigation/>
 
@@ -64,7 +75,7 @@ pub fn Simulate() -> impl IntoView {
                 {move || {
                     match current_view.get() {
                         SimulateView::FormAndViewer => view! {
-                            <FormAndViewerLayout runners=runners_resource.get().flatten() />
+                            <FormAndViewerLayout runners=runners_resource.get().flatten() app_config=apps_config/>
                         }.into_any(),
                         SimulateView::RunnerStateViewer => view! {
                             <RunnerView runners=runners_resource.get().flatten() />
@@ -136,7 +147,10 @@ fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
 
 /// Form and 3D Viewer Layout Component with working resizable splitter
 #[component]
-fn FormAndViewerLayout(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
+fn FormAndViewerLayout(
+    runners: Option<HashMap<Uuid, RunnerInfo>>,
+    app_config: ApplicationSchemaConfig,
+) -> impl IntoView {
     let (splitter_x, set_splitter_x) = signal(400.0);
     let (is_dragging, set_is_dragging) = signal(false);
 
@@ -147,7 +161,7 @@ fn FormAndViewerLayout(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoV
                 class="absolute top-0 left-0 h-full bg-white dark:bg-surface-800 border-r border-surface-200 dark:border-surface-700 overflow-hidden"
                 style:width=move || format!("{}px", splitter_x.get())
             >
-                <JobConfigForm runner_list=runners.clone() />
+                <JobConfigForm runner_list=runners.clone() applications=app_config />
             </div>
 
             // Draggable vertical splitter line

@@ -20,6 +20,7 @@
  * ------------------------------------------------------------------------------------------------
  */
 
+pub mod application_service;
 pub mod home;
 pub mod job_service;
 pub mod not_found;
