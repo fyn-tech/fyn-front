@@ -21,6 +21,7 @@
  */
 
 use leptos::prelude::*;
+use uuid::Uuid;
 
 use crate::common::size::Size;
 use crate::components::atoms::layout::*;
@@ -361,6 +362,63 @@ pub fn SelectInteger(
                     <option
                         value={value.to_string()}  // Convert i64 to String for HTML
                         selected={signal.get() == Some(value)}  // Fixed: compare with Some(value)
+                    >
+                        {text}
+                    </option>
+                }
+            }).collect_view()}
+        </select>
+    };
+}
+
+#[component]
+pub fn SelectUuid(
+    id: String,
+    key: String,
+    options: Vec<(Uuid, String)>,
+    signal: RwSignal<Option<Uuid>>,
+    #[prop(default = None)] placeholder: Option<String>,
+    #[prop(default = false)] required: bool,
+) -> impl IntoView {
+    let class_str = input_field_string(Align::Left);
+
+    return view! {
+        <select
+            class={class_str}
+            id={id}
+            name={key}
+            required={required}
+            prop:value=move || {
+                signal.get()
+                    .map(|v| v.to_string())
+                    .unwrap_or_default()
+            }
+            on:change=move |ev| {
+                let value_str = event_target_value(&ev);
+                if value_str.is_empty() {
+                    signal.set(None);
+                } else {
+                    signal.set(value_str.parse::<Uuid>().ok());
+                }
+            }
+        >
+            // Placeholder option (only if provided)
+            {if let Some(placeholder_text) = placeholder {
+                Some(view! {
+                    <option value="" disabled=true selected={signal.get().is_none()}>
+                        {placeholder_text}
+                    </option>
+                })
+            } else {
+                None
+            }}
+
+            // Regular options
+            {options.into_iter().map(|(value, text)| {
+                view! {
+                    <option
+                        value={value.to_string()}
+                        selected={signal.get() == Some(value)}
                     >
                         {text}
                     </option>
