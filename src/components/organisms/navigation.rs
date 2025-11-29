@@ -78,7 +78,7 @@ pub fn Navigation() -> impl IntoView {
                 match user_context.get() {
                   Some(_) => view! {
                     <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
-                      <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
+                      <A href={"/user_preferences".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
                       <div
                           class="cursor-pointer"
                           on:click=move |_| {logout_user_update(); }

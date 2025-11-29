@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: mod.rs
- * description: Organism components module exports
+ * filename: user_preferences.rs
+ * description: User registration page component
  * ------------------------------------------------------------------------------------------------
  */
 
-pub mod footer;
-pub mod fyn_tech_profile;
-pub mod job_config_form;
-pub mod job_manager_view;
-pub mod navigation;
-pub mod user_perferences_form;
-pub mod user_registration_form;
-pub mod user_sign_in;
+use leptos::prelude::*;
+
+use crate::components::organisms::user_perferences_form::*;
+use crate::components::templates::standard::*;
+
+#[component]
+pub fn UserPreferences() -> impl IntoView {
+    return view! {
+      <Standard>
+        <UserPreferencesForm/>
+      </Standard>
+    };
+}

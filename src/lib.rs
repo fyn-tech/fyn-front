@@ -41,6 +41,7 @@ use crate::application::register::Register;
 use crate::application::showcase::Showcase;
 use crate::application::sign_in::SignIn;
 use crate::application::simulate::Simulate;
+use crate::application::user_preferences::UserPreferences;
 
 /// An app router which renders the homepage and handles 404's
 #[component]
@@ -75,6 +76,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/") view=Home />
                     <Route path=path!("/simulate") view=Simulate />
                     <Route path=path!("/register") view=Register />
+                    <Route path=path!("/user_preferences") view=UserPreferences />
                     <Route path=path!("/sign_in") view=SignIn />
                     <Route path=path!("/showcase") view=Showcase />  // Add this
                 </Routes>

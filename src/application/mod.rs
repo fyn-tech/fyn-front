@@ -28,3 +28,4 @@ pub mod runner_service;
 pub mod showcase;
 pub mod sign_in;
 pub mod simulate;
+pub mod user_preferences;
