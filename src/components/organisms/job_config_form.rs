@@ -19,8 +19,9 @@
  * description: Job configuration form organism
  * ------------------------------------------------------------------------------------------------
  */
+
 use leptos::{prelude::*, reactive::spawn_local};
-use serde_json::json;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -47,29 +48,70 @@ pub struct ApplicationSchemaConfig {
     pub schema: LocalResource<Option<String>>,
 }
 
+#[derive(Clone, Copy, Default)]
+struct JobFormData {
+    // Job Configuration
+    pub app_id: RwSignal<Option<Uuid>>,
+    pub job_name: RwSignal<String>,
+    pub executable_name: RwSignal<String>,
+    pub command_line_args: RwSignal<String>,
+
+    // Job Inputs
+    pub schema_form: RwSignal<Option<SchemaFormState>>,
+
+    // Compute Allocation
+    pub runner_id: RwSignal<Option<Uuid>>,
+    pub job_priority: RwSignal<Option<i64>>,
+}
+
+impl JobFormData {
+    fn new() -> Self {
+        Self {
+            app_id: RwSignal::new(None),
+            job_name: RwSignal::new("".to_string()),
+            executable_name: RwSignal::new("".to_string()),
+            command_line_args: RwSignal::new("".to_string()),
+            schema_form: RwSignal::new(None),
+            runner_id: RwSignal::new(None),
+            job_priority: RwSignal::new(None),
+        }
+    }
+
+    // fn validate(&self) -> Result<ValidatedJobSubmission, Vec<ValidationError>> {}
+}
+
+struct JobSubmissionService {
+    api_client: FynApiClient,
+}
+
+impl JobSubmissionService {
+    async fn submit_job(&self, form_data: &JobFormData) -> Result<JobInfo, String> {}
+}
+
 async fn submit_job(
     fyn_api_client: &FynApiClient,
-    job_name: String,
-    runner_id: String,
-    app_id: String,
-    job_priority: i64,
-    schema_form_state: Option<SchemaFormState>,
+    form_data: &JobFormData,
 ) -> Result<JobInfo, String> {
     // Helper for UUID parsing
     let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
         Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
     };
 
-    let runner_uuid = parse_uuid(&runner_id, "runner UUID")?;
-    let app_uuid = parse_uuid(&app_id, "application UUID")?;
+    let cli_conv = form_data
+        .command_line_args
+        .get()
+        .split_whitespace()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>();
 
     let new_job_request = JobInfo::new()
-        .name(job_name)
-        .application_id(app_uuid)
-        .runner_id(runner_uuid)
-        .priority(job_priority)
-        .executable("executable")
-        .command_line_args(&json!(["arg1", "arg2", "arg3"]))
+        .name(form_data.job_name.get())
+        .application_id(form_data.app_id.get().unwrap_or_default())
+        .runner_id(form_data.runner_id.get().unwrap_or_default())
+        .priority(form_data.job_priority.get().unwrap_or(0i64))
+        .executable(form_data.executable_name.get())
+        .command_line_args(&json!(cli_conv))
         .build()
         .map_err(|e| format!("Failed to create job: {:?}", e))?;
 
@@ -81,7 +123,7 @@ async fn submit_job(
     leptos::logging::log!("Job created: {}", created_job.id);
 
     // Upload config file if we have form data
-    if let Some(form_state) = schema_form_state {
+    if let Some(form_state) = form_data.schema_form.get() {
         let config_json = form_state.to_json();
         leptos::logging::log!("Creating config file from form data");
 
@@ -128,17 +170,9 @@ pub fn JobConfigForm(
     runner_list: Option<HashMap<Uuid, RunnerInfo>>,
     applications: ApplicationSchemaConfig,
 ) -> impl IntoView {
-    let job_name = RwSignal::new(String::new());
+    let job_data = JobFormData::new();
 
     let error_message = RwSignal::new(None::<String>);
-
-    // Signal to receive form data from SchemaForm
-    let schema_form_state: RwSignal<Option<SchemaFormState>> = RwSignal::new(None);
-
-    // Clone for closure
-    let runner_id = RwSignal::new(String::new());
-    let job_priority = RwSignal::new(Some(0i64));
-    let runner_list_clone = runner_list.clone();
 
     // Button state signal
     let button_state_signal = RwSignal::new(State::Default);
@@ -154,16 +188,7 @@ pub fn JobConfigForm(
             cl_button_state_signal.set(State::Loading);
             error_message.set(None);
 
-            match submit_job(
-                &fyn_api_client,
-                job_name.get(),
-                runner_id.get(),
-                applications.id.get(),
-                job_priority.get().unwrap_or(0),
-                schema_form_state.get(),
-            )
-            .await
-            {
+            match submit_job(&fyn_api_client, &job_data).await {
                 Ok(_job_info) => {
                     cl_button_text_signal.set("Success".to_string());
                     cl_button_state_signal.set(State::Success);
@@ -176,9 +201,11 @@ pub fn JobConfigForm(
         });
     };
 
+    job_data.command_line_args.set("--input yml".to_string());
+
     return view! {
         <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
-            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Selection".to_string()}>
+            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Configuration".to_string()}>
             // meta data
             {move || {
                 let options = applications.list.get().flatten()
@@ -197,7 +224,15 @@ pub fn JobConfigForm(
                         key={"job_name".to_string()}
                         placeholder={"name".to_string()}
                         input_type=InputType::Text {
-                            signal: job_name
+                            signal: job_data.job_name
+                        }
+                    />
+                    <FormField
+                        label={"CL Args".to_string()}
+                        key={"cl_args".to_string()}
+                        placeholder={"args".to_string()}
+                        input_type=InputType::Text {
+                            signal: job_data.command_line_args
                         }
                     />
                 }
@@ -208,10 +243,10 @@ pub fn JobConfigForm(
             {move || {
                 match applications.schema.get() {
                     Some(Some(value)) => view! {
-                        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Job Definition".to_string()}>
-                                <SchemaForm schema_json=value.to_string() _key=applications.id.get() form_state_out=schema_form_state />
+                        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Input".to_string()}>
+                                <SchemaForm schema_json=value.to_string() form_state_out=job_data.schema_form />
                         </Section>
-                        <JobDefinition runner_list=runner_list_clone.clone() runner_id=runner_id.clone() job_priority=job_priority.clone() />
+                        <JobDefinition runner_list=runner_list.clone() runner_id=job_data.runner_id job_priority=job_data.job_priority />
 
                         <Stack align=FlexAlign::Center>
                                 <ErrorAlert message={error_message.read_only()} />
@@ -236,23 +271,23 @@ pub fn JobConfigForm(
 #[component]
 fn JobDefinition(
     runner_list: Option<HashMap<Uuid, RunnerInfo>>,
-    runner_id: RwSignal<String>,
+    runner_id: RwSignal<Option<Uuid>>,
     job_priority: RwSignal<Option<i64>>,
 ) -> impl IntoView {
     let runner_options = match &runner_list.clone() {
         Some(runners) => runners
             .iter()
-            .map(|(id, runner)| (id.to_string(), runner.name.clone()))
-            .collect::<Vec<(String, String)>>(),
-        None => vec![("...".to_string(), "Loading runners...".to_string())],
+            .map(|(id, runner)| (id.clone(), runner.name.clone()))
+            .collect::<Vec<(Uuid, String)>>(),
+        None => vec![(Uuid::nil(), "Loading runners...".to_string())],
     };
 
     view! {
-        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Job Definition".to_string()}>
+        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Compute Allocation".to_string()}>
             <FormField
                 label={"Runner".to_string()}
                 key={"runner".to_string()}
-                input_type=InputType::SelectText {
+                input_type=InputType::SelectUuid {
                     options: runner_options,
                     signal: runner_id
                 }
