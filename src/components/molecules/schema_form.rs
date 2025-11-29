@@ -220,7 +220,6 @@ impl SchemaFormState {
 #[component]
 pub fn SchemaForm(
     schema_json: String,
-    #[prop(optional)] _key: String,
     #[prop(optional)] form_state_out: Option<RwSignal<Option<SchemaFormState>>>,
 ) -> impl IntoView {
     // Use StoredValue to persist form state across re-renders

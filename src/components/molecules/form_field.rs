@@ -21,6 +21,7 @@
  */
 
 use leptos::prelude::*;
+use uuid::Uuid;
 
 use crate::common::size::Size;
 use crate::components::atoms::input::*;
@@ -64,6 +65,10 @@ pub enum InputType {
     SelectInteger {
         options: Vec<(i64, String)>,
         signal: RwSignal<Option<i64>>,
+    },
+    SelectUuid {
+        options: Vec<(Uuid, String)>, // (value, display_text) pairs
+        signal: RwSignal<Option<Uuid>>,
     },
 }
 
@@ -150,6 +155,17 @@ fn build_input(
         .into_any(),
         InputType::SelectInteger { options, signal } => view! {
           <SelectInteger
+            id={id.clone()}
+            key={key}
+            placeholder={placeholder}
+            required={required}
+            options={options}
+            signal={signal}
+          />
+        }
+        .into_any(),
+        InputType::SelectUuid { options, signal } => view! {
+          <SelectUuid
             id={id.clone()}
             key={key}
             placeholder={placeholder}

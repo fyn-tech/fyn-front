@@ -19,8 +19,9 @@
  * description: Job configuration form organism
  * ------------------------------------------------------------------------------------------------
  */
+
 use leptos::{prelude::*, reactive::spawn_local};
-use serde_json::json;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -29,105 +30,135 @@ use crate::common::size::*;
 use crate::components::atoms::alert::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::*;
 use crate::components::molecules::form_field::*;
 use crate::components::molecules::schema_form::{SchemaForm, SchemaFormState};
 use crate::components::molecules::section::*;
-use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::*;
 use crate::domain::runner_info::RunnerInfo;
-use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
 // -------------------------------------------------------------------------------------------------
-// Support Functions
+// Helpers
 // -------------------------------------------------------------------------------------------------
 
-fn get_application_list() -> LocalResource<Option<Vec<(String, String)>>> {
-    LocalResource::new({
-        move || async move {
-            let fyn_api_client =
-                use_context::<FynApiClient>().expect("FynApiClient should be provided");
-            let user_context =
-                use_context::<RwSignal<Option<UserContext>>>().expect("user should be provided");
-            if user_context.get().is_some() && user_context.get().unwrap().apps.len() == 0 {
-                let app_info: Option<HashMap<Uuid, AppInfo>> =
-                    fyn_api_client.get_applications().await;
-                let user_cont = user_context.get();
-                match user_cont {
-                    Some(mut user) => {
-                        user.apps = app_info.unwrap_or_default();
-                        user_context.set(Some(user));
-                    }
-                    None => {}
-                }
-            }
-            Some(
-                user_context
-                    .get()
-                    .unwrap_or_default()
-                    .apps
-                    .iter()
-                    .map(|app| (app.0.to_string(), app.1.name.clone()))
-                    .collect(),
-            )
-        }
-    })
+#[derive(Clone, Copy)]
+pub struct ApplicationSchemaConfig {
+    pub id: RwSignal<String>,
+    pub list: LocalResource<Option<Vec<(String, String)>>>,
+    pub schema: LocalResource<Option<String>>,
 }
 
-fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Option<String>> {
-    LocalResource::new(move || {
-        let app_id = application_id.get();
-        async move {
-            let fyn_api_client =
-                use_context::<FynApiClient>().expect("FynApiClient should be provided");
+#[derive(Clone, Copy, Default)]
+struct JobFormData {
+    // Job Configuration
+    pub app_id: RwSignal<Option<Uuid>>,
+    pub job_name: RwSignal<String>,
+    pub executable_name: RwSignal<String>,
+    pub command_line_args: RwSignal<String>,
 
-            let user_context = use_context::<RwSignal<Option<UserContext>>>()
-                .expect("UserContext should be provided.");
+    // Job Inputs
+    pub schema_form: RwSignal<Option<SchemaFormState>>,
 
-            if app_id.is_empty() {
-                return None;
-            }
+    // Compute Allocation
+    pub runner_id: RwSignal<Option<Uuid>>,
+    pub job_priority: RwSignal<Option<i64>>,
+}
 
-            let app_selected_id = match Uuid::from_str(&app_id) {
-                Ok(ufs) => Some(ufs),
-                Err(_) => None,
-            };
-
-            if app_selected_id.is_some() && user_context.get().is_some() {
-                let selected_app_id = app_selected_id.unwrap();
-                let user = user_context.get().unwrap();
-
-                match user.apps.get(&selected_app_id) {
-                    Some(app_info) => {
-                        match &app_info.schema {
-                            Some(existing_schema) => Some(existing_schema.to_string()), // existing schema, don't fetch
-                            None => {
-                                // need to fetch new value
-                                let new_schema =
-                                    match fyn_api_client.get_app_schema(selected_app_id).await {
-                                        Some(schema) => schema,
-                                        None => serde_json::Value::Null,
-                                    };
-
-                                // Update the user context with the new schema
-                                let mut updated_user = user.clone();
-                                if let Some(app) = updated_user.apps.get_mut(&selected_app_id) {
-                                    app.schema = Some(new_schema.clone());
-                                }
-                                user_context.set(Some(updated_user));
-
-                                Some(new_schema.to_string())
-                            }
-                        }
-                    }
-                    None => None,
-                }
-            } else {
-                None
-            }
+impl JobFormData {
+    fn new() -> Self {
+        Self {
+            app_id: RwSignal::new(None),
+            job_name: RwSignal::new("".to_string()),
+            executable_name: RwSignal::new("".to_string()),
+            command_line_args: RwSignal::new("".to_string()),
+            schema_form: RwSignal::new(None),
+            runner_id: RwSignal::new(None),
+            job_priority: RwSignal::new(None),
         }
-    })
+    }
+
+    // fn validate(&self) -> Result<ValidatedJobSubmission, Vec<ValidationError>> {}
+}
+
+struct JobSubmissionService {
+    api_client: FynApiClient,
+}
+
+impl JobSubmissionService {
+    async fn submit_job(&self, form_data: &JobFormData) -> Result<JobInfo, String> {}
+}
+
+async fn submit_job(
+    fyn_api_client: &FynApiClient,
+    form_data: &JobFormData,
+) -> Result<JobInfo, String> {
+    // Helper for UUID parsing
+    let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
+        Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
+    };
+
+    let cli_conv = form_data
+        .command_line_args
+        .get()
+        .split_whitespace()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>();
+
+    let new_job_request = JobInfo::new()
+        .name(form_data.job_name.get())
+        .application_id(form_data.app_id.get().unwrap_or_default())
+        .runner_id(form_data.runner_id.get().unwrap_or_default())
+        .priority(form_data.job_priority.get().unwrap_or(0i64))
+        .executable(form_data.executable_name.get())
+        .command_line_args(&json!(cli_conv))
+        .build()
+        .map_err(|e| format!("Failed to create job: {:?}", e))?;
+
+    let mut created_job = fyn_api_client
+        .submit_new_job(&new_job_request)
+        .await
+        .map_err(|e| format!("Failed to submit new job: {}", e))?;
+
+    leptos::logging::log!("Job created: {}", created_job.id);
+
+    // Upload config file if we have form data
+    if let Some(form_state) = form_data.schema_form.get() {
+        let config_json = form_state.to_json();
+        leptos::logging::log!("Creating config file from form data");
+
+        let config_file = FynApiClient::create_json_file(&config_json, "config_file.json")
+            .map_err(|e| format!("Failed to create config file: {}", e))?;
+
+        leptos::logging::log!("Uploading config file for job {}", created_job.id);
+
+        fyn_api_client
+            .upload_job_resource_file(
+                created_job.id,
+                config_file,
+                "CFG", // CONFIG resource type
+                Some("Application configuration file"),
+            )
+            .await
+            .map_err(|e| format!("Failed to upload config file: {}", e))?;
+
+        leptos::logging::log!("Config file uploaded successfully");
+    } else {
+        leptos::logging::log!("No form data to upload");
+    }
+
+    // Place into queued state to trigger runner pick up
+    created_job.status = JobStatus::Queued;
+    let job_info = fyn_api_client.patch_job(&created_job).await.map_err(|e| {
+        format!(
+            "Error setting job {} ({}) to queue: {:?}",
+            created_job.name, created_job.id, e
+        )
+    })?;
+
+    leptos::logging::log!("Job {} ({}) set to queued", job_info.name, job_info.id);
+
+    Ok(job_info)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -135,24 +166,18 @@ fn get_application_schema(application_id: RwSignal<String>) -> LocalResource<Opt
 // -------------------------------------------------------------------------------------------------
 
 #[component]
-pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
-    let job_name = RwSignal::new(String::new());
-    let job_priority = RwSignal::new(Some(0i64));
-    let application_id = RwSignal::new(String::new());
-    let runner_id = RwSignal::new(String::new());
-    let application_list = get_application_list();
-    let fetch_json_schema = get_application_schema(application_id);
+pub fn JobConfigForm(
+    runner_list: Option<HashMap<Uuid, RunnerInfo>>,
+    applications: ApplicationSchemaConfig,
+) -> impl IntoView {
+    let job_data = JobFormData::new();
+
     let error_message = RwSignal::new(None::<String>);
-
-    // Signal to receive form data from SchemaForm
-    let schema_form_state: RwSignal<Option<SchemaFormState>> = RwSignal::new(None);
-
-    // Clone for closure
-    let runner_list_clone = runner_list.clone();
 
     // Button state signal
     let button_state_signal = RwSignal::new(State::Default);
     let button_text_signal = RwSignal::new("Submit".to_string());
+
     let on_submit_click = move || {
         let fyn_api_client =
             use_context::<FynApiClient>().expect("FynApiClient should be provided");
@@ -160,125 +185,30 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
         let cl_button_text_signal = button_text_signal.clone();
 
         spawn_local(async move {
-            // Helper for UUID parsing
-            let parse_uuid = |s: &str, field: &str| -> Result<Uuid, String> {
-                Uuid::from_str(s).map_err(|e| format!("Invalid {}: {:?}", field, e))
-            };
             cl_button_state_signal.set(State::Loading);
-            let error_signal = error_message.clone();
-            error_signal.set(None);
+            error_message.set(None);
 
-            let runner_uuid = match parse_uuid(&runner_id.get(), "runner UUID") {
-                Ok(id) => id,
-                Err(e) => {
-                    error_signal.set(Some(format!("{}", e)));
-                    cl_button_state_signal.set(State::Error);
-                    return;
-                }
-            };
-
-            let app_uuid = match parse_uuid(&application_id.get(), "application UUID") {
-                Ok(id) => id,
-                Err(e) => {
-                    error_signal.set(Some(format!("{}", e)));
-                    cl_button_state_signal.set(State::Error);
-                    return;
-                }
-            };
-
-            let new_job_request = match JobInfo::new()
-                .name(job_name.get())
-                .application_id(app_uuid)
-                .runner_id(runner_uuid)
-                .priority(job_priority.get().unwrap_or(0))
-                .executable("executable")
-                .command_line_args(&json!(["arg1", "arg2", "arg3"]))
-                .build()
-            {
-                Ok(job) => job,
-                Err(e) => {
-                    error_signal.set(Some(format!("Failed to create job: {:?}", e)));
-                    cl_button_state_signal.set(State::Error);
-                    return;
-                }
-            };
-
-            let mut created_job = match fyn_api_client.submit_new_job(&new_job_request).await {
-                Ok(job) => {
-                    leptos::logging::log!("Job created: {}", job.id);
-                    job
+            match submit_job(&fyn_api_client, &job_data).await {
+                Ok(_job_info) => {
+                    cl_button_text_signal.set("Success".to_string());
+                    cl_button_state_signal.set(State::Success);
                 }
                 Err(e) => {
-                    error_signal.set(Some(format!("Failed to submit new job: {}", e)));
+                    error_message.set(Some(e));
                     cl_button_state_signal.set(State::Error);
-                    return;
                 }
-            };
-
-            // Upload config file if we have form data
-            if let Some(form_state) = schema_form_state.get() {
-                let config_json = form_state.to_json();
-                leptos::logging::log!("Creating config file from form data");
-
-                match FynApiClient::create_json_file(&config_json, "config_file.json") {
-                    Ok(config_file) => {
-                        leptos::logging::log!("Uploading config file for job {}", created_job.id);
-
-                        match fyn_api_client
-                            .upload_job_resource_file(
-                                created_job.id,
-                                config_file,
-                                "CFG", // CONFIG resource type
-                                Some("Application configuration file"),
-                            )
-                            .await
-                        {
-                            Ok(_) => {
-                                leptos::logging::log!("Config file uploaded successfully");
-                            }
-                            Err(e) => {
-                                error_signal
-                                    .set(Some(format!("Failed to upload config file: {}", e)));
-                                cl_button_state_signal.set(State::Error);
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        error_signal.set(Some(format!("Failed to create config file: {}", e)));
-                        cl_button_state_signal.set(State::Error);
-                    }
-                }
-            } else {
-                leptos::logging::log!("No form data to upload");
             }
-
-            // place into queued state to trigger runner pick up
-            created_job.status = JobStatus::Queued;
-            match fyn_api_client.patch_job(&created_job).await {
-                Ok(job_info) => {
-                    leptos::logging::log!("Job {} ({}) set to queued", job_info.name, job_info.id);
-                }
-                Err(e) => {
-                    error_signal.set(Some(format!(
-                        "Error setting job {} ({}) to queue: {:?}",
-                        created_job.name, created_job.id, e
-                    )));
-                    cl_button_state_signal.set(State::Error);
-                    return;
-                }
-            };
-            cl_button_text_signal.set("Success".to_string());
-            cl_button_state_signal.set(State::Success);
         });
     };
 
+    job_data.command_line_args.set("--input yml".to_string());
+
     return view! {
         <div class=format!("w-max {} h-full overflow-y-auto", padding(Size::Md))>
-            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Selection".to_string()}>
+            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Configuration".to_string()}>
             // meta data
             {move || {
-                let options = application_list.get()
-                    .flatten()
+                let options = applications.list.get().flatten()
                     .unwrap_or(vec![("...".to_string(), "Loading...".to_string())]);
                 view! {
                     <FormField
@@ -286,7 +216,7 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                         key={"application".to_string()}
                         input_type=InputType::SelectText {
                             options: options,
-                            signal: application_id
+                            signal: applications.id
                         }
                     />
                     <FormField
@@ -294,70 +224,80 @@ pub fn JobConfigForm(runner_list: Option<HashMap<Uuid, RunnerInfo>>) -> impl Int
                         key={"job_name".to_string()}
                         placeholder={"name".to_string()}
                         input_type=InputType::Text {
-                            signal: job_name
+                            signal: job_data.job_name
                         }
                     />
                     <FormField
-                        label={"Job Priority".to_string()}
-                        key={"job_priority".to_string()}
-                        placeholder={"0".to_string()}
-                        input_type=InputType::Integer { signal: job_priority, min: Some(0), max: Some(100), step: Some(1) }
+                        label={"CL Args".to_string()}
+                        key={"cl_args".to_string()}
+                        placeholder={"args".to_string()}
+                        input_type=InputType::Text {
+                            signal: job_data.command_line_args
+                        }
                     />
                 }
             }}
             </Section>
 
             // actual input data collection
-            <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Setup".to_string()}>
             {move || {
-                match fetch_json_schema.get() {
+                match applications.schema.get() {
                     Some(Some(value)) => view! {
-                        <SchemaForm
-                            schema_json=value.to_string()
-                            _key=application_id.get()
-                            form_state_out=schema_form_state
-                        />
+                        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Application Input".to_string()}>
+                                <SchemaForm schema_json=value.to_string() form_state_out=job_data.schema_form />
+                        </Section>
+                        <JobDefinition runner_list=runner_list.clone() runner_id=job_data.runner_id job_priority=job_data.job_priority />
 
-                        // Runner selection
-                        {
-                            let runner_options = match &runner_list_clone {
-                                Some(runners) => {
-                                    runners.iter().map(|(id, runner)| {
-                                        (id.to_string(), runner.name.clone())
-                                    }).collect::<Vec<(String, String)>>()
-                                },
-                                None => vec![("...".to_string(), "Loading runners...".to_string())]
-                            };
-
-                            view! {
-                                <FormField
-                                    label={"Runner".to_string()}
-                                    key={"runner".to_string()}
-                                    input_type=InputType::SelectText {
-                                        options: runner_options,
-                                        signal: runner_id
-                                    }
-                                />
-                            }
-                        }
-
-                      <Stack align=FlexAlign::Center>
-                            <ErrorAlert message={error_message.read_only()} />
-                            <Button button_data={
-                              let mut button_data = ButtonData::new().on_click(on_submit_click);
-                              button_data.state_signal = button_state_signal;
-                              button_data.text_signal = button_text_signal;
-                              button_data
-                          } />
-                      </Stack>
+                        <Stack align=FlexAlign::Center>
+                                <ErrorAlert message={error_message.read_only()} />
+                                <Button button_data={
+                                let mut button_data = ButtonData::new().on_click(on_submit_click);
+                                button_data.state_signal = button_state_signal;
+                                button_data.text_signal = button_text_signal;
+                                button_data
+                            } />
+                        </Stack>
                     }.into_any(),
-                    Some(None) | None => view!{<P>"select an application..."</P>}.into_any()
+                    Some(None) | None => view!{}.into_any()
                }
              }
             }
-            </Section>
 
 
         </div>
     };
+}
+
+#[component]
+fn JobDefinition(
+    runner_list: Option<HashMap<Uuid, RunnerInfo>>,
+    runner_id: RwSignal<Option<Uuid>>,
+    job_priority: RwSignal<Option<i64>>,
+) -> impl IntoView {
+    let runner_options = match &runner_list.clone() {
+        Some(runners) => runners
+            .iter()
+            .map(|(id, runner)| (id.clone(), runner.name.clone()))
+            .collect::<Vec<(Uuid, String)>>(),
+        None => vec![(Uuid::nil(), "Loading runners...".to_string())],
+    };
+
+    view! {
+        <Section level={SectionLevel::H2} centre={false} spaced={false} title={"Compute Allocation".to_string()}>
+            <FormField
+                label={"Runner".to_string()}
+                key={"runner".to_string()}
+                input_type=InputType::SelectUuid {
+                    options: runner_options,
+                    signal: runner_id
+                }
+            />
+            <FormField
+                label={"Job Priority".to_string()}
+                key={"job_priority".to_string()}
+                placeholder={"0".to_string()}
+                input_type=InputType::Integer { signal: job_priority, min: Some(0), max: Some(100), step: Some(1) }
+            />
+        </Section>
+    }
 }

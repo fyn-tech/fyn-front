@@ -106,4 +106,17 @@ impl UserContext {
         self.country = country.map(Into::into);
         self
     }
+
+    pub fn maybe_apps(mut self, apps: Option<HashMap<Uuid, AppInfo>>) -> Self {
+        match apps {
+            Some(a) => self.apps = a,
+            None => self.apps.clear(),
+        }
+        self
+    }
+
+    pub fn apps(mut self, apps: HashMap<Uuid, AppInfo>) -> Self {
+        self.apps = apps;
+        self
+    }
 }
