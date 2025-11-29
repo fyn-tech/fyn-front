@@ -63,11 +63,12 @@ pub fn Text(
     return view! {
         <input
             class={class_str}
-            type="text" id={id}
+            type="text"
+            id={id}
             name={key}
             placeholder={placeholder.unwrap_or("text".to_string())}
             required={required}
-            prop:signal=move || signal.get()
+            prop:value=move || signal.get()
             on:input=move |ev| {
                 signal.set(event_target_value(&ev));
             }
@@ -99,7 +100,7 @@ pub fn Float(
             min={min}
             max={max}
             step={step.map_or("any".to_string(), |s| s.to_string())}
-            prop:signal=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
+            prop:value=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
             on:input=move |ev| {
                 let input_str = event_target_value(&ev);
                 if input_str.is_empty() {
@@ -136,7 +137,7 @@ pub fn Integer(
             min={min}
             max={max}
             step={step.map_or("1".to_string(), |s| s.to_string())}
-            prop:signal=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
+            prop:value=move || signal.get().map(|v| v.to_string()).unwrap_or_default()
             on:input=move |ev| {
                 let input_str = event_target_value(&ev);
                 if input_str.is_empty() {
@@ -167,7 +168,7 @@ pub fn Email(
             name={key}
             placeholder={placeholder}
             required={required}
-            prop:signal=move || signal.get()
+            prop:value=move || signal.get()
             on:input=move |ev| {
                 signal.set(event_target_value(&ev));
             }
@@ -193,7 +194,7 @@ pub fn Password(
             name={key}
             placeholder={placeholder}
             required={required}
-            prop:signal=move || signal.get()
+            prop:value=move || signal.get()
             on:input=move |ev| {
                 signal.set(event_target_value(&ev));
             }
@@ -232,7 +233,7 @@ pub fn File(
             id={id}
             name={key}
             required={required}
-            prop:signal=move || signal.get()
+            prop:value=move || signal.get()
             on:input=move |ev| {
                 signal.set(event_target_value(&ev));
             }
