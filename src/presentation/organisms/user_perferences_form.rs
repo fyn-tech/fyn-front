@@ -31,77 +31,7 @@ use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::molecules::form_field::*;
 use crate::presentation::molecules::section::*;
-
-#[derive(Clone)]
-struct PreferencesForm {
-    first_name: RwSignal<String>,
-    last_name: RwSignal<String>,
-    username: RwSignal<String>,
-    email: RwSignal<String>,
-    password: RwSignal<String>,
-    company: RwSignal<String>,
-    country: RwSignal<String>,
-    loading: RwSignal<bool>,
-    error: RwSignal<Option<String>>,
-}
-
-impl PreferencesForm {
-    fn new() -> Self {
-        Self {
-            first_name: RwSignal::new(String::new()),
-            last_name: RwSignal::new(String::new()),
-            username: RwSignal::new(String::new()),
-            email: RwSignal::new(String::new()),
-            password: RwSignal::new(String::new()),
-            company: RwSignal::new(String::new()),
-            country: RwSignal::new(String::new()),
-            loading: RwSignal::new(false),
-            error: RwSignal::new(None),
-        }
-    }
-
-    fn to_user_context(&self) -> UserContext {
-        UserContext::new()
-            .first_name(&self.first_name.get())
-            .last_name(&self.last_name.get())
-            .username(&self.username.get())
-            .email(&self.email.get())
-            .company(&self.company.get())
-            .country(&self.country.get())
-    }
-
-    fn validate(&self) -> Result<(), String> {
-        if self.username.get().is_empty() {
-            return Err("Username is required".to_string());
-        }
-        if self.password.get().is_empty() {
-            return Err("Password is required".to_string());
-        }
-        if self.email.get().is_empty() {
-            return Err("Email is required".to_string());
-        }
-        if self.company.get().is_empty() {
-            return Err("Company is required".to_string());
-        }
-        if self.country.get().is_empty() {
-            return Err("Country is required".to_string());
-        }
-        Ok(())
-    }
-
-    fn set_error(&self, msg: String) {
-        self.error.set(Some(msg));
-        self.loading.set(false);
-    }
-
-    fn clear_error(&self) {
-        self.error.set(None);
-    }
-
-    fn set_loading(&self, loading: bool) {
-        self.loading.set(loading);
-    }
-}
+use crate::presentation::view_models::user_form::*;
 
 #[component]
 pub fn UserPreferencesForm() -> impl IntoView {
