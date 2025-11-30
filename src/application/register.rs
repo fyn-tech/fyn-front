@@ -23,8 +23,8 @@
 
 use leptos::prelude::*;
 
-use crate::components::organisms::user_registration_form::*;
-use crate::components::templates::standard::*;
+use crate::presentation::organisms::user_registration_form::*;
+use crate::presentation::templates::standard::*;
 
 #[component]
 pub fn Register() -> impl IntoView {

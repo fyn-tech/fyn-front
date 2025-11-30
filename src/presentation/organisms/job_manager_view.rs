@@ -24,7 +24,7 @@ use leptos::prelude::*;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::components::molecules::table::*;
+use crate::presentation::molecules::table::*;
 use crate::domain::job_context::*;
 use crate::domain::runner_info::*;
 

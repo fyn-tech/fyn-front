@@ -15,41 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: drop_down.rs
- * description: Form field molecule component
+ * filename: standard.rs
+ * description: Standard page template component
  * ------------------------------------------------------------------------------------------------
  */
+
+
 use leptos::prelude::*;
 
-use crate::common::size::*;
-use crate::components::atoms::layout::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::organisms::footer::*;
+use crate::presentation::organisms::navigation::*;
 
 #[component]
-pub fn DropDown(trigger: impl IntoView + 'static, children: Children) -> impl IntoView {
-    let show = RwSignal::new(false);
-    let menu_content = children();
-
-    view! {
-        <Stack position={Position::Relative} fill_space={false} size={Size::None}>
-            <div
-                class="cursor-pointer"
-                on:click=move |_| show.update(|open| *open = !*open)
-            >
-                {trigger}
-            </div>
-            <div
-                class=move || format!("absolute top-full right-0 z-50 {}",
-                    if show.get() { "" } else { "hidden" }
-                )
-            >
-                <Stack
-                    fill_space={false}
-                    size={Size::Sm}
-                    add_class={"bg-surface-700 dark:bg-surface-300 shadow-lg rounded-lg p-2".to_string()}
-                >
-                    {menu_content}
-                </Stack>
-            </div>
+pub fn Standard(children: Children) -> impl IntoView {
+    return view! {
+        <Stack
+            horizontal=false
+            fill_space=true
+            add_class="min-h-screen justify-between".to_string()
+        >
+            <Navigation/>
+            <main class="flex-1 max-w-4xl mx-auto px-8 py-8 w-full">
+                {children()}
+            </main>
+            <Footer/>
         </Stack>
-    }
+    };
 }

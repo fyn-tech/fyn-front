@@ -23,8 +23,8 @@
 use leptos::prelude::*;
 
 use crate::common::size::Size;
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{FONT_CLR, FONT_STR};
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{FONT_CLR, FONT_STR};
 
 // ------------------------------------------------------------------------------------------------
 //  Common Input

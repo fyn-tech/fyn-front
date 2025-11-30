@@ -22,8 +22,8 @@
 
 use leptos::prelude::*;
 
-use crate::components::organisms::fyn_tech_profile::FynTechProfile;
-use crate::components::templates::standard::Standard;
+use crate::presentation::organisms::fyn_tech_profile::FynTechProfile;
+use crate::presentation::templates::standard::Standard;
 
 #[component]
 pub fn Home() -> impl IntoView {

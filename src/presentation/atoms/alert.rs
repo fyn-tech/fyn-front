@@ -23,8 +23,8 @@
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{text_size, FONT_STR};
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{text_size, FONT_STR};
 
 // ------------------------------------------------------------------------------------------------
 //  Alert Type

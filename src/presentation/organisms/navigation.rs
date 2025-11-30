@@ -22,9 +22,9 @@
 
 use leptos::prelude::*;
 
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::*;
-use crate::components::molecules::drop_down::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::*;
+use crate::presentation::molecules::drop_down::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 

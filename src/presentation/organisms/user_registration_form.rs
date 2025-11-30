@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: user_preferences_form.rs
- * description: User preferences form organism
+ * filename: user_registration_form.rs
+ * description: User registration form organism
  * ------------------------------------------------------------------------------------------------
  */
 
@@ -24,16 +24,16 @@ use leptos::{prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
-use crate::components::atoms::alert::*;
-use crate::components::atoms::button::*;
-use crate::components::atoms::layout::*;
-use crate::components::molecules::form_field::*;
-use crate::components::molecules::section::*;
+use crate::presentation::atoms::alert::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::molecules::form_field::*;
+use crate::presentation::molecules::section::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
 #[derive(Clone)]
-struct PreferencesForm {
+struct RegisterForm {
     first_name: RwSignal<String>,
     last_name: RwSignal<String>,
     username: RwSignal<String>,
@@ -45,7 +45,7 @@ struct PreferencesForm {
     error: RwSignal<Option<String>>,
 }
 
-impl PreferencesForm {
+impl RegisterForm {
     fn new() -> Self {
         Self {
             first_name: RwSignal::new(String::new()),
@@ -104,29 +104,28 @@ impl PreferencesForm {
 }
 
 #[component]
-pub fn UserPreferencesForm() -> impl IntoView {
-    let fyn_api_client: FynApiClient =
-        use_context::<FynApiClient>().expect("FynApiClient should be provided");
-    let user_form = PreferencesForm::new();
+pub fn UserRegisterForm() -> impl IntoView {
+    let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
+    let reg_form = RegisterForm::new();
     let navigate = use_navigate();
 
     let handle_register = {
-        let user_form = user_form.clone();
+        let reg_form = reg_form.clone();
         move || {
-            user_form.clear_error();
+            reg_form.clear_error();
 
-            if let Err(error) = user_form.validate() {
-                user_form.set_error(error);
+            if let Err(error) = reg_form.validate() {
+                reg_form.set_error(error);
                 return;
             }
 
-            user_form.set_loading(true);
+            reg_form.set_loading(true);
 
-            let user_context = user_form.to_user_context();
-            let password = user_form.password.get();
+            let user_context = reg_form.to_user_context();
+            let password = reg_form.password.get();
 
             let api_client = fyn_api_client.clone();
-            let form = user_form.clone();
+            let form = reg_form.clone();
             let nav_fn = navigate.clone();
 
             spawn_local(async move {
@@ -137,7 +136,7 @@ pub fn UserPreferencesForm() -> impl IntoView {
                         nav_fn("/sign_in", Default::default()); // Navigate to login after successful registration
                     }
                     Err(error) => {
-                        form.set_error(format!("Update failed: {}", error));
+                        form.set_error(format!("Registration failed: {}", error));
                     }
                 }
             });
@@ -146,50 +145,50 @@ pub fn UserPreferencesForm() -> impl IntoView {
 
     view! {
         <form on:submit=|e| e.prevent_default()>
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Preferences".to_string()}>
-                <Grid size={Size::Xl} cols=1>
+            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Register".to_string()}>
+                <Grid size={Size::Xl} cols=2>
                     <FormField
                         label={"First Name".to_string()}
                         key={"first_name".to_string()}
                         placeholder={"first name".to_string()}
-                        input_type=InputType::Text { signal: user_form.first_name }
+                        input_type=InputType::Text { signal: reg_form.first_name }
                     />
                     <FormField
                         label={"Last Name".to_string()}
                         key={"last_name".to_string()}
                         placeholder={"last name".to_string()}
-                        input_type=InputType::Text { signal: user_form.last_name }
+                        input_type=InputType::Text { signal: reg_form.last_name }
                     />
                     <FormField
                         label={"Username".to_string()}
                         key={"username".to_string()}
                         placeholder={"username".to_string()}
-                        input_type=InputType::Text { signal: user_form.username }
+                        input_type=InputType::Text { signal: reg_form.username }
                     />
                     <FormField
                         label={"Email".to_string()}
                         key={"email".to_string()}
-                        input_type=InputType::Email { signal: user_form.email }
+                        input_type=InputType::Email { signal: reg_form.email }
                     />
                     <FormField
                         label={"Password".to_string()}
                         key={"password".to_string()}
-                        input_type=InputType::Password { signal: user_form.password }
+                        input_type=InputType::Password { signal: reg_form.password }
                     />
                     <FormField
                         label={"Company".to_string()}
                         key={"company".to_string()}
                         placeholder={"company".to_string()}
-                        input_type=InputType::Text { signal: user_form.company }
+                        input_type=InputType::Text { signal: reg_form.company }
                     />
                     <FormField
                         label={"Country".to_string()}
                         key={"country".to_string()}
                         placeholder={"country".to_string()}
-                        input_type=InputType::Text { signal: user_form.country }
+                        input_type=InputType::Text { signal: reg_form.country }
                     />
                 </Grid>
-                <ErrorAlert message={user_form.error.read_only()} />
+                <ErrorAlert message={reg_form.error.read_only()} />
             </Section>
 
             <Stack align=FlexAlign::Center>

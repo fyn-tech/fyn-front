@@ -25,8 +25,8 @@ use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::common::size::*;
-use crate::components::atoms::layout::{spacing, Align, BorderColor, BorderedDiv};
-use crate::components::atoms::typography::{FONT_CLR, H3, H4_CLASS, NORMAL_CLASS};
+use crate::presentation::atoms::layout::{spacing, Align, BorderColor, BorderedDiv};
+use crate::presentation::atoms::typography::{FONT_CLR, H3, H4_CLASS, NORMAL_CLASS};
 
 // ------------------------------------------------------------------------------------------------
 //  Data Structs

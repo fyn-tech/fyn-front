@@ -25,7 +25,7 @@ use const_format::formatcp;
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::layout::Align;
+use crate::presentation::atoms::layout::Align;
 
 // ------------------------------------------------------------------------------------------------
 //  TextSizing

@@ -25,8 +25,8 @@ use leptos::prelude::*;
 use regex::Regex;
 
 use crate::common::size::Size;
-use crate::components::atoms::layout::{FlexAlign, Stack};
-use crate::components::atoms::typography::{A, H1, H2, H3, H4, H4_CLASS, P};
+use crate::presentation::atoms::layout::{FlexAlign, Stack};
+use crate::presentation::atoms::typography::{A, H1, H2, H3, H4, H4_CLASS, P};
 
 // -------------------------------------------------------------------------------------------------
 // Supporting Parse Helper

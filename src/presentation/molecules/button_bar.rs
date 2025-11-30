@@ -23,8 +23,8 @@
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::button::*;
-use crate::components::atoms::layout::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::layout::*;
 
 #[component]
 pub fn ButtonBar(

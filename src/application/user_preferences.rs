@@ -22,8 +22,8 @@
 
 use leptos::prelude::*;
 
-use crate::components::organisms::user_perferences_form::*;
-use crate::components::templates::standard::*;
+use crate::presentation::organisms::user_perferences_form::*;
+use crate::presentation::templates::standard::*;
 
 #[component]
 pub fn UserPreferences() -> impl IntoView {

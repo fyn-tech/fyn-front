@@ -22,8 +22,8 @@
 
 use chrono::{DateTime, Utc};
 use leptos::{prelude::*, reactive::spawn_local};
-use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -65,7 +65,6 @@ pub struct FynApiClient {
     user_id: RwSignal<Option<String>>,
     loading: RwSignal<bool>,
 }
-
 
 impl FynApiClient {
     pub fn new() -> Self {
@@ -678,7 +677,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_patch.application_id = Some(self.application_id);
         new_patch.executable = Some(self.executable.clone());
         new_patch.command_line_args = Some(self.command_line_args.clone());
-        new_patch.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_patch.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_patch.resources = Some(self.resources.clone());
         new_patch
     }
@@ -691,7 +690,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_request.assigned_runner = Some(self.runner_id);
         new_request.executable = Some(self.executable.clone());
         new_request.command_line_args = Some(self.command_line_args.clone());
-        new_request.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_request.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_request
     }
 }
