@@ -47,7 +47,7 @@ pub fn UserPreferencesForm() -> impl IntoView {
             user_form.set_loading(true);
 
             let user_context = user_context.clone();
-            let user_form_context = UserContext::from(user_form.clone());
+            let user_form_context = UserContext::from(&user_form);
 
             let api_client = fyn_api_client.clone();
             let form = user_form.clone();
