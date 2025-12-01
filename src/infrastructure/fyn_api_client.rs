@@ -37,7 +37,9 @@ use crate::domain::runner_info::{
 };
 use crate::domain::user_context::UserContext;
 
-use fyn_api::apis::accounts_api::{accounts_users_create, accounts_users_retrieve};
+use fyn_api::apis::accounts_api::{
+    accounts_users_create, accounts_users_partial_update, accounts_users_retrieve,
+};
 use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
 };
@@ -309,6 +311,32 @@ impl FynApiClient {
 
         self.loading.set(false);
         Ok("User created successfully".to_string())
+    }
+
+    pub async fn update_user(&self, user: UserContext) -> Result<UserContext, String> {
+        if (self.user_id.get().is_none()) {
+            return Err("No user id set, cannot make API request.".to_string());
+        }
+        self.loading.set(true);
+
+        let mut partial_user_request = PatchedUserRequest::new();
+        partial_user_request.first_name = user.first_name;
+        partial_user_request.last_name = user.last_name;
+        partial_user_request.username = user.username;
+        partial_user_request.email = user.email;
+        partial_user_request.country = user.country;
+        partial_user_request.company = user.company;
+
+        let _response = accounts_users_partial_update(
+            &self.config.get(),
+            &self.user_id.get().unwrap(),
+            Some(partial_user_request),
+        )
+        .await
+        .map_err(|e| format!("API error: {:?}", e))?;
+
+        self.loading.set(false);
+        Ok(UserContext::from(_response))
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -715,5 +743,29 @@ impl DomainAPITraits for JobInfo {
             .maybe_exit_code(self.exit_code.flatten().map(|v| v as i64))
             .resources(&self.resources)
             .build()
+    }
+}
+
+impl From<&User> for UserContext {
+    fn from(user: &User) -> UserContext {
+        UserContext::new()
+            .maybe_first_name(user.first_name.clone())
+            .maybe_last_name(user.last_name.clone())
+            .username(user.username.clone())
+            .maybe_email(user.email.clone())
+            .company(user.company.clone())
+            .country(user.country.clone())
+    }
+}
+
+impl From<User> for UserContext {
+    fn from(user: User) -> UserContext {
+        UserContext::new()
+            .maybe_first_name(user.first_name)
+            .maybe_first_name(user.last_name)
+            .username(user.username)
+            .maybe_email(user.email)
+            .company(user.company)
+            .country(user.country)
     }
 }
