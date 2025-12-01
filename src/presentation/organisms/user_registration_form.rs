@@ -24,13 +24,13 @@ use leptos::{prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
+use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::molecules::form_field::*;
 use crate::presentation::molecules::section::*;
-use crate::domain::user_context::UserContext;
-use crate::infrastructure::fyn_api_client::FynApiClient;
 
 #[derive(Clone)]
 struct RegisterForm {
@@ -70,7 +70,7 @@ impl RegisterForm {
             .country(&self.country.get())
     }
 
-    fn validate(&self) -> Result<(), String> {
+    fn validate_new_user(&self) -> Result<(), String> {
         if self.username.get().is_empty() {
             return Err("Username is required".to_string());
         }
@@ -114,7 +114,7 @@ pub fn UserRegisterForm() -> impl IntoView {
         move || {
             reg_form.clear_error();
 
-            if let Err(error) = reg_form.validate() {
+            if let Err(error) = reg_form.validate_new_user() {
                 reg_form.set_error(error);
                 return;
             }

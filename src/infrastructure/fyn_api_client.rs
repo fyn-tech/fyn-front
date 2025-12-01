@@ -297,7 +297,6 @@ impl FynApiClient {
 
         let mut new_user_request = UserRequest::new(
             new_user.username.unwrap(),
-            password,
             new_user.country.unwrap(),
             new_user.company.unwrap(),
         );
@@ -322,7 +321,6 @@ impl FynApiClient {
         let mut partial_user_request = PatchedUserRequest::new();
         partial_user_request.first_name = user.first_name;
         partial_user_request.last_name = user.last_name;
-        partial_user_request.username = user.username;
         partial_user_request.email = user.email;
         partial_user_request.country = user.country;
         partial_user_request.company = user.company;
@@ -762,7 +760,7 @@ impl From<User> for UserContext {
     fn from(user: User) -> UserContext {
         UserContext::new()
             .maybe_first_name(user.first_name)
-            .maybe_first_name(user.last_name)
+            .maybe_last_name(user.last_name)
             .username(user.username)
             .maybe_email(user.email)
             .company(user.company)

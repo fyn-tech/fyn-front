@@ -25,7 +25,7 @@ use leptos::prelude::*;
 use crate::domain::user_context::UserContext;
 
 #[derive(Clone, Default)]
-struct UserForm {
+pub struct UserForm {
     // User Context Mirror Data
     pub first_name: RwSignal<String>,
     pub last_name: RwSignal<String>,
@@ -40,6 +40,7 @@ struct UserForm {
     pub error: RwSignal<Option<String>>,
 }
 
+#[warn(dead_code)]
 impl UserForm {
     pub fn new() -> Self {
         Self::default()

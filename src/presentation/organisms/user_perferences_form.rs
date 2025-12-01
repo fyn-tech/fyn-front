@@ -21,7 +21,6 @@
  */
 
 use leptos::{prelude::*, reactive::spawn_local};
-use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
 use crate::domain::user_context::UserContext;
@@ -37,34 +36,28 @@ use crate::presentation::view_models::user_form::*;
 pub fn UserPreferencesForm() -> impl IntoView {
     let fyn_api_client: FynApiClient =
         use_context::<FynApiClient>().expect("FynApiClient should be provided");
-    let user_form = PreferencesForm::new();
-    let navigate = use_navigate();
+    let user_context =
+        use_context::<RwSignal<Option<UserContext>>>().expect("UserContext should be provided.");
+    let user_form = UserForm::from(user_context.get().unwrap_or_default());
 
     let handle_register = {
         let user_form = user_form.clone();
         move || {
             user_form.clear_error();
-
-            if let Err(error) = user_form.validate() {
-                user_form.set_error(error);
-                return;
-            }
-
             user_form.set_loading(true);
 
-            let user_context = user_form.to_user_context();
-            let password = user_form.password.get();
+            let user_context = user_context.clone();
+            let user_form_context = UserContext::from(user_form.clone());
 
             let api_client = fyn_api_client.clone();
             let form = user_form.clone();
-            let nav_fn = navigate.clone();
 
             spawn_local(async move {
-                let response = api_client.register(user_context, password).await;
+                let response = api_client.update_user(user_form_context).await;
 
                 match response {
-                    Ok(_) => {
-                        nav_fn("/sign_in", Default::default()); // Navigate to login after successful registration
+                    Ok(updated_user) => {
+                        user_context.set(Some(updated_user));
                     }
                     Err(error) => {
                         form.set_error(format!("Update failed: {}", error));
@@ -79,6 +72,12 @@ pub fn UserPreferencesForm() -> impl IntoView {
             <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Preferences".to_string()}>
                 <Grid size={Size::Xl} cols=1>
                     <FormField
+                        label={"Username".to_string()}
+                        key={"username".to_string()}
+                        placeholder={"username".to_string()}
+                        input_type=InputType::Text { signal: user_form.username }
+                    />
+                <FormField
                         label={"First Name".to_string()}
                         key={"first_name".to_string()}
                         placeholder={"first name".to_string()}
@@ -91,20 +90,9 @@ pub fn UserPreferencesForm() -> impl IntoView {
                         input_type=InputType::Text { signal: user_form.last_name }
                     />
                     <FormField
-                        label={"Username".to_string()}
-                        key={"username".to_string()}
-                        placeholder={"username".to_string()}
-                        input_type=InputType::Text { signal: user_form.username }
-                    />
-                    <FormField
                         label={"Email".to_string()}
                         key={"email".to_string()}
                         input_type=InputType::Email { signal: user_form.email }
-                    />
-                    <FormField
-                        label={"Password".to_string()}
-                        key={"password".to_string()}
-                        input_type=InputType::Password { signal: user_form.password }
                     />
                     <FormField
                         label={"Company".to_string()}
@@ -124,7 +112,7 @@ pub fn UserPreferencesForm() -> impl IntoView {
 
             <Stack align=FlexAlign::Center>
                 <Button button_data=ButtonData::new()
-                .text("Create Account")
+                .text("Update")
                 .on_click(Box::new(move || handle_register()))
                 />
             </Stack>
