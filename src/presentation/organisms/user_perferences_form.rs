@@ -72,12 +72,6 @@ pub fn UserPreferencesForm() -> impl IntoView {
             <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Preferences".to_string()}>
                 <Grid size={Size::Xl} cols=1>
                     <FormField
-                        label={"Username".to_string()}
-                        key={"username".to_string()}
-                        placeholder={"username".to_string()}
-                        input_type=InputType::Text { signal: user_form.username }
-                    />
-                <FormField
                         label={"First Name".to_string()}
                         key={"first_name".to_string()}
                         placeholder={"first name".to_string()}
