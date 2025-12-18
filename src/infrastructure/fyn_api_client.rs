@@ -297,6 +297,7 @@ impl FynApiClient {
 
         let mut new_user_request = UserRequest::new(
             new_user.username.unwrap(),
+            password,
             new_user.country.unwrap(),
             new_user.company.unwrap(),
         );
@@ -313,7 +314,7 @@ impl FynApiClient {
     }
 
     pub async fn update_user(&self, user: UserContext) -> Result<UserContext, String> {
-        if (self.user_id.get().is_none()) {
+        if self.user_id.get().is_none() {
             return Err("No user id set, cannot make API request.".to_string());
         }
         self.loading.set(true);
