@@ -40,7 +40,7 @@ pub struct UserForm {
     pub error: RwSignal<Option<String>>,
 }
 
-#[warn(dead_code)]
+#[allow(dead_code)]
 impl UserForm {
     pub fn new() -> Self {
         Self::default()
