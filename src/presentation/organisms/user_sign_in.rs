@@ -23,11 +23,11 @@
 use leptos::{prelude::*, reactive::spawn_local};
 
 use crate::common::size::*;
-use crate::components::atoms::alert::*;
-use crate::components::atoms::button::*;
-use crate::components::atoms::layout::*;
-use crate::components::molecules::form_field::*;
-use crate::components::molecules::section::*;
+use crate::presentation::atoms::alert::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::molecules::form_field::*;
+use crate::presentation::molecules::section::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 

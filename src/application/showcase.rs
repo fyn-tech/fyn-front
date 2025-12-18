@@ -23,15 +23,15 @@
 use leptos::prelude::*;
 
 use crate::common::size::*;
-use crate::components::atoms::alert::*;
-use crate::components::atoms::button::*;
-use crate::components::atoms::input::*;
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{H1, H2, H3, H4, P};
-use crate::components::molecules::button_bar::*;
-use crate::components::molecules::form_field::*;
-use crate::components::molecules::section::*;
-use crate::components::molecules::table::*;
+use crate::presentation::atoms::alert::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::input::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{H1, H2, H3, H4, P};
+use crate::presentation::molecules::button_bar::*;
+use crate::presentation::molecules::form_field::*;
+use crate::presentation::molecules::section::*;
+use crate::presentation::molecules::table::*;
 
 /// Component showcase page for design system development
 #[component]

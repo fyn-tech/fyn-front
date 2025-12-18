@@ -21,10 +21,11 @@
  */
 
 use leptos::prelude::*;
+use uuid::Uuid;
 
 use crate::common::size::*;
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{text_size, FONT_CLR, FONT_STR};
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{text_size, FONT_CLR, FONT_STR};
 
 // ------------------------------------------------------------------------------------------------
 //  Variant & State
@@ -170,7 +171,7 @@ pub fn Button(#[prop(default = ButtonData::new())] button_data: ButtonData) -> i
 
     return view! {
         <button
-            id=format!("btn-{:?}", button_data.size)
+            id=format!("btn-{:?}", Uuid::new_v4())
             class={move || format!(
                     "{} {} {} {}",
                     build_class_format(&button_data.variant, &button_data.state_signal.get()),

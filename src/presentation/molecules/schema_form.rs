@@ -26,8 +26,8 @@ use serde_json::{Error, Value};
 use std::collections::HashMap;
 
 use crate::common::size::*;
-use crate::components::atoms::layout::*;
-use crate::components::molecules::form_field::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::molecules::form_field::*;
 
 fn build_string_form_field(
     key: &String,

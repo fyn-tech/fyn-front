@@ -22,9 +22,9 @@
 
 use leptos::prelude::*;
 
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::*;
-use crate::components::molecules::drop_down::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::*;
+use crate::presentation::molecules::drop_down::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
 
@@ -78,7 +78,7 @@ pub fn Navigation() -> impl IntoView {
                 match user_context.get() {
                   Some(_) => view! {
                     <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
-                      <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
+                      <A href={"/user_preferences".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
                       <div
                           class="cursor-pointer"
                           on:click=move |_| {logout_user_update(); }

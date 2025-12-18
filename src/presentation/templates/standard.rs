@@ -15,15 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: mod.rs
- * description: Organism components module exports
+ * filename: standard.rs
+ * description: Standard page template component
  * ------------------------------------------------------------------------------------------------
  */
 
-pub mod footer;
-pub mod fyn_tech_profile;
-pub mod job_config_form;
-pub mod job_manager_view;
-pub mod navigation;
-pub mod user_registration_form;
-pub mod user_sign_in;
+
+use leptos::prelude::*;
+
+use crate::presentation::atoms::layout::*;
+use crate::presentation::organisms::footer::*;
+use crate::presentation::organisms::navigation::*;
+
+#[component]
+pub fn Standard(children: Children) -> impl IntoView {
+    return view! {
+        <Stack
+            horizontal=false
+            fill_space=true
+            add_class="min-h-screen justify-between".to_string()
+        >
+            <Navigation/>
+            <main class="flex-1 max-w-4xl mx-auto px-8 py-8 w-full">
+                {children()}
+            </main>
+            <Footer/>
+        </Stack>
+    };
+}

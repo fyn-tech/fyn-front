@@ -15,22 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: register.rs
- * description: User registration page component
+ * filename: mod.rs
+ * description: Components module exports
  * ------------------------------------------------------------------------------------------------
  */
 
-
-use leptos::prelude::*;
-
-use crate::presentation::organisms::user_registration_form::*;
-use crate::presentation::templates::standard::*;
-
-#[component]
-pub fn Register() -> impl IntoView {
-    return view! {
-      <Standard>
-        <UserRegisterForm/>
-      </Standard>
-    };
-}
+pub mod user_form;

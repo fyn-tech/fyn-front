@@ -16,12 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
  * filename: mod.rs
- * description: Components module exports
+ * description: Organism components module exports
  * ------------------------------------------------------------------------------------------------
  */
 
-
-pub mod atoms;
-pub mod molecules;
-pub mod organisms;
-pub mod templates;
+pub mod footer;
+pub mod fyn_tech_profile;
+pub mod job_config_form;
+pub mod job_manager_view;
+pub mod navigation;
+pub mod user_perferences_form;
+pub mod user_registration_form;
+pub mod user_sign_in;

@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: register.rs
+ * filename: user_preferences.rs
  * description: User registration page component
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
-use crate::presentation::organisms::user_registration_form::*;
+use crate::presentation::organisms::user_perferences_form::*;
 use crate::presentation::templates::standard::*;
 
 #[component]
-pub fn Register() -> impl IntoView {
+pub fn UserPreferences() -> impl IntoView {
     return view! {
       <Standard>
-        <UserRegisterForm/>
+        <UserPreferencesForm/>
       </Standard>
     };
 }

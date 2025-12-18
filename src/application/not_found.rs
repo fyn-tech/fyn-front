@@ -23,8 +23,8 @@
 
 use leptos::prelude::*;
 
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{A, H1, H1_CLASS};
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{A, H1, H1_CLASS};
 
 /// 404 Not Found Page
 #[component]

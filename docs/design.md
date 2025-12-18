@@ -157,7 +157,6 @@ src/components/
 ├── molecules/      # Simple functional combinations  
 ├── organisms/      # Complex functional components
 ├── templates/      # Page layout structures
-└── pages/          # Complete page implementations
 ```
 
 ### Component Characteristics

@@ -23,9 +23,9 @@
 use leptos::prelude::*;
 
 use crate::common::size::Size;
-use crate::components::atoms::input::*;
-use crate::components::atoms::layout::*;
-use crate::components::atoms::typography::{FONT_CLR, H4_CLASS};
+use crate::presentation::atoms::input::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::{FONT_CLR, H4_CLASS};
 
 #[derive(Debug, Clone, PartialEq)]
 #[allow(dead_code)]

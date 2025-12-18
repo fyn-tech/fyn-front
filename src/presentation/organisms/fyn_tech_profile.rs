@@ -15,31 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: standard.rs
- * description: Standard page template component
+ * filename: fyn_tech_profile.rs
+ * description: Company profile organism component
  * ------------------------------------------------------------------------------------------------
  */
 
 
 use leptos::prelude::*;
+use reqwest;
 
-use crate::components::atoms::layout::*;
-use crate::components::organisms::footer::*;
-use crate::components::organisms::navigation::*;
+use crate::presentation::atoms::typography::P;
+use crate::presentation::molecules::markdown_render::MarkdownRenderer;
 
 #[component]
-pub fn Standard(children: Children) -> impl IntoView {
-    return view! {
-        <Stack
-            horizontal=false
-            fill_space=true
-            add_class="min-h-screen justify-between".to_string()
-        >
-            <Navigation/>
-            <main class="flex-1 max-w-4xl mx-auto px-8 py-8 w-full">
-                {children()}
-            </main>
-            <Footer/>
-        </Stack>
-    };
+pub fn FynTechProfile() -> impl IntoView {
+    let readme_resource = LocalResource::new(move || fetch_fyn_tech_readme());
+
+    view! {
+        {move || match readme_resource.get() {
+            Some(Ok(content)) => view! { <MarkdownRenderer content={content} /> }.into_any(),
+            Some(Err(error)) => view! { <P>{error}</P> }.into_any(),
+            None => view! { <P>"Loading..."</P> }.into_any(),
+          }
+        }
+    }
+}
+
+async fn fetch_fyn_tech_readme() -> Result<String, String> {
+    reqwest::get("https://raw.githubusercontent.com/fyn-tech/.github/main/profile/README.md")
+        .await
+        .map_err(|e| format!("Network error: {}", e))?
+        .text()
+        .await
+        .map_err(|e| format!("Text parsing error: {}", e))
 }

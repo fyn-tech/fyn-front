@@ -27,13 +27,13 @@ use uuid::Uuid;
 use crate::application::job_service::JobService;
 use crate::application::runner_service::RunnerService;
 use crate::common::size::*;
-use crate::components::atoms::button::*;
-use crate::components::molecules::button_bar::*;
-use crate::components::molecules::table::*;
-use crate::components::organisms::job_config_form::*;
-use crate::components::organisms::job_manager_view::*;
-use crate::components::organisms::navigation::*;
 use crate::domain::runner_info::RunnerInfo;
+use crate::presentation::atoms::button::*;
+use crate::presentation::molecules::button_bar::*;
+use crate::presentation::molecules::table::*;
+use crate::presentation::organisms::job_config_form::*;
+use crate::presentation::organisms::job_manager_view::*;
+use crate::presentation::organisms::navigation::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {

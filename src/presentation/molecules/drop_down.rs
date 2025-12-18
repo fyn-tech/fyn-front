@@ -15,37 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: fyn_tech_profile.rs
- * description: Company profile organism component
+ * filename: drop_down.rs
+ * description: Form field molecule component
  * ------------------------------------------------------------------------------------------------
  */
-
-
 use leptos::prelude::*;
-use reqwest;
 
-use crate::components::atoms::typography::P;
-use crate::components::molecules::markdown_render::MarkdownRenderer;
+use crate::common::size::*;
+use crate::presentation::atoms::layout::*;
 
 #[component]
-pub fn FynTechProfile() -> impl IntoView {
-    let readme_resource = LocalResource::new(move || fetch_fyn_tech_readme());
+pub fn DropDown(trigger: impl IntoView + 'static, children: Children) -> impl IntoView {
+    let show = RwSignal::new(false);
+    let menu_content = children();
 
     view! {
-        {move || match readme_resource.get() {
-            Some(Ok(content)) => view! { <MarkdownRenderer content={content} /> }.into_any(),
-            Some(Err(error)) => view! { <P>{error}</P> }.into_any(),
-            None => view! { <P>"Loading..."</P> }.into_any(),
-          }
-        }
+        <Stack position={Position::Relative} fill_space={false} size={Size::None}>
+            <div
+                class="cursor-pointer"
+                on:click=move |_| show.update(|open| *open = !*open)
+            >
+                {trigger}
+            </div>
+            <div
+                class=move || format!("absolute top-full right-0 z-50 {}",
+                    if show.get() { "" } else { "hidden" }
+                )
+            >
+                <Stack
+                    fill_space={false}
+                    size={Size::Sm}
+                    add_class={"bg-surface-700 dark:bg-surface-300 shadow-lg rounded-lg p-2".to_string()}
+                >
+                    {menu_content}
+                </Stack>
+            </div>
+        </Stack>
     }
-}
-
-async fn fetch_fyn_tech_readme() -> Result<String, String> {
-    reqwest::get("https://raw.githubusercontent.com/fyn-tech/.github/main/profile/README.md")
-        .await
-        .map_err(|e| format!("Network error: {}", e))?
-        .text()
-        .await
-        .map_err(|e| format!("Text parsing error: {}", e))
 }

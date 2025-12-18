@@ -24,89 +24,19 @@ use leptos::{prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 
 use crate::common::size::*;
-use crate::components::atoms::alert::*;
-use crate::components::atoms::button::*;
-use crate::components::atoms::layout::*;
-use crate::components::molecules::form_field::*;
-use crate::components::molecules::section::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
-
-#[derive(Clone)]
-struct RegisterForm {
-    first_name: RwSignal<String>,
-    last_name: RwSignal<String>,
-    username: RwSignal<String>,
-    email: RwSignal<String>,
-    password: RwSignal<String>,
-    company: RwSignal<String>,
-    country: RwSignal<String>,
-    loading: RwSignal<bool>,
-    error: RwSignal<Option<String>>,
-}
-
-impl RegisterForm {
-    fn new() -> Self {
-        Self {
-            first_name: RwSignal::new(String::new()),
-            last_name: RwSignal::new(String::new()),
-            username: RwSignal::new(String::new()),
-            email: RwSignal::new(String::new()),
-            password: RwSignal::new(String::new()),
-            company: RwSignal::new(String::new()),
-            country: RwSignal::new(String::new()),
-            loading: RwSignal::new(false),
-            error: RwSignal::new(None),
-        }
-    }
-
-    fn to_user_context(&self) -> UserContext {
-        UserContext::new()
-            .first_name(&self.first_name.get())
-            .last_name(&self.last_name.get())
-            .username(&self.username.get())
-            .email(&self.email.get())
-            .company(&self.company.get())
-            .country(&self.country.get())
-    }
-
-    fn validate(&self) -> Result<(), String> {
-        if self.username.get().is_empty() {
-            return Err("Username is required".to_string());
-        }
-        if self.password.get().is_empty() {
-            return Err("Password is required".to_string());
-        }
-        if self.email.get().is_empty() {
-            return Err("Email is required".to_string());
-        }
-        if self.company.get().is_empty() {
-            return Err("Company is required".to_string());
-        }
-        if self.country.get().is_empty() {
-            return Err("Country is required".to_string());
-        }
-        Ok(())
-    }
-
-    fn set_error(&self, msg: String) {
-        self.error.set(Some(msg));
-        self.loading.set(false);
-    }
-
-    fn clear_error(&self) {
-        self.error.set(None);
-    }
-
-    fn set_loading(&self, loading: bool) {
-        self.loading.set(loading);
-    }
-}
+use crate::presentation::atoms::alert::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::molecules::form_field::*;
+use crate::presentation::molecules::section::*;
+use crate::presentation::view_models::user_form::*;
 
 #[component]
 pub fn UserRegisterForm() -> impl IntoView {
     let fyn_api_client = use_context::<FynApiClient>().expect("FynApiClient should be provided");
-    let reg_form = RegisterForm::new();
+    let reg_form = UserForm::new();
     let navigate = use_navigate();
 
     let handle_register = {
@@ -114,14 +44,14 @@ pub fn UserRegisterForm() -> impl IntoView {
         move || {
             reg_form.clear_error();
 
-            if let Err(error) = reg_form.validate() {
+            if let Err(error) = reg_form.validate_new_user() {
                 reg_form.set_error(error);
                 return;
             }
 
             reg_form.set_loading(true);
 
-            let user_context = reg_form.to_user_context();
+            let user_form_context = UserContext::from(&reg_form);
             let password = reg_form.password.get();
 
             let api_client = fyn_api_client.clone();
@@ -129,7 +59,7 @@ pub fn UserRegisterForm() -> impl IntoView {
             let nav_fn = navigate.clone();
 
             spawn_local(async move {
-                let response = api_client.register(user_context, password).await;
+                let response = api_client.register(user_form_context, password).await;
 
                 match response {
                     Ok(_) => {
