@@ -39,6 +39,7 @@ use crate::domain::user_context::UserContext;
 
 use fyn_api::apis::accounts_api::{
     accounts_users_create, accounts_users_partial_update, accounts_users_retrieve,
+    accounts_users_update_password_create,
 };
 use fyn_api::apis::application_registry_api::{
     application_registry_list, application_registry_program_schema_retrieve,
@@ -336,6 +337,31 @@ impl FynApiClient {
 
         self.loading.set(false);
         Ok(UserContext::from(_response))
+    }
+
+    pub async fn update_user_password(
+        &self,
+        current_password: &String,
+        new_password: &String,
+    ) -> Result<(), String> {
+        if self.user_id.get().is_none() {
+            return Err("No user id set, cannot make API request.".to_string());
+        }
+        self.loading.set(true);
+
+        let password_request =
+            PasswordUpdateRequest::new(current_password.clone(), new_password.clone());
+
+        let _response = accounts_users_update_password_create(
+            &self.config.get(),
+            &self.user_id.get().unwrap(),
+            password_request,
+        )
+        .await
+        .map_err(|e| format!("API Error: {:?}", e))?;
+
+        self.loading.set(false);
+        Ok(())
     }
 
     // ---------------------------------------------------------------------------------------------

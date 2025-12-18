@@ -32,44 +32,80 @@ use crate::presentation::molecules::form_field::*;
 use crate::presentation::molecules::section::*;
 use crate::presentation::view_models::user_form::*;
 
-#[component]
-pub fn UserPreferencesForm() -> impl IntoView {
+fn handle_password_update(
+    current_password: RwSignal<String>,
+    password_0: RwSignal<String>,
+    password_1: RwSignal<String>,
+    error_message: RwSignal<Option<String>>,
+) {
+    error_message.set(None);
+
+    if password_0.get() != password_1.get() {
+        error_message.set(Some(String::from("New passwords do not match")));
+        return;
+    }
+
+    let fyn_api_client: FynApiClient =
+        use_context::<FynApiClient>().expect("FynApiClient should be provided");
+    let cloned_message = error_message.clone();
+    spawn_local(async move {
+        let response = fyn_api_client
+            .update_user_password(&current_password.get(), &password_0.get())
+            .await;
+
+        match response {
+            Ok(()) => {}
+            Err(error) => {
+                cloned_message.set(Some(format!("Update failed: {}", error)));
+            }
+        }
+    });
+}
+
+fn handle_details_update(user_form: &UserForm) {
     let fyn_api_client: FynApiClient =
         use_context::<FynApiClient>().expect("FynApiClient should be provided");
     let user_context =
         use_context::<RwSignal<Option<UserContext>>>().expect("UserContext should be provided.");
+    user_form.clear_error();
+    user_form.set_loading(true);
+
+    let user_context = user_context.clone();
+    let user_form_context = UserContext::from(user_form);
+
+    let api_client = fyn_api_client.clone();
+    let form = user_form.clone();
+
+    spawn_local(async move {
+        let response = api_client.update_user(user_form_context).await;
+
+        match response {
+            Ok(updated_user) => {
+                user_context.set(Some(updated_user));
+            }
+            Err(error) => {
+                form.set_error(format!("Update failed: {}", error));
+            }
+        }
+    });
+
+    user_form.set_loading(false);
+}
+
+#[component]
+pub fn UserPreferencesForm() -> impl IntoView {
+    let user_context =
+        use_context::<RwSignal<Option<UserContext>>>().expect("UserContext should be provided.");
     let user_form = UserForm::from(user_context.get().unwrap_or_default());
 
-    let handle_register = {
-        let user_form = user_form.clone();
-        move || {
-            user_form.clear_error();
-            user_form.set_loading(true);
-
-            let user_context = user_context.clone();
-            let user_form_context = UserContext::from(&user_form);
-
-            let api_client = fyn_api_client.clone();
-            let form = user_form.clone();
-
-            spawn_local(async move {
-                let response = api_client.update_user(user_form_context).await;
-
-                match response {
-                    Ok(updated_user) => {
-                        user_context.set(Some(updated_user));
-                    }
-                    Err(error) => {
-                        form.set_error(format!("Update failed: {}", error));
-                    }
-                }
-            });
-        }
-    };
+    let password = RwSignal::new(String::new());
+    let new_password_0 = RwSignal::new(String::new());
+    let new_password_1 = RwSignal::new(String::new());
+    let password_error = RwSignal::new(None);
 
     view! {
         <form on:submit=|e| e.prevent_default()>
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Preferences".to_string()}>
+            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Details".to_string()}>
                 <Grid size={Size::Xl} cols=1>
                     <FormField
                         label={"First Name".to_string()}
@@ -106,10 +142,37 @@ pub fn UserPreferencesForm() -> impl IntoView {
 
             <Stack align=FlexAlign::Center>
                 <Button button_data=ButtonData::new()
-                .text("Update")
-                .on_click(Box::new(move || handle_register()))
+                .text("Update Details")
+                .on_click(Box::new(move || handle_details_update(&user_form)))
                 />
             </Stack>
+
+            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Account".to_string()}>
+            <Grid size={Size::Xl} cols=1>
+                    <FormField
+                        label={"Current Password".to_string()}
+                        key={"password".to_string()}
+                        input_type=InputType::Password { signal: password }
+                    />
+                    <FormField
+                        label={"New Password".to_string()}
+                        key={"new_password_0".to_string()}
+                        input_type=InputType::Password  { signal: new_password_0 }
+                    /><FormField
+                        label={"Repeat New Password".to_string()}
+                        key={"new_password_1".to_string()}
+                        input_type=InputType::Password  { signal: new_password_1 }
+                    />
+                </Grid>
+                <ErrorAlert message={password_error.read_only()} />
+            </Section>
+            <Stack align=FlexAlign::Center>
+                <Button button_data=ButtonData::new()
+                .text("Update Account")
+                .on_click(Box::new(move || handle_password_update(password, new_password_0, new_password_1, password_error)))
+                />
+            </Stack>
+
         </form>
     }
 }
