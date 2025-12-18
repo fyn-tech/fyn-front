@@ -47,14 +47,22 @@ fn handle_password_update(
 
     let fyn_api_client: FynApiClient =
         use_context::<FynApiClient>().expect("FynApiClient should be provided");
+    let user_context =
+        use_context::<RwSignal<Option<UserContext>>>().expect("UserContext should be provided.");
     let cloned_message = error_message.clone();
+    let navigate = leptos_router::hooks::use_navigate();
+
     spawn_local(async move {
         let response = fyn_api_client
             .update_user_password(&current_password.get(), &password_0.get())
             .await;
-
+        let nav_fn = navigate.clone();
         match response {
-            Ok(()) => {}
+            Ok(()) => {
+                let _logout_response = fyn_api_client.logout().await;
+                user_context.set(None);
+                nav_fn("/sign_in", Default::default());
+            }
             Err(error) => {
                 cloned_message.set(Some(format!("Update failed: {}", error)));
             }
