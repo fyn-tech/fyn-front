@@ -75,7 +75,7 @@ pub fn UserRegisterForm() -> impl IntoView {
 
     view! {
         <form on:submit=|e| e.prevent_default()>
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Register".to_string()}>
+            <Section level={SectionLevel::H2} centre=true spaced=true is_first=true max_width=Size::Xl4 title={"Register".to_string()}>
                 <Grid size={Size::Xl} cols=2>
                     <FormField
                         label={"First Name".to_string()}
@@ -119,14 +119,13 @@ pub fn UserRegisterForm() -> impl IntoView {
                     />
                 </Grid>
                 <ErrorAlert message={reg_form.error.read_only()} />
+                <Stack align=FlexAlign::Center size=Size::Md add_class="py-4".to_string()>
+                    <Button button_data=ButtonData::new()
+                    .text("Create Account")
+                    .on_click(Box::new(move || handle_register()))
+                    />
+                </Stack>
             </Section>
-
-            <Stack align=FlexAlign::Center>
-                <Button button_data=ButtonData::new()
-                .text("Create Account")
-                .on_click(Box::new(move || handle_register()))
-                />
-            </Stack>
         </form>
     }
 }

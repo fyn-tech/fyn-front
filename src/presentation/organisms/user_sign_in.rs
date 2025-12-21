@@ -23,13 +23,13 @@
 use leptos::{prelude::*, reactive::spawn_local};
 
 use crate::common::size::*;
+use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::molecules::form_field::*;
 use crate::presentation::molecules::section::*;
-use crate::domain::user_context::UserContext;
-use crate::infrastructure::fyn_api_client::FynApiClient;
 
 #[component]
 pub fn UserSignIn() -> impl IntoView {
@@ -87,7 +87,7 @@ pub fn UserSignIn() -> impl IntoView {
 
     return view! {
         <form on:submit=|e| e.prevent_default()>
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Sign In".to_string()}>
+            <Section level={SectionLevel::H2} centre=true spaced=true is_first=true max_width=Size::Xl4 title={"Sign In".to_string()}>
                 <Grid size={Size::Xl} cols=2>
                     <FormField
                         label={"Username".to_string()}
@@ -102,12 +102,13 @@ pub fn UserSignIn() -> impl IntoView {
                     />
                 </Grid>
                 <ErrorAlert message={error_message.read_only()} />
+                <Stack align=FlexAlign::Center size=Size::Md add_class="py-4".to_string()>
+                    <Button
+                        button_data=ButtonData::new().text("Sign In").on_click(Box::new(handle_login))
+                    />
+                </Stack>
             </Section>
-            <Stack align=FlexAlign::Center>
-                <Button
-                    button_data=ButtonData::new().text("Sign In").on_click(Box::new(handle_login))
-                />
-            </Stack>
+
         </form>
     };
 }

@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use const_format::formatcp;
 use leptos::prelude::*;
 
@@ -40,6 +39,9 @@ pub const fn text_size(size: Size) -> &'static str {
         Size::Lg => "text-lg",
         Size::Xl => "text-xl",
         Size::Xl2 => "text-2xl",
+        Size::Xl3 => "text-3xl",
+        Size::Xl4 => "text-4xl",
+        Size::Xl5 => "text-5xl",
     };
 }
 

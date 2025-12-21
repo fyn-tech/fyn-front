@@ -107,6 +107,25 @@ pub fn spacing(size: Size) -> &'static str {
         Size::Lg => "4",
         Size::Xl => "5",
         Size::Xl2 => "6",
+        Size::Xl3 => "7",
+        Size::Xl4 => "8",
+        Size::Xl5 => "9",
+    };
+}
+
+// TODO: when we do max width we centre with mx-auto, probably needs to be properly seperated.
+pub fn max_w(size: Size) -> &'static str {
+    return match size {
+        Size::None => "",
+        Size::Xs => "max-w-xs mx-auto",
+        Size::Sm => "max-w-sm mx-auto",
+        Size::Md => "max-w-md mx-auto",
+        Size::Lg => "max-w-lg mx-auto",
+        Size::Xl => "max-w-xl mx-auto",
+        Size::Xl2 => "max-w-2xl mx-auto",
+        Size::Xl3 => "max-w-3xl mx-auto",
+        Size::Xl4 => "max-w-4xl mx-auto",
+        Size::Xl5 => "max-w-5xl mx-auto",
     };
 }
 
@@ -119,6 +138,9 @@ pub fn padding(size: Size) -> String {
         Size::Lg => format!("px-{} py-{}", spacing(Size::Lg), spacing(Size::Md)),
         Size::Xl => format!("px-{} py-{}", spacing(Size::Xl), spacing(Size::Lg)),
         Size::Xl2 => format!("px-{} py-{}", spacing(Size::Xl2), spacing(Size::Xl)),
+        Size::Xl3 => format!("px-{} py-{}", spacing(Size::Xl3), spacing(Size::Xl2)),
+        Size::Xl4 => format!("px-{} py-{}", spacing(Size::Xl4), spacing(Size::Xl3)),
+        Size::Xl5 => format!("px-{} py-{}", spacing(Size::Xl5), spacing(Size::Xl4)),
     };
 }
 
@@ -167,18 +189,20 @@ pub fn Stack(
     #[prop(default = Position::Static)] position: Position,
     #[prop(default = true)] fill_space: bool,
     #[prop(default = FlexAlign::Stretch)] align: FlexAlign,
+    #[prop(default = Size::None)] max_width: Size,
     #[prop(optional)] add_class: Option<String>,
     children: Children,
 ) -> impl IntoView {
     let additional_class = add_class.unwrap_or_default();
 
     let class_str = format!(
-        "{} {} flex-{} gap-{} {} {}",
+        "{} {} flex-{} gap-{} {} {} {}",
         position,
         if fill_space { "flex" } else { "inline-flex" },
         if horizontal { "row" } else { "col" },
         spacing(size),
         align,
+        max_w(max_width),
         additional_class
     );
     return view! {

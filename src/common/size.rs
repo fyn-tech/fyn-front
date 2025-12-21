@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Size {
     None,
@@ -30,4 +29,7 @@ pub enum Size {
     Lg,
     Xl,
     Xl2,
+    Xl3,
+    Xl4,
+    Xl5,
 }

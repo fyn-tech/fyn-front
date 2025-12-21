@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 use regex::Regex;
 
@@ -201,7 +200,7 @@ pub fn MarkdownRenderer(content: String) -> impl IntoView {
     let parsed_content = parse_markdown(&content);
 
     view! {
-        <Stack size={Size::Lg} align={FlexAlign::Stretch}>
+        <Stack size={Size::Lg} align={FlexAlign::Stretch} max_width=Size::Xl4>
             {parsed_content.into_iter().collect::<Vec<_>>()}
         </Stack>
     }
