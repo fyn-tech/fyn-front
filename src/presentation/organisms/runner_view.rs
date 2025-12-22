@@ -24,14 +24,57 @@ use leptos::prelude::*;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::common::size::*;
 use crate::domain::runner_info::RunnerInfo;
+use crate::presentation::atoms::alert::*;
+use crate::presentation::atoms::button::*;
+use crate::presentation::atoms::layout::*;
+use crate::presentation::atoms::typography::*;
+use crate::presentation::molecules::form_field::*;
+use crate::presentation::molecules::section::*;
 use crate::presentation::molecules::table::*;
-
+use crate::presentation::view_models::new_runner_form::*;
 // use crate::domain::user_context::UserContext;
+
+fn handle_new_runner_install(new_runner: &NewRunnerForm) {}
 
 #[component]
 fn RunnerInstallView() -> impl IntoView {
-    view! {<a>"Hello".to_string()</a>}
+    let new_runner = NewRunnerForm::new();
+
+    view! {
+        <form on:submit=|e| e.prevent_default()>
+            <Section level={SectionLevel::H1}
+            centre={true}
+            spaced={true}
+            max_width={Size::Xl4}
+
+            title={"Resgister New Runner".to_string()}>
+
+                <H2>"Runner Installation"</H2>
+                <P>
+                "To install the fyn-tech runner you are asked to download it from source from githup at the below link
+                 and follow the instructions."
+                </P>
+                <H2>"New Runner Details"</H2>
+                <Grid size={Size::Xl} cols=1>
+                    <FormField
+                        label={"Runner Name".to_string()}
+                        key={"name".to_string()}
+                        input_type=InputType::Text { signal: new_runner.name }
+                    />
+                </Grid>
+                <ErrorAlert message={new_runner.error.read_only()} />
+                <InfoAlert message={new_runner.info.read_only()} />
+                <Stack align=FlexAlign::Center size=Size::Md add_class="py-4".to_string()>
+                    <Button button_data=ButtonData::new()
+                    .text("Create New Runner")
+                    .on_click(Box::new(move || handle_new_runner_install(&new_runner)))
+                    />
+                </Stack>
+            </Section>
+        </form>
+    }
 }
 
 #[component]
