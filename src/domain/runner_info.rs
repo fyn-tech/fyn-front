@@ -38,6 +38,8 @@ pub struct RunnerInfo {
     pub id: Uuid,
     pub name: String,
     pub state: RunnerState,
+    pub owner: Uuid,
+    pub token: Option<Uuid>, //typically only used when created, otherwise should be none.
     pub created_at: DateTime<Utc>,
     pub last_contact: Option<DateTime<Utc>>,
 }
@@ -47,24 +49,48 @@ impl RunnerInfo {
         Self::default()
     }
 
+    pub fn id(mut self, id: Uuid) -> Self {
+        self.id = id;
+        self
+    }
+
     pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = name.into();
         self
     }
 
-    pub fn new_complete(
-        id: Uuid,
-        name: String,
-        state: RunnerState,
-        created_at: DateTime<Utc>,
-        last_contact: Option<DateTime<Utc>>,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            state,
-            created_at,
-            last_contact,
-        }
+    pub fn state(mut self, state: RunnerState) -> Self {
+        self.state = state;
+        self
+    }
+
+    pub fn owner(mut self, owner: Uuid) -> Self {
+        self.owner = owner;
+        self
+    }
+
+    pub fn token(mut self, token: Uuid) -> Self {
+        self.token = Some(token);
+        self
+    }
+
+    pub fn maybe_token(mut self, token: Option<Uuid>) -> Self {
+        self.token = token;
+        self
+    }
+
+    pub fn created_at(mut self, date: DateTime<Utc>) -> Self {
+        self.created_at = date;
+        self
+    }
+
+    pub fn last_contact(mut self, date: DateTime<Utc>) -> Self {
+        self.last_contact = Some(date);
+        self
+    }
+
+    pub fn maybe_last_contact(mut self, date: Option<DateTime<Utc>>) -> Self {
+        self.last_contact = date;
+        self
     }
 }

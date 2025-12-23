@@ -27,16 +27,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::common::base64_utils::*;
-use crate::domain::application_info::AppInfo;
-use crate::domain::job_context::{
-    JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
-};
-use crate::domain::runner_info::{
-    RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
-};
-use crate::domain::user_context::UserContext;
-
 use fyn_api::apis::accounts_api::{
     accounts_users_create, accounts_users_partial_update, accounts_users_retrieve,
     accounts_users_update_password_create,
@@ -48,6 +38,17 @@ use fyn_api::apis::configuration::Configuration;
 use fyn_api::apis::job_manager_api::*;
 use fyn_api::apis::runner_manager_api::runner_manager_users_list;
 use fyn_api::models::*;
+
+use crate::common::base64_utils::*;
+use crate::domain::application_info::AppInfo;
+use crate::domain::job_context::{
+    JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
+};
+use crate::domain::runner_info::{
+    RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
+};
+use crate::domain::user_context::UserContext;
+use crate::infrastructure::runner_adapter::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct TokenResponse {
@@ -568,21 +569,7 @@ impl FynApiClient {
 
         let runner_infos = response
             .iter()
-            .map(|run| {
-                (
-                    run.id,
-                    RunnerInfoDomain::new_complete(
-                        run.id,
-                        run.name.as_ref().unwrap().to_string(),
-                        api_domain_runner_state(run.state.unwrap()),
-                        run.created_at.parse::<DateTime<Utc>>().unwrap(),
-                        run.last_contact
-                            .as_ref()
-                            .flatten()
-                            .and_then(|s| s.parse::<DateTime<Utc>>().ok()),
-                    ),
-                )
-            })
+            .map(|run| (run.id, run.clone().into()))
             .collect::<HashMap<Uuid, RunnerInfoDomain>>();
 
         Ok(runner_infos)
@@ -688,26 +675,6 @@ fn api_domain_resource_type(resource_type: ResourceTypeEnum) -> ResourceType {
     }
 }
 
-#[allow(dead_code)]
-fn domain_api_runner_state(domain_state: RunnerStateDomain) -> StateEnum {
-    match domain_state {
-        RunnerStateDomain::Idle => StateEnum::Id,
-        RunnerStateDomain::Busy => StateEnum::Bs,
-        RunnerStateDomain::Offline => StateEnum::Of,
-        RunnerStateDomain::Unregistered => StateEnum::Ur,
-        RunnerStateDomain::Unknown => StateEnum::Of, // Map Unknown to Offline
-    }
-}
-
-fn api_domain_runner_state(api_state: StateEnum) -> RunnerStateDomain {
-    match api_state {
-        StateEnum::Id => RunnerStateDomain::Idle,
-        StateEnum::Bs => RunnerStateDomain::Busy,
-        StateEnum::Of => RunnerStateDomain::Offline,
-        StateEnum::Ur => RunnerStateDomain::Unregistered,
-    }
-}
-
 // -------------------------------------------------------------------------------------------------
 // Model Mapping
 // -------------------------------------------------------------------------------------------------
@@ -730,7 +697,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_patch.application_id = Some(self.application_id);
         new_patch.executable = Some(self.executable.clone());
         new_patch.command_line_args = Some(self.command_line_args.clone());
-        new_patch.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_patch.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_patch.resources = Some(self.resources.clone());
         new_patch
     }
@@ -743,7 +710,7 @@ impl APIDomainTraits for JobInfoDomain {
         new_request.assigned_runner = Some(self.runner_id);
         new_request.executable = Some(self.executable.clone());
         new_request.command_line_args = Some(self.command_line_args.clone());
-        new_request.exit_code = Some(self.exit_code.map(|v| v as i32));
+        new_request.exit_code = Some(self.exit_code.map(|v| v as i64));
         new_request
     }
 }

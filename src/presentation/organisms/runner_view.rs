@@ -36,7 +36,9 @@ use crate::presentation::molecules::table::*;
 use crate::presentation::view_models::new_runner_form::*;
 // use crate::domain::user_context::UserContext;
 
-fn handle_new_runner_install(new_runner: &NewRunnerForm) {}
+fn handle_new_runner_install(new_runner: &NewRunnerForm) {
+    // RunnerInfo::new()
+}
 
 #[component]
 fn RunnerInstallView() -> impl IntoView {
