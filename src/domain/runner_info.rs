@@ -39,7 +39,7 @@ pub struct RunnerInfo {
     pub name: String,
     pub state: RunnerState,
     pub owner: Uuid,
-    pub token: Option<Uuid>, //typically only used when created, otherwise should be none.
+    pub token: Option<String>, //typically only used when created, otherwise should be none.
     pub created_at: DateTime<Utc>,
     pub last_contact: Option<DateTime<Utc>>,
 }
@@ -69,12 +69,12 @@ impl RunnerInfo {
         self
     }
 
-    pub fn token(mut self, token: Uuid) -> Self {
+    pub fn token(mut self, token: String) -> Self {
         self.token = Some(token);
         self
     }
 
-    pub fn maybe_token(mut self, token: Option<Uuid>) -> Self {
+    pub fn maybe_token(mut self, token: Option<String>) -> Self {
         self.token = token;
         self
     }

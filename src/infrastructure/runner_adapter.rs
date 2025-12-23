@@ -112,13 +112,7 @@ impl From<RunnerInfoFull> for RunnerInfoDomain {
             .name(api.name)
             .state(api.state.into())
             .owner(api.owner)
-            .token(match api.token.parse() {
-                Ok(_uuid) => _uuid,
-                Err(error) => {
-                    leptos::logging::error!("Failed to convert uuid for 'token' {:?}.", error);
-                    Uuid::nil()
-                }
-            })
+            .token(api.token.clone())
             .created_at(match api.created_at.parse() {
                 Ok(date) => date,
                 Err(error) => {
