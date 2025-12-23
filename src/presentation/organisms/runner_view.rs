@@ -51,9 +51,9 @@ fn handle_new_runner_install(runner_form: &NewRunnerModel) {
                 format!("\
                 Success, new runner created! 
                 \nDuring first time runner startup you will be requested to provide the runner ID \
-                and Authentication Token below. Do not navigate away until you have done this, the token is not recoverable.
+                and Registration Token below. Do not navigate away until you have done this, the token is not recoverable.
                 \nRunner ID:          {}
-                Authentication Token: {}
+                Registration Token: {}
                 ", response.id, response.token.unwrap()
             )),
             Err(msg) => cloned_runner_form.set_error(msg),
