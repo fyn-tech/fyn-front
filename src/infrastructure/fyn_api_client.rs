@@ -36,7 +36,7 @@ use fyn_api::apis::application_registry_api::{
 };
 use fyn_api::apis::configuration::Configuration;
 use fyn_api::apis::job_manager_api::*;
-use fyn_api::apis::runner_manager_api::runner_manager_users_list;
+use fyn_api::apis::runner_manager_api::*;
 use fyn_api::models::*;
 
 use crate::common::base64_utils::*;
@@ -549,6 +549,21 @@ impl FynApiClient {
     // ---------------------------------------------------------------------------------------------
     // Runners
     // ---------------------------------------------------------------------------------------------
+
+    pub async fn create_runner(
+        &self,
+        new_runner: RunnerInfoDomain,
+    ) -> Result<RunnerInfoDomain, String> {
+        self.loading.set(true);
+        let response = runner_manager_users_create(&self.config.get(), new_runner.into())
+            .await
+            .map_err(|e| {
+                leptos::logging::error!("Runner info API error: {:?}", e);
+                format!("API error: {:?}", e)
+            })?;
+        self.loading.set(false);
+        Ok(response.into())
+    }
 
     pub async fn get_runner_info(&self) -> Result<HashMap<Uuid, RunnerInfoDomain>, String> {
         self.loading.set(true);

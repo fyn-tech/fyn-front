@@ -20,12 +20,13 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use leptos::prelude::*;
+use leptos::{prelude::*, reactive::spawn_local};
 use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::common::size::*;
 use crate::domain::runner_info::RunnerInfo;
+use crate::infrastructure::fyn_api_client::FynApiClient;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
@@ -33,17 +34,36 @@ use crate::presentation::atoms::typography::*;
 use crate::presentation::molecules::form_field::*;
 use crate::presentation::molecules::section::*;
 use crate::presentation::molecules::table::*;
-use crate::presentation::view_models::new_runner_form::*;
+use crate::presentation::view_models::new_runner_model::*;
 // use crate::domain::user_context::UserContext;
 
-fn handle_new_runner_install(new_runner: &NewRunnerForm) {
-    // RunnerInfo::new()
+fn handle_new_runner_install(runner_form: &NewRunnerModel) {
+    let fyn_api_client: FynApiClient =
+        use_context::<FynApiClient>().expect("FynApiClient should be provided");
+
+    let cloned_runner_form = runner_form.clone();
+    spawn_local(async move {
+        let response = fyn_api_client
+            .create_runner(cloned_runner_form.clone().into())
+            .await;
+        match response {
+            Ok(response) => cloned_runner_form.set_info(
+                format!("\
+                Success, new runner created! 
+                \nDuring first time runner startup you will be requested to provide the runner ID \
+                and Authentication Token below. Do not navigate away until you have done this, the token is not recoverable.
+                \nRunner ID:          {}
+                Authentication Token: {}
+                ", response.id, response.token.unwrap()
+            )),
+            Err(msg) => cloned_runner_form.set_error(msg),
+        }
+    });
 }
 
 #[component]
 fn RunnerInstallView() -> impl IntoView {
-    let new_runner = NewRunnerForm::new();
-
+    let new_runner = NewRunnerModel::new();
     view! {
         <form on:submit=|e| e.prevent_default()>
             <Section level={SectionLevel::H1}

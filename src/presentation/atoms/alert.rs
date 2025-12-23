@@ -82,7 +82,7 @@ pub fn Alert(
     let text_size_class = text_size(size);
 
     let alert_classes = format!(
-        "{} {} {} {} {} {} {} {} {}",
+        "{} {} {} {} {} {} {} {} {} {}",
         alert_type.background_color(),
         "border",
         alert_type.border_color(),
@@ -90,6 +90,7 @@ pub fn Alert(
         padding_class,
         "rounded",
         "mb-4",
+        "whitespace-pre-line",
         FONT_STR,
         text_size_class
     );

@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: new_runner_form.rs
- * description: View of the user context.
+ * filename: new_runner_model.rs
+ * description: Model view for new runner creation.
  * ------------------------------------------------------------------------------------------------
  */
 
+use crate::domain::runner_info::*;
 use leptos::prelude::*;
 
 #[derive(Clone, Default)]
-pub struct NewRunnerForm {
+pub struct NewRunnerModel {
     // Required Context Mirror Data
     pub name: RwSignal<String>,
 
@@ -34,7 +35,7 @@ pub struct NewRunnerForm {
 }
 
 #[allow(dead_code)]
-impl NewRunnerForm {
+impl NewRunnerModel {
     pub fn new() -> Self {
         Self::default()
     }
@@ -77,5 +78,11 @@ impl NewRunnerForm {
 
     pub fn set_loading(&self, loading: bool) {
         self.loading.set(loading);
+    }
+}
+
+impl From<NewRunnerModel> for RunnerInfo {
+    fn from(form: NewRunnerModel) -> Self {
+        RunnerInfo::new().name(form.name.get())
     }
 }
