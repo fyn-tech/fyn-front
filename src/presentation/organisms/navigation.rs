@@ -74,12 +74,12 @@ pub fn Navigation() -> impl IntoView {
               <H4 color={FONT_DRK_CLR.to_string()}>"creativity leads inovation"</H4>
             </Stack>
             <Stack horizontal={true}>
-              <A href={SIMULATE.path.to_string()} text_class={H4_CLASS.to_string()}>SIMULATE.name</A>
+              <A href={SIMULATE.path.to_string()} text_class={H4_CLASS.to_string()}>{SIMULATE.name}</A>
               { move || {
                 match user_context.get() {
                   Some(_) => view! {
                     <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
-                      <A href={USER_PREFERENCES.path.to_string()} text_class={H4_CLASS.to_string()}>USER_PREFERENCES.name</A>
+                      <A href={USER_PREFERENCES.path.to_string()} text_class={H4_CLASS.to_string()}>{USER_PREFERENCES.name}</A>
                       <div
                           class="cursor-pointer"
                           on:click=move |_| {logout_user_update(); }
@@ -89,8 +89,8 @@ pub fn Navigation() -> impl IntoView {
                     </DropDown>
                   }.into_any(),
                   None => view! {
-                      <A href={REGISTER.path.to_string()} text_class={H4_CLASS.to_string()}>REGISTER.name</A>
-                      <A href={SIGN_IN.path.to_string()} text_class={H4_CLASS.to_string()}>SIGN_IN.name</A>
+                      <A href={REGISTER.path.to_string()} text_class={H4_CLASS.to_string()}>{REGISTER.name}</A>
+                      <A href={SIGN_IN.path.to_string()} text_class={H4_CLASS.to_string()}>{SIGN_IN.name}</A>
                   }.into_any()
                 }
               }
