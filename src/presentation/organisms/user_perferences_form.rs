@@ -25,6 +25,7 @@ use leptos::{prelude::*, reactive::spawn_local};
 use crate::common::size::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::SIGN_IN;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
@@ -61,7 +62,7 @@ fn handle_password_update(
             Ok(()) => {
                 let _logout_response = fyn_api_client.logout().await;
                 user_context.set(None);
-                nav_fn("/sign_in", Default::default());
+                nav_fn(SIGN_IN.path, Default::default());
             }
             Err(error) => {
                 cloned_message.set(Some(format!("Update failed: {}", error)));

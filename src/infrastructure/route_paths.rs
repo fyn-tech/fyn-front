@@ -15,11 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: mod.rs
- * description: Infrastructure layer module exports
+ * filename: routing.rs
+ * description: Application routing, map
  * ------------------------------------------------------------------------------------------------
  */
 
-pub mod fyn_api_client;
-pub mod route_paths;
-mod runner_adapter;
+pub struct RoutePath {
+    pub path: &'static str,
+    pub name: &'static str,
+}
+
+pub const HOME: RoutePath = RoutePath {
+    path: "/",
+    name: "Home",
+};
+
+pub const SHOWCASE: RoutePath = RoutePath {
+    path: "/showcase",
+    name: "Showcase",
+};
+
+pub const SIGN_IN: RoutePath = RoutePath {
+    path: "/sign_in",
+    name: "Sign In",
+};
+
+pub const SIMULATE: RoutePath = RoutePath {
+    path: "/simulate",
+    name: "Simulate",
+};
+
+pub const REGISTER: RoutePath = RoutePath {
+    path: "/register",
+    name: "Register",
+};
+
+pub const USER_PREFERENCES: RoutePath = RoutePath {
+    path: "/user_preferences",
+    name: "User Preferences",
+};

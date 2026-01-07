@@ -25,6 +25,7 @@ use leptos::{prelude::*, reactive::spawn_local};
 use crate::common::size::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::HOME;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
@@ -73,7 +74,7 @@ pub fn UserSignIn() -> impl IntoView {
                 match response {
                     Ok(user_data) => {
                         user_signal.set(Some(user_data));
-                        nav_fn("/", Default::default());
+                        nav_fn(HOME.path, Default::default());
                     }
                     Err(error) => {
                         error_signal.set(Some(format!("Login failed: {}", error)));

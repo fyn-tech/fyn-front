@@ -26,6 +26,7 @@ use leptos_router::hooks::use_navigate;
 use crate::common::size::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::SIGN_IN;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
@@ -63,7 +64,7 @@ pub fn UserRegisterForm() -> impl IntoView {
 
                 match response {
                     Ok(_) => {
-                        nav_fn("/sign_in", Default::default()); // Navigate to login after successful registration
+                        nav_fn(SIGN_IN.path, Default::default()); // Navigate to login after successful registration
                     }
                     Err(error) => {
                         form.set_error(format!("Registration failed: {}", error));
