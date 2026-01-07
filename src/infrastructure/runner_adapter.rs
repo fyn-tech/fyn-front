@@ -26,7 +26,6 @@ use fyn_api::models::{
     runner_info::RunnerInfo, runner_info_full::RunnerInfoFull,
     runner_info_request::RunnerInfoRequest, state_enum::StateEnum,
 };
-use uuid::Uuid;
 
 use crate::domain::runner_info::{RunnerInfo as RunnerInfoDomain, RunnerState};
 

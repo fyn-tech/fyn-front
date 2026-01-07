@@ -20,7 +20,6 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-use chrono::{DateTime, Utc};
 use leptos::{prelude::*, reactive::spawn_local};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -44,11 +43,8 @@ use crate::domain::application_info::AppInfo;
 use crate::domain::job_context::{
     JobInfo as JobInfoDomain, JobStatus as JobStatusDomain, ResourceType,
 };
-use crate::domain::runner_info::{
-    RunnerInfo as RunnerInfoDomain, RunnerState as RunnerStateDomain,
-};
+use crate::domain::runner_info::RunnerInfo;
 use crate::domain::user_context::UserContext;
-use crate::infrastructure::runner_adapter::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct TokenResponse {
@@ -550,10 +546,7 @@ impl FynApiClient {
     // Runners
     // ---------------------------------------------------------------------------------------------
 
-    pub async fn create_runner(
-        &self,
-        new_runner: RunnerInfoDomain,
-    ) -> Result<RunnerInfoDomain, String> {
+    pub async fn create_runner(&self, new_runner: RunnerInfo) -> Result<RunnerInfo, String> {
         self.loading.set(true);
         let response = runner_manager_users_create(&self.config.get(), new_runner.into())
             .await
@@ -565,7 +558,7 @@ impl FynApiClient {
         Ok(response.into())
     }
 
-    pub async fn get_runner_info(&self) -> Result<HashMap<Uuid, RunnerInfoDomain>, String> {
+    pub async fn get_runner_info(&self) -> Result<HashMap<Uuid, RunnerInfo>, String> {
         self.loading.set(true);
 
         leptos::logging::log!("Fetching runner info...");
@@ -585,7 +578,7 @@ impl FynApiClient {
         let runner_infos = response
             .iter()
             .map(|run| (run.id, run.clone().into()))
-            .collect::<HashMap<Uuid, RunnerInfoDomain>>();
+            .collect::<HashMap<Uuid, RunnerInfo>>();
 
         Ok(runner_infos)
     }
