@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
  * filename: routing.rs
- * description: Application routing, map
+ * description: Application routing paths and their 'names'.
  * ------------------------------------------------------------------------------------------------
  */
 

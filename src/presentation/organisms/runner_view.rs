@@ -101,11 +101,37 @@ fn RunnerInstallView() -> impl IntoView {
 
 #[component]
 pub fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
+    let new_runner_view = RwSignal::new(false);
+
+    // Initialize based on whether we have runners
+    match &runners {
+        Some(runner_map) => new_runner_view.set(runner_map.is_empty()),
+        None => new_runner_view.set(false),
+    };
+
+    // Create button with click handler
+    let button_data = ButtonData::new().on_click(move || {
+        new_runner_view.update(|v| *v = !*v);
+    });
+    Effect::new(move |_| {
+        let text = if new_runner_view.get() {
+            "Back to Runner List"
+        } else {
+            "Add New Runner"
+        };
+        button_data.text_signal.set(text.to_string());
+    });
+
     view! {
+        <Stack align=FlexAlign::End size=Size::Md add_class="py-2 px-2".to_string()>
+            <Button button_data=button_data/>
+        </Stack>
+
+
         {move || {
             match &runners {
                 Some(runner_map) => {
-                    if runner_map.len() == 0 {
+                    if runner_map.len() == 0 || new_runner_view.get() {
                         return view!{
                             <RunnerInstallView/>
                         }.into_any();
