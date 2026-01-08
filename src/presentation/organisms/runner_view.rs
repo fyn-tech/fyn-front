@@ -100,6 +100,57 @@ fn RunnerInstallView() -> impl IntoView {
 }
 
 #[component]
+fn RunnerTable(runner_map: HashMap<Uuid, RunnerInfo>) -> impl IntoView {
+    let rows = runner_map
+        .iter()
+        .map(|(_, runner)| {
+            vec![
+                runner.name.clone(),
+                format!("{:?}", runner.state),
+                runner
+                    .last_contact
+                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                    .unwrap_or_else(|| "Never".to_string()),
+                runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+                runner.id.to_string(),
+            ]
+        })
+        .collect::<Vec<Vec<String>>>();
+
+    view! {
+        <Table table={TableStruct {
+            name: "Runner List".to_string(),
+            data: TableData {
+                col_def: vec![
+                    ColumnDefinition {
+                        name: "Name".to_string(),
+                        data_type: CellType::Text
+                    },
+                    ColumnDefinition {
+                        name: "Status".to_string(),
+                        data_type: CellType::Text
+                    },
+                    ColumnDefinition {
+                        name: "Last Contact".to_string(),
+                        data_type: CellType::Text
+                    },
+                    ColumnDefinition {
+                        name: "Created".to_string(),
+                        data_type: CellType::Text
+                    },
+                    ColumnDefinition {
+                        name: "ID".to_string(),
+                        data_type: CellType::Text
+                    },
+                ],
+                rows
+            }
+        }}/>
+    }
+    .into_any()
+}
+
+#[component]
 pub fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
     let new_runner_view = RwSignal::new(false);
 
@@ -136,48 +187,8 @@ pub fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
                             <RunnerInstallView/>
                         }.into_any();
                     }
-
-                    let rows = runner_map.iter().map(|(_, runner)| {
-                        vec![
-                            runner.name.clone(),
-                            format!("{:?}", runner.state),
-                            runner.last_contact
-                                .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                                .unwrap_or_else(|| "Never".to_string()),
-                            runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
-                            runner.id.to_string(),
-                        ]
-                    }).collect::<Vec<Vec<String>>>();
-
-                    view! {
-                        <Table table={TableStruct {
-                            name: "Runner List".to_string(),
-                            data: TableData {
-                                col_def: vec![
-                                    ColumnDefinition {
-                                        name: "Name".to_string(),
-                                        data_type: CellType::Text
-                                    },
-                                    ColumnDefinition {
-                                        name: "Status".to_string(),
-                                        data_type: CellType::Text
-                                    },
-                                    ColumnDefinition {
-                                        name: "Last Contact".to_string(),
-                                        data_type: CellType::Text
-                                    },
-                                    ColumnDefinition {
-                                        name: "Created".to_string(),
-                                        data_type: CellType::Text
-                                    },
-                                    ColumnDefinition {
-                                        name: "ID".to_string(),
-                                        data_type: CellType::Text
-                                    },
-                                ],
-                                rows
-                            }
-                        }}/>
+                    view!{
+                        <RunnerTable runner_map=runner_map.clone()/>
                     }.into_any()
                 },
                 None => view! { <div>"Loading runners..."</div> }.into_any()
