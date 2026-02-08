@@ -178,7 +178,6 @@ pub fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
             <Button button_data=button_data/>
         </Stack>
 
-
         {move || {
             match &runners {
                 Some(runner_map) => {

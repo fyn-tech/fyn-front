@@ -20,11 +20,11 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::common::size::*;
+use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::{spacing, Align, BorderColor, BorderedDiv};
 use crate::presentation::atoms::typography::{FONT_CLR, H3, H4_CLASS, NORMAL_CLASS};
 
@@ -34,10 +34,18 @@ use crate::presentation::atoms::typography::{FONT_CLR, H3, H4_CLASS, NORMAL_CLAS
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum CellType {
-    // we can get more complicated later.
     Text,
     Float,
     Int,
+    Button,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum CellData {
+    Text(String),
+    Float(f64),
+    Int(i64),
+    ButtonData(ButtonData),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,6 +58,7 @@ pub struct TableStruct {
 pub struct TableData {
     pub col_def: Vec<ColumnDefinition>,
     pub rows: Vec<Vec<String>>,
+    pub row_data: Vec<Vec<CellData>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
