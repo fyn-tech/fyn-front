@@ -143,7 +143,8 @@ fn RunnerTable(runner_map: HashMap<Uuid, RunnerInfo>) -> impl IntoView {
                         data_type: CellType::Text
                     },
                 ],
-                rows
+                rows,
+                row_data: vec![]
             }
         }}/>
     }

@@ -45,7 +45,6 @@ pub enum CellData {
     Text(String),
     Float(f64),
     Int(i64),
-    ButtonData(ButtonData),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -93,7 +92,9 @@ fn TH(children: Children) -> impl IntoView {
 fn TD(cell_type: CellType, children: Children) -> impl IntoView {
     return view! {
         <td class=format!("{} {} {} {}", NORMAL_CLASS, FONT_CLR, cell_format(),
-                        if cell_type == CellType::Text {Align::Left} else {Align::Right})>
+                        if cell_type == CellType::Text {Align::Left}
+                        else if cell_type == CellType::Button {Align::Center}
+                        else {Align::Right})>
             {children()}
         </td>
     };
@@ -129,6 +130,39 @@ pub fn Table(table: TableStruct) -> impl IntoView {
         .into_iter()
         .map(|col_def| view! {<TH>{col_def.name.clone()}</TH>})
         .collect();
+
+    let data = table.data.row_data;
+    let table_data: Vec<_> = data
+        .into_iter()
+        .map(|row_cells| {
+            let cells: Vec<_> = row_cells
+                .into_iter()
+                .zip(col_defs.iter())
+                .map(|(cell, col_def)| {
+                    if col_def.data_type != CellType::Button {
+                        let display = match cell {
+                            CellData::Text(s) => s,
+                            CellData::Float(f) => format!("{:3}", f),
+                            CellData::Int(i) => i.to_string(),
+                        };
+                        view! {<TD cell_type={col_def.data_type}>{display}</TD>}
+                    } else {
+                        let label = match cell {
+                            CellData::Text(s) => s,
+                            _ => "Action".to_string(),
+                        };
+                        view! {
+                            <TD cell_type={col_def.data_type}>
+                                <Button button_data=ButtonData::new().text(&label).size(Size::Sm) />
+                            </TD>
+                        }
+                    }
+                })
+                .collect();
+            view! {<TR>{cells}</TR>}
+        })
+        .collect();
+
     let row_data: Vec<_> = rows
         .into_iter()
         .map(|row_cells| {
@@ -144,7 +178,6 @@ pub fn Table(table: TableStruct) -> impl IntoView {
         .collect();
 
     return view! {
-
         {title}
         <BorderedDiv>
             <table class="w-full border-collapse">
@@ -154,7 +187,7 @@ pub fn Table(table: TableStruct) -> impl IntoView {
                     </tr>
                 </thead>
                 <tbody>
-                    {row_data}
+                    {table_data}
                 </tbody>
             </table>
         </BorderedDiv>

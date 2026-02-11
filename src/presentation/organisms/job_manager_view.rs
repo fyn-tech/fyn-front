@@ -24,9 +24,9 @@ use leptos::prelude::*;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::presentation::molecules::table::*;
 use crate::domain::job_context::*;
 use crate::domain::runner_info::*;
+use crate::presentation::molecules::table::*;
 
 #[component]
 pub fn JobManagerView(
@@ -75,9 +75,14 @@ pub fn JobManagerView(
                                     ColumnDefinition {
                                         name: "Job ID".to_string(),
                                         data_type: CellType::Text
+                                    },
+                                    ColumnDefinition {
+                                        name: "Action".to_string(),
+                                        data_type: CellType::Button
                                     }
                                 ],
-                                rows
+                                rows,
+                                row_data: vec![],
                             }
                         }}/>
                     }.into_any()

@@ -368,6 +368,10 @@ fn get_example_table_data() -> TableStruct {
                     name: "Status".to_string(),
                     data_type: CellType::Text,
                 },
+                ColumnDefinition {
+                    name: "Buttons".to_string(),
+                    data_type: CellType::Button,
+                },
             ],
             rows: vec![
                 vec![
@@ -376,6 +380,7 @@ fn get_example_table_data() -> TableStruct {
                     "-".to_string(),
                     "1247".to_string(),
                     "Converged".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Lift Coefficient".to_string(),
@@ -383,6 +388,7 @@ fn get_example_table_data() -> TableStruct {
                     "-".to_string(),
                     "1247".to_string(),
                     "Converged".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Pressure Drop".to_string(),
@@ -390,6 +396,7 @@ fn get_example_table_data() -> TableStruct {
                     "Pa".to_string(),
                     "892".to_string(),
                     "Converged".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Reynolds Number".to_string(),
@@ -397,6 +404,7 @@ fn get_example_table_data() -> TableStruct {
                     "-".to_string(),
                     "0".to_string(),
                     "Input".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Angle of Attack".to_string(),
@@ -404,6 +412,7 @@ fn get_example_table_data() -> TableStruct {
                     "degrees".to_string(),
                     "0".to_string(),
                     "Input".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Mach Number".to_string(),
@@ -411,6 +420,7 @@ fn get_example_table_data() -> TableStruct {
                     "-".to_string(),
                     "0".to_string(),
                     "Input".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Turbulence Intensity".to_string(),
@@ -418,6 +428,7 @@ fn get_example_table_data() -> TableStruct {
                     "%".to_string(),
                     "1450".to_string(),
                     "Converged".to_string(),
+                    "button".to_string(),
                 ],
                 vec![
                     "Wall Y+".to_string(),
@@ -425,6 +436,73 @@ fn get_example_table_data() -> TableStruct {
                     "-".to_string(),
                     "2100".to_string(),
                     "Converged".to_string(),
+                    "button".to_string(),
+                ],
+            ],
+            row_data: vec![
+                vec![
+                    CellData::Text("Drag Coefficient".to_string()),
+                    CellData::Float(0.0234),
+                    CellData::Text("-".to_string()),
+                    CellData::Int(1247),
+                    CellData::Text("Converged".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Lift Coefficient".to_string()),
+                    CellData::Float(1.2456),
+                    CellData::Text("-".to_string()),
+                    CellData::Int(1247),
+                    CellData::Text("Converged".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Pressure Drop".to_string()),
+                    CellData::Float(1245.67),
+                    CellData::Text("Pa".to_string()),
+                    CellData::Int(892),
+                    CellData::Text("Converged".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Reynolds Number".to_string()),
+                    CellData::Float(2300000.0),
+                    CellData::Text("-".to_string()),
+                    CellData::Int(0),
+                    CellData::Text("Input".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Angle of Attack".to_string()),
+                    CellData::Float(15.5),
+                    CellData::Text("degrees".to_string()),
+                    CellData::Int(0),
+                    CellData::Text("Input".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Mach Number".to_string()),
+                    CellData::Float(0.3),
+                    CellData::Text("-".to_string()),
+                    CellData::Int(0),
+                    CellData::Text("Input".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Turbulence Intensity".to_string()),
+                    CellData::Float(0.05),
+                    CellData::Text("%".to_string()),
+                    CellData::Int(1450),
+                    CellData::Text("Converged".to_string()),
+                    CellData::Text("View".to_string()),
+                ],
+                vec![
+                    CellData::Text("Wall Y+".to_string()),
+                    CellData::Float(1.2),
+                    CellData::Text("-".to_string()),
+                    CellData::Int(2100),
+                    CellData::Text("Converged".to_string()),
+                    CellData::Text("View".to_string()),
                 ],
             ],
         },
