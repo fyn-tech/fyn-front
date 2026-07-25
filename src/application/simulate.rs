@@ -30,10 +30,10 @@ use crate::common::size::*;
 use crate::domain::runner_info::RunnerInfo;
 use crate::presentation::atoms::button::*;
 use crate::presentation::molecules::button_bar::*;
-use crate::presentation::molecules::table::*;
 use crate::presentation::organisms::job_config_form::*;
 use crate::presentation::organisms::job_manager_view::*;
 use crate::presentation::organisms::navigation::*;
+use crate::presentation::organisms::runner_view::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SimulateView {
@@ -76,61 +76,6 @@ pub fn Simulate() -> impl IntoView {
                 }}
             </div>
         </div>
-    }
-}
-
-#[component]
-fn RunnerView(runners: Option<HashMap<Uuid, RunnerInfo>>) -> impl IntoView {
-    view! {
-        {move || {
-            match &runners {
-                Some(runner_map) => {
-                            let rows = runner_map.iter().map(|(_, runner)| {
-                                vec![
-                                    runner.name.clone(),
-                                    format!("{:?}", runner.state),
-                                    runner.last_contact
-                                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                                        .unwrap_or_else(|| "Never".to_string()),
-                                    runner.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
-                                    runner.id.to_string(),
-                                ]
-                            }).collect::<Vec<Vec<String>>>();
-
-                            view! {
-                                <Table table={TableStruct {
-                                    name: "Runner List".to_string(),
-                                    data: TableData {
-                                        col_def: vec![
-                                            ColumnDefinition {
-                                                name: "Name".to_string(),
-                                                data_type: CellType::Text
-                                            },
-                                            ColumnDefinition {
-                                                name: "Status".to_string(),
-                                                data_type: CellType::Text
-                                            },
-                                            ColumnDefinition {
-                                                name: "Last Contact".to_string(),
-                                                data_type: CellType::Text
-                                            },
-                                            ColumnDefinition {
-                                                name: "Created".to_string(),
-                                                data_type: CellType::Text
-                                            },
-                                            ColumnDefinition {
-                                                name: "ID".to_string(),
-                                                data_type: CellType::Text
-                                            },
-                                        ],
-                                        rows
-                                    }
-                                }}/>
-                            }.into_any()
-                },
-                None => view! { <div>"Loading runners..."</div> }.into_any()
-            }
-        }}
     }
 }
 

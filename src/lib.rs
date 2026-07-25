@@ -22,17 +22,18 @@
 
 mod application;
 mod common;
-mod presentation;
 mod domain;
 mod infrastructure;
+mod presentation;
 
 use leptos::prelude::*;
 use leptos::reactive::spawn_local;
 use leptos_meta::*;
-use leptos_router::{components::*, path};
+use leptos_router::{components::*, StaticSegment};
 
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::*;
 
 // Top-Level pages
 use crate::application::home::Home;
@@ -73,12 +74,12 @@ pub fn App() -> impl IntoView {
         <div class="min-h-screen bg-surface-50 dark:bg-surface-950">
             <Router>
                 <Routes fallback=NotFound >
-                    <Route path=path!("/") view=Home />
-                    <Route path=path!("/simulate") view=Simulate />
-                    <Route path=path!("/register") view=Register />
-                    <Route path=path!("/user_preferences") view=UserPreferences />
-                    <Route path=path!("/sign_in") view=SignIn />
-                    <Route path=path!("/showcase") view=Showcase />  // Add this
+                    <Route path=StaticSegment(HOME.path) view=Home />
+                    <Route path=StaticSegment(SIMULATE.path) view=Simulate />
+                    <Route path=StaticSegment(REGISTER.path) view=Register />
+                    <Route path=StaticSegment(USER_PREFERENCES.path) view=UserPreferences />
+                    <Route path=StaticSegment(SIGN_IN.path) view=SignIn />
+                    <Route path=StaticSegment(SHOWCASE.path) view=Showcase />
                 </Routes>
             </Router>
         </div>

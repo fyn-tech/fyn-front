@@ -25,6 +25,7 @@ pub mod fyn_tech_profile;
 pub mod job_config_form;
 pub mod job_manager_view;
 pub mod navigation;
+pub mod runner_view;
 pub mod user_perferences_form;
 pub mod user_registration_form;
 pub mod user_sign_in;

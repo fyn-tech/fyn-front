@@ -15,21 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  * ------------------------------------------------------------------------------------------------
- * filename: size.rs
- * description: Size utility types and functions
+ * filename: routing.rs
+ * description: Application routing paths and their 'names'.
  * ------------------------------------------------------------------------------------------------
  */
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Size {
-    None,
-    Xs,
-    Sm,
-    Md,
-    Lg,
-    Xl,
-    Xl2,
-    Xl3,
-    Xl4,
-    Xl5,
+pub struct RoutePath {
+    pub path: &'static str,
+    pub name: &'static str,
 }
+
+pub const HOME: RoutePath = RoutePath {
+    path: "/",
+    name: "Home",
+};
+
+pub const SHOWCASE: RoutePath = RoutePath {
+    path: "/showcase",
+    name: "Showcase",
+};
+
+pub const SIGN_IN: RoutePath = RoutePath {
+    path: "/sign_in",
+    name: "Sign In",
+};
+
+pub const SIMULATE: RoutePath = RoutePath {
+    path: "/simulate",
+    name: "Simulate",
+};
+
+pub const REGISTER: RoutePath = RoutePath {
+    path: "/register",
+    name: "Register",
+};
+
+pub const USER_PREFERENCES: RoutePath = RoutePath {
+    path: "/user_preferences",
+    name: "User Preferences",
+};

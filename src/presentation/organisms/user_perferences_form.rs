@@ -25,6 +25,7 @@ use leptos::{prelude::*, reactive::spawn_local};
 use crate::common::size::*;
 use crate::domain::user_context::UserContext;
 use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::SIGN_IN;
 use crate::presentation::atoms::alert::*;
 use crate::presentation::atoms::button::*;
 use crate::presentation::atoms::layout::*;
@@ -61,7 +62,7 @@ fn handle_password_update(
             Ok(()) => {
                 let _logout_response = fyn_api_client.logout().await;
                 user_context.set(None);
-                nav_fn("/sign_in", Default::default());
+                nav_fn(SIGN_IN.path, Default::default());
             }
             Err(error) => {
                 cloned_message.set(Some(format!("Update failed: {}", error)));
@@ -113,7 +114,7 @@ pub fn UserPreferencesForm() -> impl IntoView {
 
     view! {
         <form on:submit=|e| e.prevent_default()>
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"User Details".to_string()}>
+            <Section level={SectionLevel::H2} centre=true spaced=true is_first=true max_width=Size::Xl4 title={"User Details".to_string()}>
                 <Grid size={Size::Xl} cols=1>
                     <FormField
                         label={"First Name".to_string()}
@@ -146,17 +147,16 @@ pub fn UserPreferencesForm() -> impl IntoView {
                     />
                 </Grid>
                 <ErrorAlert message={user_form.error.read_only()} />
+                <Stack align=FlexAlign::Center size=Size::Md add_class="py-4".to_string()>
+                    <Button button_data=ButtonData::new()
+                    .text("Update Details")
+                    .on_click(Box::new(move || handle_details_update(&user_form)))
+                    />
+                </Stack>
             </Section>
 
-            <Stack align=FlexAlign::Center>
-                <Button button_data=ButtonData::new()
-                .text("Update Details")
-                .on_click(Box::new(move || handle_details_update(&user_form)))
-                />
-            </Stack>
-
-            <Section level={SectionLevel::H2} centre={true} spaced={true} title={"Account".to_string()}>
-            <Grid size={Size::Xl} cols=1>
+            <Section level={SectionLevel::H2} centre={true} spaced={true} max_width=Size::Xl4 title={"Account".to_string()}>
+                <Grid size={Size::Xl} cols=1>
                     <FormField
                         label={"Current Password".to_string()}
                         key={"password".to_string()}
@@ -173,13 +173,14 @@ pub fn UserPreferencesForm() -> impl IntoView {
                     />
                 </Grid>
                 <ErrorAlert message={password_error.read_only()} />
+                <Stack align=FlexAlign::Center size=Size::Md add_class="py-4".to_string()>
+                    <Button button_data=ButtonData::new()
+                    .text("Update Account")
+                    .on_click(Box::new(move || handle_password_update(password, new_password_0, new_password_1, password_error)))
+                    />
+                </Stack>
             </Section>
-            <Stack align=FlexAlign::Center>
-                <Button button_data=ButtonData::new()
-                .text("Update Account")
-                .on_click(Box::new(move || handle_password_update(password, new_password_0, new_password_1, password_error)))
-                />
-            </Stack>
+
 
         </form>
     }

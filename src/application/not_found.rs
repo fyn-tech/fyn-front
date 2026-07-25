@@ -20,9 +20,9 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
+use crate::infrastructure::route_paths::HOME;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::atoms::typography::{A, H1, H1_CLASS};
 
@@ -35,7 +35,7 @@ pub fn NotFound() -> impl IntoView {
                 add_class="min-h-screen justify-center".to_string()>
                 <H1>"Uh oh!"</H1>
                 <H1>"We couldn't find that page!"</H1>
-                <A href={"/".to_string()} text_class={H1_CLASS.to_string()}>"Back home"</A>
+                <A href={HOME.path.to_string()} text_class={H1_CLASS.to_string()}>"Back to home"</A>
             </Stack>
     };
 }

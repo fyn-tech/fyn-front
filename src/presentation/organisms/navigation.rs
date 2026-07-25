@@ -22,11 +22,12 @@
 
 use leptos::prelude::*;
 
+use crate::domain::user_context::UserContext;
+use crate::infrastructure::fyn_api_client::FynApiClient;
+use crate::infrastructure::route_paths::*;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::atoms::typography::*;
 use crate::presentation::molecules::drop_down::*;
-use crate::domain::user_context::UserContext;
-use crate::infrastructure::fyn_api_client::FynApiClient;
 
 fn logout_user_update() {
     LocalResource::new(move || async move {
@@ -73,23 +74,23 @@ pub fn Navigation() -> impl IntoView {
               <H4 color={FONT_DRK_CLR.to_string()}>"creativity leads inovation"</H4>
             </Stack>
             <Stack horizontal={true}>
-              <A href={"/simulate".to_string()} text_class={H4_CLASS.to_string()}>"Simulate"</A>
+              <A href={SIMULATE.path.to_string()} text_class={H4_CLASS.to_string()}>{SIMULATE.name}</A>
               { move || {
                 match user_context.get() {
                   Some(_) => view! {
                     <DropDown trigger={view! {<H4 color={LINK_CLR.to_string()}>{user_initials.get()}</H4>}}>
-                      <A href={"/user_preferences".to_string()} text_class={H4_CLASS.to_string()}>"Preference"</A>
+                      <A href={USER_PREFERENCES.path.to_string()} text_class={H4_CLASS.to_string()}>{USER_PREFERENCES.name}</A>
                       <div
                           class="cursor-pointer"
                           on:click=move |_| {logout_user_update(); }
                       >
-                      <A href={"/".to_string()} text_class={H4_CLASS.to_string()}>"Sign Out"</A>
+                      <A href={HOME.path.to_string()} text_class={H4_CLASS.to_string()}>"Sign Out"</A>
                       </div>
                     </DropDown>
                   }.into_any(),
                   None => view! {
-                      <A href={"/register".to_string()} text_class={H4_CLASS.to_string()}>"Register"</A>
-                      <A href={"/sign_in".to_string()} text_class={H4_CLASS.to_string()}>"Sign In"</A>
+                      <A href={REGISTER.path.to_string()} text_class={H4_CLASS.to_string()}>{REGISTER.name}</A>
+                      <A href={SIGN_IN.path.to_string()} text_class={H4_CLASS.to_string()}>{SIGN_IN.name}</A>
                   }.into_any()
                 }
               }

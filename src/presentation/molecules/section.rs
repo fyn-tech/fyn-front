@@ -40,6 +40,7 @@ pub fn Section(
     #[prop(default = false)] is_first: bool,
     #[prop(default = false)] centre: bool,
     #[prop(default = false)] spaced: bool,
+    #[prop(default = Size::None)] max_width: Size,
     level: SectionLevel,
     title: String,
     children: Children,
@@ -66,7 +67,10 @@ pub fn Section(
     };
 
     view! {
-        <Stack size={if spaced { Size::Lg } else { Size::Sm }} add_class={class_str}>
+        <Stack
+            size={if spaced { Size::Lg } else { Size::Sm }}
+            max_width={max_width}
+            add_class={class_str}>
             {heading}
             <Stack>
                 {children()}

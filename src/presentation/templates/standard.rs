@@ -20,9 +20,9 @@
  * ------------------------------------------------------------------------------------------------
  */
 
-
 use leptos::prelude::*;
 
+use crate::common::size::*;
 use crate::presentation::atoms::layout::*;
 use crate::presentation::organisms::footer::*;
 use crate::presentation::organisms::navigation::*;
@@ -33,12 +33,13 @@ pub fn Standard(children: Children) -> impl IntoView {
         <Stack
             horizontal=false
             fill_space=true
-            add_class="min-h-screen justify-between".to_string()
+            size=Size::Xl4
+            add_class="min-h-screen".to_string()
         >
             <Navigation/>
-            <main class="flex-1 max-w-4xl mx-auto px-8 py-8 w-full">
-                {children()}
-            </main>
+                <Stack fill_space=false size=Size::None add_class="flex-grow".to_string()>
+                    {children()}
+                </Stack>
             <Footer/>
         </Stack>
     };
